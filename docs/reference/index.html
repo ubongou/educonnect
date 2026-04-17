@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="EduConnect — Personal Tutoring from Nigeria's Best Teachers. One-on-one sessions in Maths, English, and Science. Backed by MIT.">
+<title>EduConnect | Personal Tutoring from Nigeria's Best Teachers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Nunito+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#04131C;--blue:#3EBEFF;--yellow:#FCB936;--coral:#FF693F;
+  --white:#fff;--g50:#F8F7F5;--g100:#EEECEA;--g400:#999;--g600:#555;
+  --pill:100px;--lg:16px;--md:10px;--t:.22s ease;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Nunito Sans',sans-serif;font-size:16px;color:var(--navy);background:var(--white);-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+h1,h2,h3,h4{font-family:'Nunito',sans-serif}
+.container{max-width:1100px;margin:0 auto;padding:0 40px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:12px;display:block}
+
+/* BUTTONS — all coral+navy */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 24px;border-radius:var(--pill);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:transform var(--t),box-shadow var(--t);border:2px solid var(--navy);line-height:1;background:var(--coral);color:var(--white)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.18)}
+.btn:active{transform:translateY(0);box-shadow:none}
+.btn-lg{font-size:15px;padding:14px 30px}
+.btn-outline{background:transparent;color:var(--navy);border:2px solid var(--navy)}
+.btn-outline:hover{background:rgba(4,19,28,.06)}
+
+/* NAV */
+.nav-wrap{position:sticky;top:0;z-index:100;background:var(--yellow);padding:12px 28px}
+nav{background:var(--blue);border-radius:var(--pill);max-width:1100px;margin:0 auto;padding:8px 8px 8px 24px;display:flex;align-items:center;justify-content:space-between;border:2px solid var(--navy)}
+.nav-logo{display:flex;align-items:center;gap:10px;font-family:'Nunito',sans-serif;font-size:20px;font-weight:800;color:var(--white);flex-shrink:0}
+.nav-logo-icon{width:26px;height:26px;background:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--blue);flex-shrink:0}
+.nav-right{display:flex;align-items:center;gap:0;margin-left:auto}
+.nav-links{display:flex;align-items:center;gap:28px;list-style:none;margin-right:20px}
+.nav-links a{font-size:14px;font-weight:600;color:var(--navy);transition:color var(--t)}
+.nav-links a:hover{color:var(--white)}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px}
+.hamburger span{display:block;width:22px;height:2px;background:var(--navy);border-radius:2px}
+.mobile-menu{display:none;background:var(--blue);border-radius:var(--lg);margin:10px 28px 0;border:2px solid var(--navy);overflow:hidden}
+.mobile-menu.open{display:block}
+.mobile-menu a{display:block;padding:14px 24px;font-size:15px;font-weight:600;color:var(--navy);border-bottom:1px solid rgba(4,19,28,.1)}
+.mobile-menu a:last-child{border-bottom:none}
+
+/* HERO */
+.hero{background:var(--yellow);padding:72px 40px 0;overflow:hidden;position:relative}
+.hero::before{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2304131C' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");pointer-events:none}
+.hero-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:end;position:relative}
+.hero-content{padding-bottom:80px}
+.mit-badge{display:inline-flex;align-items:center;gap:12px;background:#6B1A1A;border-radius:var(--lg);padding:10px 16px 10px 12px;margin-bottom:28px}
+.mit-badge-text{font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:var(--yellow)}
+.mit-logo-box{background:var(--white);border-radius:6px;padding:5px 10px;display:flex;align-items:center;gap:8px}
+.mit-bars{display:flex;gap:3px;align-items:flex-end}
+.mit-bars span{display:block;background:var(--navy);border-radius:1px}
+.mit-bars span:nth-child(1){width:4px;height:14px}
+.mit-bars span:nth-child(2){width:4px;height:14px}
+.mit-bars span:nth-child(3){width:4px;height:8px}
+.mit-bars span:nth-child(4){width:4px;height:14px}
+.mit-txt{font-family:'Nunito',sans-serif;font-size:10px;font-weight:700;color:var(--navy);line-height:1.3}
+.hero h1{font-size:clamp(34px,4.5vw,54px);color:var(--navy);line-height:1.1;margin-bottom:20px;font-weight:800}
+.hero-sub{font-size:17px;color:rgba(4,19,28,.7);line-height:1.72;margin-bottom:32px;max-width:460px}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.hero-small{font-size:13px;color:rgba(4,19,28,.48)}
+.hero-visual{display:flex;align-items:flex-end;justify-content:center;position:relative;min-height:440px}
+.bubble{position:absolute;background:rgba(4,19,28,.1);border:1.5px solid rgba(4,19,28,.15);border-radius:var(--md);padding:10px 16px;font-size:13px;font-weight:700;color:var(--navy);white-space:nowrap;animation:float 4s ease-in-out infinite;font-family:'Nunito',sans-serif}
+.b1{top:12%;left:0;animation-delay:0s}
+.b2{top:12%;right:0;animation-delay:1.5s}
+.b3{bottom:30%;left:4%;animation-delay:.8s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.hero-img{width:320px;height:420px;background:rgba(4,19,28,.08);border-radius:20px 20px 0 0;overflow:hidden;position:relative;z-index:1;display:flex;align-items:center;justify-content:center}
+.hero-img img{width:100%;height:100%;object-fit:cover;object-position:top}
+.img-ph{font-size:12px;color:rgba(4,19,28,.35);text-align:center;padding:20px;font-weight:500}
+
+/* INTRO STRIP — teacher trajectory theme */
+.intro{background:var(--navy);padding:0 40px}
+.intro-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:stretch}
+.intro-left{padding:56px 56px 56px 0;border-right:1px solid rgba(255,255,255,.08)}
+.intro-quote{font-family:'Nunito',sans-serif;font-size:clamp(22px,2.8vw,30px);font-weight:800;color:var(--white);line-height:1.3;position:relative}
+.intro-quote::before{content:'\201C';font-size:80px;color:var(--yellow);line-height:.6;display:block;margin-bottom:12px;font-family:'Nunito',sans-serif}
+.intro-right{padding:56px 0 56px 56px;display:flex;flex-direction:column;justify-content:center;gap:20px}
+.intro-stat{display:flex;align-items:flex-start;gap:16px}
+.intro-stat-num{font-family:'Nunito',sans-serif;font-size:36px;font-weight:800;color:var(--yellow);line-height:1;flex-shrink:0;min-width:60px}
+.intro-stat-text{font-size:14px;color:rgba(255,255,255,.55);line-height:1.65;padding-top:6px}
+.intro-divider{height:1px;background:rgba(255,255,255,.08);margin:4px 0}
+
+/* SECTIONS */
+section{padding:96px 40px}
+section.alt{background:var(--g50)}
+section.dark{background:var(--navy)}
+.sh2{font-size:clamp(26px,3.5vw,40px);color:var(--navy);line-height:1.15;font-weight:800;margin-bottom:14px}
+.sh2.light{color:var(--white)}
+.sp{font-size:16px;color:var(--g600);line-height:1.75;max-width:520px}
+.sp.light{color:rgba(255,255,255,.52)}
+.section-header{margin-bottom:52px}
+
+/* WHY CARDS — current site style: dark navy, yellow border, icon top right */
+.why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.wc{background:var(--navy);border:1.5px solid var(--yellow);border-radius:var(--lg);padding:28px;position:relative;transition:transform var(--t),box-shadow var(--t)}
+.wc:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(4,19,28,.3)}
+.wc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px}
+.wc-title{font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;color:var(--yellow);line-height:1.3;max-width:160px}
+.wc-icon{width:48px;height:48px;flex-shrink:0;opacity:.9}
+.wc-icon svg{width:100%;height:100%}
+.wc p{font-size:14px;color:rgba(255,255,255,.72);line-height:1.72}
+
+/* WHY IMAGE STRIP — integrated side-by-side like current site */
+.why-imgs{display:grid;grid-template-columns:3fr 2fr;gap:0;margin-top:28px;border-radius:var(--lg);overflow:hidden;height:300px}
+.why-img-main{overflow:hidden;background:var(--g100);display:flex;align-items:center;justify-content:center}
+.why-img-main img{width:100%;height:100%;object-fit:cover}
+.why-img-side{display:flex;flex-direction:column}
+.why-img-side-a{flex:1;overflow:hidden;background:var(--g50);border-left:4px solid var(--white);border-bottom:4px solid var(--white);display:flex;align-items:center;justify-content:center}
+.why-img-side-b{flex:1;overflow:hidden;background:var(--navy);border-left:4px solid var(--white);display:flex;align-items:center;justify-content:center}
+.why-img-side-a img,.why-img-side-b img{width:100%;height:100%;object-fit:cover}
+.img-ph-light{font-size:12px;color:var(--g400);text-align:center;padding:12px;font-weight:500}
+.img-ph-dark{font-size:12px;color:rgba(255,255,255,.3);text-align:center;padding:12px;font-weight:500}
+
+/* HOW IT WORKS — integrated image left, steps right */
+.how-wrap{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:start}
+.how-img-col{position:relative}
+.how-img-primary{width:100%;aspect-ratio:3/4;max-height:520px;border-radius:var(--lg);overflow:hidden;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center}
+.how-img-primary img{width:100%;height:100%;object-fit:cover}
+.how-img-float{position:absolute;bottom:-20px;right:-20px;width:55%;aspect-ratio:4/3;border-radius:var(--md);overflow:hidden;background:var(--yellow);border:4px solid var(--navy);display:flex;align-items:center;justify-content:center}
+.how-img-float img{width:100%;height:100%;object-fit:cover}
+.how-img-ph{font-size:11px;color:rgba(255,255,255,.3);text-align:center;padding:12px;font-weight:500}
+.how-img-ph-y{font-size:11px;color:rgba(4,19,28,.45);text-align:center;padding:12px;font-weight:500}
+.steps{display:flex;flex-direction:column;padding-bottom:20px}
+.step{display:flex;gap:20px;padding:24px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.step:last-child{border-bottom:none}
+.sn{font-family:'Nunito',sans-serif;font-size:36px;font-weight:800;color:var(--yellow);min-width:44px;line-height:1}
+.step h3{font-size:16px;font-weight:700;color:var(--white);margin-bottom:6px}
+.step p{font-size:14px;color:rgba(255,255,255,.52);line-height:1.65}
+
+/* TESTIMONIALS */
+.tg{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.tc{background:var(--white);border-radius:var(--lg);padding:28px;border:1.5px solid var(--g100);transition:transform var(--t)}
+.tc:hover{transform:translateY(-3px)}
+.tc::before{content:'\201C';font-family:'Nunito',sans-serif;font-size:64px;font-weight:800;color:var(--yellow);line-height:.8;display:block;margin-bottom:16px}
+.tc-text{font-size:14px;color:var(--g600);line-height:1.78;font-style:italic;margin-bottom:20px}
+.tc-author{font-size:13px;font-weight:700;color:var(--navy)}
+
+/* ABOUT + FOUNDERS */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.about-body{font-size:16px;color:rgba(255,255,255,.55);line-height:1.8}
+.about-mit{font-size:13px;color:rgba(255,255,255,.28);margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,.08)}
+.founders{display:flex;flex-direction:column;gap:20px}
+.fc{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:var(--lg);overflow:hidden;transition:border-color var(--t),transform var(--t)}
+.fc:hover{border-color:rgba(255,255,255,.25);transform:translateY(-2px)}
+.fc-inner{display:grid;grid-template-columns:180px 1fr}
+.fc-photo{background:rgba(62,190,255,.1);display:flex;align-items:center;justify-content:center;overflow:hidden;aspect-ratio:3/4;min-height:200px}
+.fc-photo img{width:100%;height:100%;object-fit:cover;object-position:top}
+.fc-photo-label{font-size:11px;color:rgba(255,255,255,.28);text-align:center;padding:12px;font-weight:500;line-height:1.5}
+.fc-info{padding:24px}
+.fc-name{font-size:16px;font-weight:700;color:var(--white);margin-bottom:8px}
+.fc-bio{font-size:13px;color:rgba(255,255,255,.48);line-height:1.72}
+
+/* CTA */
+.cta-block{background:var(--yellow);padding:104px 40px;text-align:center;position:relative;overflow:hidden}
+.cta-block::before{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2304131C' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");pointer-events:none}
+.cta-inner{position:relative}
+.cta-h2{font-size:clamp(28px,4vw,48px);color:var(--navy);margin-bottom:16px;font-weight:800}
+.cta-sub{font-size:18px;color:rgba(4,19,28,.62);margin-bottom:36px}
+.cta-small{font-size:13px;color:rgba(4,19,28,.42);margin-top:14px}
+
+/* CONTACT */
+.contact-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:72px;align-items:start}
+.contact-body{font-size:15px;color:rgba(255,255,255,.52);line-height:1.75;margin-bottom:28px}
+.cd{display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,.55);margin-bottom:10px}
+.cd a{color:var(--blue)}
+.social-links{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap}
+.sl{display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:var(--pill);font-size:13px;font-weight:600;border:1.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);transition:border-color var(--t),color var(--t),background var(--t);font-family:'Nunito',sans-serif}
+.sl:hover{border-color:rgba(255,255,255,.5);color:var(--white);background:rgba(255,255,255,.06)}
+.sl svg{width:16px;height:16px;flex-shrink:0}
+.cf{display:flex;flex-direction:column;gap:14px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fg{display:flex;flex-direction:column;gap:7px}
+.fg label{font-size:13px;font-weight:600;color:rgba(255,255,255,.55)}
+.fg input,.fg select,.fg textarea{background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.14);border-radius:var(--md);padding:13px 16px;font-family:'Nunito Sans',sans-serif;font-size:14px;color:var(--white);outline:none;transition:border-color var(--t);width:100%}
+.fg input::placeholder,.fg textarea::placeholder{color:rgba(255,255,255,.28)}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--blue)}
+.fg select option{background:var(--navy)}
+.fg textarea{resize:vertical;min-height:110px}
+.form-ok{display:none;background:rgba(62,190,255,.08);border:1px solid rgba(62,190,255,.25);border-radius:var(--md);padding:24px;text-align:center;color:var(--blue);font-size:15px;font-weight:600}
+
+/* FOOTER */
+footer{background:#020d13;padding:40px;border-top:1px solid rgba(255,255,255,.05)}
+.fi{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.fl-logo{font-family:'Nunito',sans-serif;font-size:20px;font-weight:800;color:var(--blue)}
+.fl{display:flex;gap:24px;list-style:none}
+.fl a{font-size:13px;color:rgba(255,255,255,.35);transition:color var(--t)}
+.fl a:hover{color:rgba(255,255,255,.7)}
+.fl-legal{font-size:12px;color:rgba(255,255,255,.18)}
+
+/* FADE */
+.fi-{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+.fi-.v{opacity:1;transform:translateY(0)}
+
+/* MOBILE */
+@media(max-width:860px){
+  .nav-wrap{padding:10px 16px}
+  .nav-links{display:none}
+  .hamburger{display:flex}
+  section{padding:64px 20px}
+  .hero{padding:48px 20px 0}
+  .hero-inner{grid-template-columns:1fr}
+  .hero-visual{display:none}
+  .hero-content{padding-bottom:56px}
+  .intro{padding:0 20px}
+  .intro-inner{grid-template-columns:1fr}
+  .intro-left{padding:40px 0;border-right:none;border-bottom:1px solid rgba(255,255,255,.08)}
+  .intro-right{padding:40px 0}
+  .why-grid,.tg{grid-template-columns:1fr}
+  .why-imgs{grid-template-columns:1fr;height:220px}
+  .why-img-side{display:none}
+  .how-wrap{grid-template-columns:1fr}
+  .how-img-col{display:none}
+  .about-grid,.contact-grid{grid-template-columns:1fr;gap:40px}
+  .fc-inner{grid-template-columns:1fr}
+  .fc-photo{aspect-ratio:4/3;min-height:200px}
+  .fr{grid-template-columns:1fr}
+  .fi{flex-direction:column;align-items:flex-start}
+  .social-links{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="nav-wrap">
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <!-- TO USE YOUR LOGO: replace with <img src="logo.png" style="height:32px;"> -->
+      <div class="nav-logo-icon">e</div>
+      educonnect
+    </a>
+    <div class="nav-right">
+      <ul class="nav-links">
+        <li><a href="#why">Why EduConnect</a></li>
+        <li><a href="#founders">About</a></li>
+        <li><a href="pricing.html">Pricing</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <a href="https://calendar.app.google/ZiNbAvQkBaYHMVY69" target="_blank" class="btn">Book a Free Session</a>
+    </div>
+    <div class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#why">Why EduConnect</a>
+    <a href="#founders">About</a>
+    <a href="pricing.html">Pricing</a>
+    <a href="#contact">Contact</a>
+    <a href="https://calendar.app.google/ZiNbAvQkBaYHMVY69" target="_blank">Book a Free Session</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-content fi-">
+      <div class="mit-badge">
+        <span class="mit-badge-text">Backed by</span>
+        <div class="mit-logo-box">
+          <div class="mit-bars"><span></span><span></span><span></span><span></span></div>
+          <div class="mit-txt">Massachusetts<br>Institute of<br>Technology</div>
+        </div>
+      </div>
+      <h1>Personal Tutoring from Nigeria's Best Teachers</h1>
+      <p class="hero-sub">EduConnect is a tutoring service that provides your children with private, one-on-one instruction from Nigeria's finest educators — rigorously vetted, carefully matched, and deeply invested in every child they teach.</p>
+      <div class="hero-btns">
+        <a href="https://calendar.app.google/ZiNbAvQkBaYHMVY69" target="_blank" class="btn btn-lg">Book a free session</a>
+        <a href="#how-it-works" class="btn btn-outline btn-lg">How it works</a>
+      </div>
+      <p class="hero-small">No commitment. Takes 15 minutes.</p>
+    </div>
+    <div class="hero-visual">
+      <div class="bubble b1">Every child can excel</div>
+      <div class="bubble b2">Nigeria's finest teachers</div>
+      <div class="bubble b3">Maths, English &amp; Science</div>
+      <div class="hero-img">
+        <!-- Replace with: <img src="hero-student.jpg" alt="EduConnect student"> -->
+        <p class="img-ph">Add your hero image here</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INTRO STRIP — teacher trajectory theme -->
+<div class="intro">
+  <div class="intro-inner">
+    <div class="intro-left fi-">
+      <div class="intro-quote">
+        The right teacher doesn't just improve a grade. They change how a child sees themselves.
+      </div>
+    </div>
+    <div class="intro-right fi-" style="transition-delay:.12s">
+      <div class="intro-stat">
+        <div class="intro-stat-num">200+</div>
+        <div class="intro-stat-text">Children across Nigeria, the UK, the US, and Canada have experienced what the right teacher can do.</div>
+      </div>
+      <div class="intro-divider"></div>
+      <div class="intro-stat">
+        <div class="intro-stat-num">4.9</div>
+        <div class="intro-stat-text">Average satisfaction rating from parents — who consistently tell us the change is visible inside and outside the classroom.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WHY EDUCONNECT -->
+<section id="why">
+  <div class="container">
+    <div class="section-header fi-">
+      <span class="eyebrow">Why EduConnect</span>
+      <h2 class="sh2">What sets our teachers apart</h2>
+      <p class="sp">We do not list tutors for parents to browse. We select, vet, and place the right teacher for each child.</p>
+    </div>
+    <div class="why-grid">
+      <!-- Card 1: Exceptional Teachers -->
+      <div class="wc fi-">
+        <div class="wc-top">
+          <div class="wc-title">Exceptional Teachers</div>
+          <div class="wc-icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="8" y="10" width="32" height="22" rx="3" stroke="white" stroke-width="2.5" fill="none"/>
+              <rect x="14" y="32" width="20" height="4" rx="1" stroke="white" stroke-width="2" fill="none"/>
+              <circle cx="24" cy="21" r="5" stroke="white" stroke-width="2.5" fill="none"/>
+              <line x1="10" y1="44" x2="38" y2="44" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+        <p>Learn from passionate educators who bring out the best in every student. Our teachers are carefully selected for their expertise, empathy, and ability to inspire confidence in learners.</p>
+      </div>
+      <!-- Card 2: Flexible Child-Centered Learning -->
+      <div class="wc fi-" style="transition-delay:.12s">
+        <div class="wc-top">
+          <div class="wc-title">Flexible, Child-Centered Learning</div>
+          <div class="wc-icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="24" cy="14" r="6" stroke="white" stroke-width="2.5" fill="none"/>
+              <path d="M10 38c0-7.732 6.268-14 14-14s14 6.268 14 14" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <circle cx="36" cy="20" r="4" stroke="white" stroke-width="2" fill="none"/>
+              <path d="M40 34c0-5-2.686-8-4-8" stroke="white" stroke-width="2" stroke-linecap="round" fill="none"/>
+            </svg>
+          </div>
+        </div>
+        <p>We work around your schedule, not the other way around. Choose the times, formats, and goals that suit your child's needs — all while staying informed and involved every step of the way.</p>
+      </div>
+      <!-- Card 3: Academic and Personal Growth -->
+      <div class="wc fi-" style="transition-delay:.24s">
+        <div class="wc-top">
+          <div class="wc-title">Academic and Personal Growth</div>
+          <div class="wc-icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polyline points="8,34 18,22 26,28 38,12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <polyline points="32,12 38,12 38,18" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+          </div>
+        </div>
+        <p>Our approach goes beyond test scores. We help students build confidence, resilience, and a genuine love for learning. Every session is a step toward becoming a more capable, self-assured learner.</p>
+      </div>
+    </div>
+
+    <!-- INTEGRATED IMAGE STRIP -->
+    <div class="why-imgs fi-" style="transition-delay:.15s">
+      <div class="why-img-main">
+        <!-- Replace with: <img src="students-class.jpg" alt="Students learning"> -->
+        <p class="img-ph-light">Add image here — students in a session</p>
+      </div>
+      <div class="why-img-side">
+        <div class="why-img-side-a">
+          <!-- Replace with: <img src="teacher.jpg" alt="Teacher"> -->
+          <p class="img-ph-light" style="font-size:11px">Add image — teacher</p>
+        </div>
+        <div class="why-img-side-b">
+          <!-- Replace with: <img src="progress.jpg" alt="Student progress"> -->
+          <p class="img-ph-dark" style="font-size:11px">Add image — student</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="dark" id="how-it-works">
+  <div class="container">
+    <div class="how-wrap">
+      <!-- IMAGE COLUMN — integrated with floating overlay -->
+      <div class="how-img-col fi-">
+        <div class="how-img-primary">
+          <!-- Replace with: <img src="session-online.jpg" alt="Online tutoring session"> -->
+          <p class="how-img-ph">Add image here — online session in progress</p>
+        </div>
+        <div class="how-img-float">
+          <!-- Replace with: <img src="student-happy.jpg" alt="Happy student"> -->
+          <p class="how-img-ph-y" style="font-size:11px">Add image — student</p>
+        </div>
+      </div>
+      <!-- STEPS -->
+      <div>
+        <div class="section-header fi-" style="transition-delay:.1s">
+          <span class="eyebrow">How it works</span>
+          <h2 class="sh2 light">Four steps to better results</h2>
+          <p class="sp light">From your first conversation to visible progress at school — here is what to expect.</p>
+        </div>
+        <div class="steps">
+          <div class="step fi-" style="transition-delay:.15s">
+            <div class="sn">1</div>
+            <div><h3>Book a free consultation</h3><p>Tell us your child's year group, subjects, and goals. Takes 15 minutes.</p></div>
+          </div>
+          <div class="step fi-" style="transition-delay:.22s">
+            <div class="sn">2</div>
+            <div><h3>We match your teacher</h3><p>We select a teacher based on your child's needs, learning style, and personality — not just availability.</p></div>
+          </div>
+          <div class="step fi-" style="transition-delay:.29s">
+            <div class="sn">3</div>
+            <div><h3>Sessions begin</h3><p>Flexible scheduling, one-on-one, fully online. Lessons adapt as your child grows.</p></div>
+          </div>
+          <div class="step fi-" style="transition-delay:.36s">
+            <div class="sn">4</div>
+            <div><h3>Results and updates</h3><p>Better grades, stronger confidence, and a changed attitude toward learning. You receive regular progress updates throughout.</p></div>
+          </div>
+        </div>
+        <div style="margin-top:36px" class="fi-" style="transition-delay:.4s">
+          <a href="https://calendar.app.google/ZiNbAvQkBaYHMVY69" target="_blank" class="btn">Book a free session</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="alt">
+  <div class="container">
+    <div class="section-header fi-">
+      <span class="eyebrow">What parents say</span>
+      <h2 class="sh2">Real results, real families</h2>
+    </div>
+    <div class="tg">
+      <div class="tc fi-">
+        <p class="tc-text">"The tutors have been outstanding — patient, professional, and deeply committed. I would wholeheartedly recommend EduConnect to any parent looking to see tangible improvement in their children's learning journey."</p>
+        <span class="tc-author">Andrew Ugbehe — Scotland, UK</span>
+      </div>
+      <div class="tc fi-" style="transition-delay:.12s">
+        <p class="tc-text">"Since I started using this service, my child's performance has improved. The lesson teacher is good at what she does, and I have recommended their services to other parents and will continue to do so."</p>
+        <span class="tc-author">Mrs. Frilster — United Kingdom</span>
+      </div>
+      <div class="tc fi-" style="transition-delay:.24s">
+        <p class="tc-text">"Our daughter gets excited to connect with her EduConnect tutor. Her attitude toward learning mathematics has changed completely. Her self-confidence has increased and she is eager to learn new concepts."</p>
+        <span class="tc-author">Mrs. Joanne — United States</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT + FOUNDERS -->
+<section class="dark" id="founders">
+  <div class="container">
+    <div class="about-grid">
+      <div class="fi-">
+        <span class="eyebrow">About</span>
+        <h2 class="sh2 light" style="margin-bottom:20px">Built on one belief: teaching quality determines everything</h2>
+        <p class="about-body">EduConnect was built on a simple belief: the quality of teaching determines everything. We recruit and vet Nigeria's most capable teachers, then work with families across Nigeria, the UK, the US, and Canada to give every child access to genuinely excellent instruction. We are a tutoring service — not a platform. That means we stay accountable for every teacher we place and every child we serve.</p>
+        <p class="about-mit">Backed by MIT.</p>
+      </div>
+      <div class="fi-" style="transition-delay:.15s">
+        <span class="eyebrow" style="margin-bottom:20px">Meet the founders</span>
+        <div class="founders">
+          <div class="fc">
+            <div class="fc-inner">
+              <div class="fc-photo">
+                <!-- TO ADD UNYIME'S PHOTO: <img src="unyime.jpg" alt="Unyime Okorosobo"> -->
+                <p class="fc-photo-label">Add photo<br>of Unyime here</p>
+              </div>
+              <div class="fc-info">
+                <p class="fc-name">Unyime Okorosobo</p>
+                <p class="fc-bio">Unyime holds a Master's in International Education from the University of Manchester and a B.Sc. in Computer Science from Bowen University. A third-generation educator with more than 15 years in classrooms and school leadership, she was named one of Nigeria's 50 Most Inspirational Teachers in 2023. She is a Microsoft Certified Educator, has trained thousands of teachers on classroom technology integration, and runs Strategic Maths — an initiative transforming how numeracy is taught across Nigerian schools. Her work sits at the intersection of educational excellence and lasting systemic change.</p>
+              </div>
+            </div>
+          </div>
+          <div class="fc">
+            <div class="fc-inner">
+              <div class="fc-photo">
+                <!-- TO ADD GRACE'S PHOTO: <img src="grace.jpg" alt="Grace Amoka"> -->
+                <p class="fc-photo-label">Add photo<br>of Grace here</p>
+              </div>
+              <div class="fc-info">
+                <p class="fc-name">Grace Amoka</p>
+                <p class="fc-bio">Grace holds a degree in Computer Engineering from Covenant University and a Master's in Educational Technology from the University of Ilorin. With over nine years of experience as a teacher, coach, and education consultant, she has worked across K-12 systems on three continents, consulted for the World Bank, and served as a programme coordinator at the African Leadership Academy and Teach for Nigeria — training over 400 educators across more than seven countries. She brings rare rigour and operational depth to everything she builds.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<div class="cta-block">
+  <div class="cta-inner">
+    <h2 class="cta-h2 fi-">Ready to get started?</h2>
+    <p class="cta-sub fi-">Book a free consultation and we'll find the right teacher for your child.</p>
+    <a href="https://calendar.app.google/ZiNbAvQkBaYHMVY69" target="_blank" class="btn btn-lg fi-">Book a free session</a>
+    <p class="cta-small fi-">No commitment. Takes 15 minutes.</p>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<section class="dark" id="contact">
+  <div class="container">
+    <div class="contact-grid">
+      <div class="fi-">
+        <span class="eyebrow">Get in touch</span>
+        <h2 class="sh2 light" style="margin-bottom:16px">Let's talk</h2>
+        <p class="contact-body">Have questions before booking? Send us a message and we'll get back to you within 24 hours.</p>
+        <div class="cd"><span>✉</span><a href="mailto:admin@joineduconnect.com">admin@joineduconnect.com</a></div>
+        <div class="cd"><span>🌐</span><a href="https://www.joineduconnect.com">joineduconnect.com</a></div>
+        <div class="social-links">
+          <a href="https://instagram.com/joineduconnect" target="_blank" class="sl">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none"/></svg>Instagram
+          </a>
+          <a href="https://facebook.com/joineduconnect" target="_blank" class="sl">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>Facebook
+          </a>
+          <a href="https://wa.me/YOURPHONENUMBER" target="_blank" class="sl">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.111.549 4.1 1.51 5.833L.036 23.25l5.584-1.463A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-5.015-1.375l-.36-.214-3.716.974.991-3.625-.235-.373A9.818 9.818 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>WhatsApp
+          </a>
+        </div>
+      </div>
+      <div class="fi-" style="transition-delay:.15s">
+        <form class="cf" id="contactForm" onsubmit="handleSubmit(event)">
+          <div class="fr">
+            <div class="fg"><label>Your name</label><input type="text" placeholder="e.g. Adaeze Obi" required></div>
+            <div class="fg"><label>Email address</label><input type="email" placeholder="your@email.com" required></div>
+          </div>
+          <div class="fg">
+            <label>Subject</label>
+            <select><option value="">Select a subject</option><option>Maths</option><option>English</option><option>Science</option><option>Multiple subjects</option><option>General enquiry</option></select>
+          </div>
+          <div class="fg"><label>Message</label><textarea placeholder="Tell us about your child and what support you're looking for..."></textarea></div>
+          <button type="submit" class="btn" style="align-self:flex-start">Send message</button>
+        </form>
+        <div class="form-ok" id="formOk">Message sent! We'll be in touch within 24 hours.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="fi">
+    <div class="fl-logo">e educonnect</div>
+    <ul class="fl">
+      <li><a href="#why">Why EduConnect</a></li>
+      <li><a href="#founders">About</a></li>
+      <li><a href="pricing.html">Pricing</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <p class="fl-legal">© 2025 EduConnect · joineduconnect.com</p>
+  </div>
+</footer>
+
+<script>
+function toggleMenu(){document.getElementById('mobileMenu').classList.toggle('open')}
+const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('v')})},{threshold:.08,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.fi-').forEach(el=>obs.observe(el));
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',function(e){
+    const t=document.querySelector(this.getAttribute('href'));
+    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});document.getElementById('mobileMenu').classList.remove('open')}
+  })
+});
+function handleSubmit(e){e.preventDefault();document.getElementById('contactForm').style.display='none';document.getElementById('formOk').style.display='block'}
+</script>
+</body>
+</html>
