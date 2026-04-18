@@ -12,6 +12,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Reference material / non-source trees:
+    "docs/**",
+    "educlone/**",
+    "supabase/**",
+    "public/**",
   ]),
 ]);
 
