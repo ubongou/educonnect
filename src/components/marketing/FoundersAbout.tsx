@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { IntersectionFade } from "@/components/ui/IntersectionFade";
@@ -5,13 +6,13 @@ import { IntersectionFade } from "@/components/ui/IntersectionFade";
 const founders = [
   {
     name: "Unyime Okorosobo",
+    photo: "/founders/unyime-okorosobo.jpeg",
     bio: "Unyime holds a Master's in International Education from the University of Manchester and a B.Sc. in Computer Science from Bowen University. A third-generation educator with more than 15 years in classrooms and school leadership, she was named one of Nigeria's 50 Most Inspirational Teachers in 2023. She is a Microsoft Certified Educator, has trained thousands of teachers on classroom technology integration, and runs Strategic Maths — an initiative transforming how numeracy is taught across Nigerian schools. Her work sits at the intersection of educational excellence and lasting systemic change.",
-    photoLabel: "Add photo\nof Unyime here",
   },
   {
     name: "Grace Amoka",
+    photo: "/founders/grace-amoka.png",
     bio: "Grace holds a degree in Computer Engineering from Covenant University and a Master's in Educational Technology from the University of Ilorin. With over nine years of experience as a teacher, coach, and education consultant, she has worked across K-12 systems on three continents, consulted for the World Bank, and served as a programme coordinator at the African Leadership Academy and Teach for Nigeria — training over 400 educators across more than seven countries. She brings rare rigour and operational depth to everything she builds.",
-    photoLabel: "Add photo\nof Grace here",
   },
 ];
 
@@ -46,10 +47,15 @@ export function FoundersAbout() {
                   className="overflow-hidden rounded-lg border border-white/10 bg-white/5 transition-colors hover:border-white/25"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-[180px_1fr]">
-                    <div className="flex min-h-[200px] items-center justify-center overflow-hidden bg-blue/10 md:aspect-[3/4]">
-                      <p className="whitespace-pre-line p-3 text-center text-[11px] font-medium leading-[1.5] text-white/30">
-                        {f.photoLabel}
-                      </p>
+                    <div className="relative min-h-[240px] overflow-hidden bg-blue/10 md:min-h-0 md:aspect-[3/4]">
+                      <Image
+                        src={f.photo}
+                        alt={f.name}
+                        fill
+                        sizes="(min-width: 768px) 180px, 100vw"
+                        className="object-cover object-top"
+                        priority={false}
+                      />
                     </div>
                     <div className="p-6">
                       <p className="mb-2 font-heading text-base font-bold text-white">{f.name}</p>

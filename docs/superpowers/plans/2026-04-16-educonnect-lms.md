@@ -127,6 +127,14 @@ This lists what each file is responsible for. Paths are relative to repo root.
 - **Each task ends with a commit** so the branch stays green.
 - **RLS is the source of truth** for authorization. Server actions rely on user-scoped Supabase clients; the service role key is only used by the download route handler after explicit verification.
 
+## Assets
+
+- **`public/founders/unyime-okorosobo.jpeg`, `public/founders/grace-amoka.png`** — client-provided founder photos, wired into `FoundersAbout.tsx` via `next/image`.
+- **`Educonnect Brand Guide PDF.pdf`** at repo root — design reference (brand colors, fonts, logo system).
+- **`assets/`** at repo root — additional client-provided WhatsApp images (uncommitted; user decides).
+- **`educlone/`** at repo root — **gitignored**. HTTrack clone of the legacy site at **https://www.joineduconnect.com/**. Useful as copy/imagery reference, but the Wix CDN thumbnails in `static.wixstatic.com/…/quality_auto/…` are aggressively compressed and low-resolution (avif, blur_2, ~147px wide) — request originals from the client before using any of them in the Next app.
+- **Hero / session imagery placeholders** currently live as labelled boxes in `Hero.tsx`, `WhyGrid.tsx`, `HowItWorks.tsx` — swap with real photos when the client supplies them.
+
 ---
 
 ## Task 1: Scaffold Next.js 15 project
