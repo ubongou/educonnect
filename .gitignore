@@ -28,6 +28,9 @@
 .claude/
 /tmp/
 
+# HTTrack clone of the legacy joineduconnect.com site — kept locally for asset reference
+educlone/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
