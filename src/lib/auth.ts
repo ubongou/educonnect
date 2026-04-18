@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import type { Role } from "@/types/db";
+import type { Role } from "@/types/domain";
 
 export type CurrentProfile = {
   id: string;
@@ -31,7 +31,10 @@ export async function getProfile(): Promise<CurrentProfile | null> {
     .eq("id", user.id)
     .single();
 
-  return data ?? null;
+  if (!data) return null;
+  // Narrow role from DB-side `string` to our literal union. The CHECK
+  // constraint on profiles.role guarantees one of these values.
+  return { ...data, role: data.role as Role };
 }
 
 /**

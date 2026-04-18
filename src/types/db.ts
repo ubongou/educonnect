@@ -1,380 +1,645 @@
-/**
- * Supabase `Database` type for EduConnect LMS.
- *
- * This file is hand-authored to mirror the schema defined in
- * `supabase/migrations/0001_init.sql` because Docker is not running locally
- * and we can't invoke `npm run db:types` against the Supabase CLI stack yet.
- *
- * When Docker is running (or a cloud project has been linked), regenerate
- * this file authoritatively with:
- *
- *     npm run db:types
- *
- * That command is defined in package.json as
- *     supabase gen types typescript --local > src/types/db.ts
- *
- * Until then, treat the types below as the canonical shape and keep them in
- * sync with migrations.
- */
-
 export type Json =
   | string
   | number
   | boolean
   | null
   | { [key: string]: Json | undefined }
-  | Json[];
-
-export type Role = "parent" | "admin";
-
-export type Gender = "male" | "female" | "prefer_not_to_say";
-
-export type Curriculum =
-  | "british"
-  | "nigerian"
-  | "american"
-  | "not_sure"
-  | "other";
-
-export type IntakeFileKind = "curriculum" | "school_report" | "class_notes";
-
-export type EnrollmentStatus = "pending" | "approved" | "rejected";
-
-// -----------------------------------------------------------------------------
-// Intake JSONB shape (validated at the app layer via zod in src/lib/validation)
-// -----------------------------------------------------------------------------
-
-export type IntakeJson = {
-  learning_background?: {
-    prior_tutoring?: "yes" | "no";
-    prior_tutoring_notes?: string;
-    recent_changes?: string;
-  };
-  strengths?: {
-    enjoys_or_excels_at?: string;
-    confident_situations?: string;
-    interests?: Array<
-      "reading" | "writing" | "music" | "sports" | "art" | "games" | "technology"
-    >;
-  };
-  challenges?: {
-    challenging_areas?: string;
-    struggling_subjects?: string;
-    response_when_difficult?:
-      | "tries_again"
-      | "asks_for_help"
-      | "gets_frustrated"
-      | "withdraws"
-      | "it_depends";
-    main_concerns?: string;
-  };
-  motivation?: {
-    motivators?: Array<
-      | "praise"
-      | "rewards"
-      | "challenge"
-      | "independence"
-      | "competition"
-      | "structured_guidance"
-      | "not_sure"
-    >;
-    demotivators?: string;
-  };
-  behaviour?: {
-    attention_span?:
-      | "very_focused"
-      | "short_bursts"
-      | "easily_distracted"
-      | "needs_supervision"
-      | "varies";
-    work_preference?: "alone" | "with_guidance" | "mix";
-    how_communicates_confusion?: string;
-    helpful_routines?: string;
-  };
-  personality?: {
-    description?: string;
-    traits?: Array<
-      | "quiet"
-      | "talkative"
-      | "curious"
-      | "shy"
-      | "confident"
-      | "careful"
-      | "perfectionist"
-      | "easily_distracted"
-      | "reflective"
-      | "independent"
-    >;
-    verbal_expression_comfort?: 1 | 2 | 3 | 4 | 5;
-  };
-  goals?: {
-    improvement_8_12_weeks?: string;
-    breakthrough_priority?: string;
-  };
-};
-
-// -----------------------------------------------------------------------------
-// Database type (Supabase-client-compatible shape)
-// -----------------------------------------------------------------------------
+  | Json[]
 
 export type Database = {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
-      profiles: {
-        Row: {
-          id: string;
-          role: Role;
-          full_name: string | null;
-          phone: string | null;
-          email: string | null;
-          created_at: string;
-        };
-        Insert: {
-          id: string;
-          role?: Role;
-          full_name?: string | null;
-          phone?: string | null;
-          email?: string | null;
-          created_at?: string;
-        };
-        Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
-        Relationships: [];
-      };
-      students: {
-        Row: {
-          id: string;
-          registration_number: string;
-          full_name: string;
-          preferred_name: string | null;
-          age: number | null;
-          gender: Gender | null;
-          current_school: string | null;
-          curriculum: Curriculum | null;
-          curriculum_other: string | null;
-          intake: IntakeJson;
-          intake_submitted_at: string | null;
-          added_by: string | null;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          registration_number: string;
-          full_name: string;
-          preferred_name?: string | null;
-          age?: number | null;
-          gender?: Gender | null;
-          current_school?: string | null;
-          curriculum?: Curriculum | null;
-          curriculum_other?: string | null;
-          intake?: IntakeJson;
-          intake_submitted_at?: string | null;
-          added_by?: string | null;
-          created_at?: string;
-        };
-        Update: Partial<Database["public"]["Tables"]["students"]["Insert"]>;
-        Relationships: [];
-      };
-      parent_students: {
-        Row: {
-          parent_id: string;
-          student_id: string;
-          created_at: string;
-        };
-        Insert: {
-          parent_id: string;
-          student_id: string;
-          created_at?: string;
-        };
-        Update: Partial<Database["public"]["Tables"]["parent_students"]["Insert"]>;
-        Relationships: [];
-      };
-      intake_files: {
-        Row: {
-          id: string;
-          student_id: string;
-          kind: IntakeFileKind;
-          original_filename: string;
-          storage_path: string;
-          mime_type: string | null;
-          size_bytes: number | null;
-          uploaded_at: string;
-        };
-        Insert: {
-          id?: string;
-          student_id: string;
-          kind: IntakeFileKind;
-          original_filename: string;
-          storage_path: string;
-          mime_type?: string | null;
-          size_bytes?: number | null;
-          uploaded_at?: string;
-        };
-        Update: Partial<Database["public"]["Tables"]["intake_files"]["Insert"]>;
-        Relationships: [];
-      };
-      subjects: {
-        Row: {
-          id: string;
-          name: string;
-          slug: string;
-          is_archived: boolean;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          name: string;
-          slug: string;
-          is_archived?: boolean;
-          created_at?: string;
-        };
-        Update: Partial<Database["public"]["Tables"]["subjects"]["Insert"]>;
-        Relationships: [];
-      };
-      subject_skills: {
-        Row: {
-          id: string;
-          subject_id: string;
-          name: string;
-          description: string | null;
-          sort_order: number;
-        };
-        Insert: {
-          id?: string;
-          subject_id: string;
-          name: string;
-          description?: string | null;
-          sort_order?: number;
-        };
-        Update: Partial<Database["public"]["Tables"]["subject_skills"]["Insert"]>;
-        Relationships: [];
-      };
       enrollments: {
         Row: {
-          id: string;
-          student_id: string;
-          subject_id: string;
-          requested_by: string;
-          status: EnrollmentStatus;
-          decided_by: string | null;
-          decided_at: string | null;
-          created_at: string;
-        };
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          id: string
+          requested_by: string
+          status: string
+          student_id: string
+          subject_id: string
+        }
         Insert: {
-          id?: string;
-          student_id: string;
-          subject_id: string;
-          requested_by: string;
-          status?: EnrollmentStatus;
-          decided_by?: string | null;
-          decided_at?: string | null;
-          created_at?: string;
-        };
-        Update: Partial<Database["public"]["Tables"]["enrollments"]["Insert"]>;
-        Relationships: [];
-      };
-      lesson_reports: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          requested_by: string
+          status?: string
+          student_id: string
+          subject_id: string
+        }
+        Update: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          requested_by?: string
+          status?: string
+          student_id?: string
+          subject_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enrollments_decided_by_fkey"
+            columns: ["decided_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enrollments_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enrollments_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enrollments_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      intake_files: {
         Row: {
-          id: string;
-          student_id: string;
-          subject_id: string;
-          lesson_date: string;
-          duration_minutes: number;
-          lesson_focus: string;
-          understanding_check: number;
-          confidence_level: number;
-          lesson_highlights: string | null;
-          participation: number;
-          focus_rating: number;
-          homework: number;
-          next_focus: string | null;
-          how_to_help_at_home: string | null;
-          uploaded_by: string;
-          emailed_at: string | null;
-          created_at: string;
-        };
+          id: string
+          kind: string
+          mime_type: string | null
+          original_filename: string
+          size_bytes: number | null
+          storage_path: string
+          student_id: string
+          uploaded_at: string
+        }
         Insert: {
-          id?: string;
-          student_id: string;
-          subject_id: string;
-          lesson_date: string;
-          duration_minutes: number;
-          lesson_focus: string;
-          understanding_check: number;
-          confidence_level: number;
-          lesson_highlights?: string | null;
-          participation: number;
-          focus_rating: number;
-          homework: number;
-          next_focus?: string | null;
-          how_to_help_at_home?: string | null;
-          uploaded_by: string;
-          emailed_at?: string | null;
-          created_at?: string;
-        };
-        Update: Partial<Database["public"]["Tables"]["lesson_reports"]["Insert"]>;
-        Relationships: [];
-      };
+          id?: string
+          kind: string
+          mime_type?: string | null
+          original_filename: string
+          size_bytes?: number | null
+          storage_path: string
+          student_id: string
+          uploaded_at?: string
+        }
+        Update: {
+          id?: string
+          kind?: string
+          mime_type?: string | null
+          original_filename?: string
+          size_bytes?: number | null
+          storage_path?: string
+          student_id?: string
+          uploaded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "intake_files_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lesson_report_skill_ratings: {
         Row: {
-          lesson_report_id: string;
-          skill_id: string;
-          rating: number;
-        };
+          lesson_report_id: string
+          rating: number
+          skill_id: string
+        }
         Insert: {
-          lesson_report_id: string;
-          skill_id: string;
-          rating: number;
-        };
-        Update: Partial<
-          Database["public"]["Tables"]["lesson_report_skill_ratings"]["Insert"]
-        >;
-        Relationships: [];
-      };
-    };
-    Views: Record<string, never>;
+          lesson_report_id: string
+          rating: number
+          skill_id: string
+        }
+        Update: {
+          lesson_report_id?: string
+          rating?: number
+          skill_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_report_skill_ratings_lesson_report_id_fkey"
+            columns: ["lesson_report_id"]
+            isOneToOne: false
+            referencedRelation: "lesson_reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lesson_report_skill_ratings_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "subject_skills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lesson_reports: {
+        Row: {
+          confidence_level: number
+          created_at: string
+          duration_minutes: number
+          emailed_at: string | null
+          focus_rating: number
+          homework: number
+          how_to_help_at_home: string | null
+          id: string
+          lesson_date: string
+          lesson_focus: string
+          lesson_highlights: string | null
+          next_focus: string | null
+          participation: number
+          student_id: string
+          subject_id: string
+          understanding_check: number
+          uploaded_by: string
+        }
+        Insert: {
+          confidence_level: number
+          created_at?: string
+          duration_minutes: number
+          emailed_at?: string | null
+          focus_rating: number
+          homework: number
+          how_to_help_at_home?: string | null
+          id?: string
+          lesson_date: string
+          lesson_focus: string
+          lesson_highlights?: string | null
+          next_focus?: string | null
+          participation: number
+          student_id: string
+          subject_id: string
+          understanding_check: number
+          uploaded_by: string
+        }
+        Update: {
+          confidence_level?: number
+          created_at?: string
+          duration_minutes?: number
+          emailed_at?: string | null
+          focus_rating?: number
+          homework?: number
+          how_to_help_at_home?: string | null
+          id?: string
+          lesson_date?: string
+          lesson_focus?: string
+          lesson_highlights?: string | null
+          next_focus?: string | null
+          participation?: number
+          student_id?: string
+          subject_id?: string
+          understanding_check?: number
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_reports_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lesson_reports_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lesson_reports_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parent_students: {
+        Row: {
+          created_at: string
+          parent_id: string
+          student_id: string
+        }
+        Insert: {
+          created_at?: string
+          parent_id: string
+          student_id: string
+        }
+        Update: {
+          created_at?: string
+          parent_id?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parent_students_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parent_students_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          phone: string | null
+          role: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          role?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          role?: string
+        }
+        Relationships: []
+      }
+      students: {
+        Row: {
+          added_by: string | null
+          age: number | null
+          created_at: string
+          current_school: string | null
+          curriculum: string | null
+          curriculum_other: string | null
+          full_name: string
+          gender: string | null
+          id: string
+          intake: Json
+          intake_submitted_at: string | null
+          preferred_name: string | null
+          registration_number: string
+        }
+        Insert: {
+          added_by?: string | null
+          age?: number | null
+          created_at?: string
+          current_school?: string | null
+          curriculum?: string | null
+          curriculum_other?: string | null
+          full_name: string
+          gender?: string | null
+          id?: string
+          intake?: Json
+          intake_submitted_at?: string | null
+          preferred_name?: string | null
+          registration_number: string
+        }
+        Update: {
+          added_by?: string | null
+          age?: number | null
+          created_at?: string
+          current_school?: string | null
+          curriculum?: string | null
+          curriculum_other?: string | null
+          full_name?: string
+          gender?: string | null
+          id?: string
+          intake?: Json
+          intake_submitted_at?: string | null
+          preferred_name?: string | null
+          registration_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "students_added_by_fkey"
+            columns: ["added_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subject_skills: {
+        Row: {
+          description: string | null
+          id: string
+          name: string
+          sort_order: number
+          subject_id: string
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          name: string
+          sort_order?: number
+          subject_id: string
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          name?: string
+          sort_order?: number
+          subject_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subject_skills_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subjects: {
+        Row: {
+          created_at: string
+          id: string
+          is_archived: boolean
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_archived?: boolean
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_archived?: boolean
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
     Functions: {
-      is_admin: {
-        Args: { uid: string };
-        Returns: boolean;
-      };
-      next_registration_number: {
-        Args: Record<string, never>;
-        Returns: string;
-      };
-      create_student_with_intake: {
-        Args: {
-          p_full_name: string;
-          p_preferred_name: string | null;
-          p_age: number | null;
-          p_gender: Gender | null;
-          p_current_school: string | null;
-          p_curriculum: Curriculum | null;
-          p_curriculum_other: string | null;
-          p_intake: IntakeJson;
-        };
-        Returns: Database["public"]["Tables"]["students"]["Row"];
-      };
       create_lesson_report: {
         Args: {
-          p_student_id: string;
-          p_subject_id: string;
-          p_lesson_date: string;
-          p_duration_minutes: number;
-          p_lesson_focus: string;
-          p_understanding_check: number;
-          p_confidence_level: number;
-          p_lesson_highlights: string | null;
-          p_participation: number;
-          p_focus_rating: number;
-          p_homework: number;
-          p_next_focus: string | null;
-          p_how_to_help_at_home: string | null;
-          p_skill_ratings: Array<{ skill_id: string; rating: number }>;
-        };
-        Returns: Database["public"]["Tables"]["lesson_reports"]["Row"];
-      };
-    };
-    Enums: Record<string, never>;
-    CompositeTypes: Record<string, never>;
-  };
-};
+          p_confidence_level: number
+          p_duration_minutes: number
+          p_focus_rating: number
+          p_homework: number
+          p_how_to_help_at_home: string
+          p_lesson_date: string
+          p_lesson_focus: string
+          p_lesson_highlights: string
+          p_next_focus: string
+          p_participation: number
+          p_skill_ratings: Json
+          p_student_id: string
+          p_subject_id: string
+          p_understanding_check: number
+        }
+        Returns: {
+          confidence_level: number
+          created_at: string
+          duration_minutes: number
+          emailed_at: string | null
+          focus_rating: number
+          homework: number
+          how_to_help_at_home: string | null
+          id: string
+          lesson_date: string
+          lesson_focus: string
+          lesson_highlights: string | null
+          next_focus: string | null
+          participation: number
+          student_id: string
+          subject_id: string
+          understanding_check: number
+          uploaded_by: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "lesson_reports"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      create_student_with_intake: {
+        Args: {
+          p_age: number
+          p_current_school: string
+          p_curriculum: string
+          p_curriculum_other: string
+          p_full_name: string
+          p_gender: string
+          p_intake: Json
+          p_preferred_name: string
+        }
+        Returns: {
+          added_by: string | null
+          age: number | null
+          created_at: string
+          current_school: string | null
+          curriculum: string | null
+          curriculum_other: string | null
+          full_name: string
+          gender: string | null
+          id: string
+          intake: Json
+          intake_submitted_at: string | null
+          preferred_name: string | null
+          registration_number: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "students"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      is_admin: { Args: { uid: string }; Returns: boolean }
+      next_registration_number: { Args: never; Returns: string }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+}
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
+  public: {
+    Enums: {},
+  },
+} as const
+
