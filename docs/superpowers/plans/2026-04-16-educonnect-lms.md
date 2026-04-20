@@ -2,13 +2,53 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build the minimal MVP of EduConnect LMS — a Next.js 15 + Supabase school management system where parents self-signup with child details, request subject enrollments, and view uploaded results, while admins manage students, subjects, enrollments, and results.
+**Goal:** Build the minimal MVP of EduConnect LMS — a Next.js 16 + Supabase school management system where parents self-signup with child details, request subject enrollments, and view uploaded results, while admins manage students, subjects, enrollments, and results.
 
-**Architecture:** Next.js 15 App Router with `src/` layout and route groups; Supabase (Postgres + Auth + Storage + RLS) accessed via `@supabase/ssr` on server and browser; Tailwind CSS with theme tokens (navy/blue/yellow/coral, Nunito fonts) ported from the existing `index.html` / `pricing.html`; server actions for all mutations with zod validation; middleware enforces role-based route guards.
+**Architecture:** Next.js 16 App Router with `src/` layout and route groups; Supabase (Postgres + Auth + Storage + RLS) accessed via `@supabase/ssr` on server and browser; Tailwind CSS v4 with CSS-first `@theme` tokens (navy/blue/yellow/coral/cyan, Nunito fonts) ported from the existing `index.html` / `pricing.html`; server actions for all mutations with zod validation; middleware enforces role-based route guards.
 
-**Tech Stack:** Next.js 15, React 19, TypeScript, Tailwind CSS, Supabase (cloud + local CLI), `@supabase/ssr`, `@supabase/supabase-js`, Zod, Vitest, Playwright, Vercel.
+**Tech Stack:** Next.js **16.2**, React **19.2**, TypeScript, Tailwind CSS **v4**, Supabase (cloud + local CLI), `@supabase/ssr`, `@supabase/supabase-js`, Zod, Vitest, Playwright, Vercel.
 
 **Spec:** `docs/superpowers/specs/2026-04-16-educonnect-lms-design.md`
+
+---
+
+## Progress Log
+
+| # | Task | Commit | Notes |
+| --- | --- | --- | --- |
+| — | initial import (after re-root of git repo inside `educonnect-lms/`) | `7a244de` | Parent-dir git removed; fresh repo with scaffold + spec + plan + brand assets. |
+| 1 | Scaffold Next.js | `213ffb3` → superseded by `7a244de` | `create-next-app@latest` used — got **Next 16.2** + Tailwind **v4**, not the Next 15 / Tailwind v3 assumed by the plan body below. |
+| 2 | Install deps + scripts | `5f6afc8` | Added runtime + dev deps and all `test:*` / `db:*` scripts. |
+| 3 | Theme tokens + fonts | `b743017` + `b58916d` | Uses Tailwind v4 `@theme` block in `globals.css` — **no** `tailwind.config.ts`. `bun.lock` added to `.gitignore`. |
+| 4 | Shared UI primitives | `b8f7040` | 11 components in `src/components/ui/`. |
+| 5 | Marketing home | `15bfb84` | 8 section components composed in `src/app/page.tsx`. |
+| 6 | Pricing page | `9be0519` | `CurrencyToggle` + `PricingTable`, USD/GBP/CAD/NGN. |
+| — | Founder photos | `e4a5432` | Real photos from `educlone/` copied into `public/founders/`; `educlone/` gitignored. |
+| 7 | Schema migration (0001) | `348ee8d` | Includes `profiles.email` — **plan's Task 29 migration 0006_profiles_email.sql is obsolete, skip it**. |
+| 8 | RLS policies (0002) | `cbdfb21` | |
+| 9 | Storage bucket (0003) | `f6553c3` | |
+| 10 | `create_student_with_intake` RPC (0004) | `9eff3a2` | |
+| 11 | `create_lesson_report` RPC (0005) | `a69390b` | |
+| 12 | Seed + db types | `a55d689` → regenerated in `453a17a` | `npm run db:types` output is canonical; narrow literal unions live in `src/types/domain.ts`. |
+| 13 | Supabase clients + auth helpers | `35cdb86` + `453a17a` | `src/lib/supabase/{browser,server,middleware}.ts` + `src/lib/auth.ts`. ESLint scope narrowed to source in `eslint.config.mjs`. |
+| 14 | Middleware | `907806d` | `middleware.ts` at repo root + `next.config.ts` pins `turbopack.root` (required so sibling `yarn.lock` in `$HOME` doesn't move the workspace root and hide middleware). End-to-end redirect verification deferred to Task 16 once `/login` exists. |
+
+**Next up:** Task 15 — zod schemas, formatters, and Vitest unit tests.
+
+---
+
+## Deviations from the task bodies below
+
+The Task sections further down were written against Next 15 + Tailwind v3. The implementation is on Next 16 + Tailwind v4. Key deltas:
+
+- **Tailwind config.** Plan's Task 3 edits `tailwind.config.ts`. Reality: no JS config file — theme tokens live in `src/app/globals.css` inside an `@theme { ... }` block. Utility class names (`bg-navy`, `rounded-pill`, `font-heading`, `animate-float`, …) are unchanged, so every later task's class strings still work.
+- **Scaffold flag.** `create-next-app@latest` rejected `--turbopack` in our Next-16 run; Turbopack is the default dev runtime anyway.
+- **Workspace root.** Because `$HOME/yarn.lock` exists, Next 16 would otherwise resolve the workspace to the home directory and silently skip `middleware.ts`. `next.config.ts` now pins `turbopack.root = path.resolve(__dirname)`.
+- **`profiles.email`.** Already in `0001_init.sql`. Skip plan's Task 29 Step 3 (migration 0006) and the `listUsers()` → profiles-query swap is already the way the task reads parent emails.
+- **Types split.** One file (`src/types/db.ts`) is auto-generated by `npm run db:types` — do not hand-edit. Narrow literal unions (`Role`, `EnrollmentStatus`, `IntakeJson`, etc.) live in `src/types/domain.ts`. Import from `@/types/domain` where narrow types matter; `@/types/db` for table/function shapes.
+- **Local Supabase env.** `.env.local` is populated from `npx supabase status -o env` after `npm run db:start`. Service role key is live for server-only actions.
+
+The rest of the task instructions below are still broadly correct — treat them as a guide, favour the deltas above when they conflict.
 
 ---
 
