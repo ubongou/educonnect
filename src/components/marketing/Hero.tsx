@@ -64,13 +64,13 @@ export function Hero() {
           >
             Maths, English &amp; Science
           </span>
-          <div className="relative z-10 h-[420px] w-[300px] overflow-hidden rounded-t-[20px] border-[3px] border-navy bg-navy/10 shadow-[0_24px_60px_-18px_rgba(4,19,28,0.35)]">
+          <div className="relative z-10 h-[480px] w-[340px] overflow-hidden rounded-t-[20px] border-[3px] border-navy bg-navy/10 shadow-[0_24px_60px_-18px_rgba(4,19,28,0.35)]">
             <Image
-              src="/home/hero.avif"
+              src="/home/hero.jpg"
               alt="EduConnect student engaged in a one-on-one lesson"
               fill
               priority
-              sizes="300px"
+              sizes="340px"
               className="object-cover object-top"
             />
           </div>
