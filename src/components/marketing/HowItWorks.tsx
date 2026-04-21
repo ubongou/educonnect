@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Button } from "@/components/ui/Button";
@@ -30,15 +31,24 @@ export function HowItWorks() {
       <Container>
         <div className="grid items-start gap-[72px] md:grid-cols-2">
           <IntersectionFade className="relative hidden md:block">
-            <div className="flex aspect-[3/4] max-h-[520px] w-full items-center justify-center overflow-hidden rounded-lg border border-white/10 bg-white/5">
-              <p className="p-3 text-center text-[11px] font-medium text-white/30">
-                Add image here — online session in progress
-              </p>
+            <div className="relative aspect-[3/4] max-h-[520px] w-full overflow-hidden rounded-lg border border-white/10 bg-white/5">
+              <Image
+                src="/gallery/session-large.webp"
+                alt="Tutor leading an online one-on-one session"
+                fill
+                sizes="(min-width: 768px) 440px, 100vw"
+                className="object-cover object-top"
+              />
+              <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-navy/70 to-transparent" />
             </div>
-            <div className="absolute -bottom-5 -right-5 flex aspect-[4/3] w-[55%] items-center justify-center overflow-hidden rounded-md border-4 border-navy bg-yellow">
-              <p className="p-3 text-center text-[11px] font-medium text-navy/45">
-                Add image — student
-              </p>
+            <div className="absolute -bottom-5 -right-5 aspect-[4/3] w-[55%] overflow-hidden rounded-md border-4 border-navy bg-yellow">
+              <Image
+                src="/home/student-card.avif"
+                alt="EduConnect student at their lesson"
+                fill
+                sizes="(min-width: 768px) 240px, 40vw"
+                className="object-cover object-center"
+              />
             </div>
           </IntersectionFade>
 

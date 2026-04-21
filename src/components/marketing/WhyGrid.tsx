@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Card } from "@/components/ui/Card";
@@ -91,17 +92,33 @@ export function WhyGrid() {
 
         <IntersectionFade delay={150} className="mt-7">
           <div className="grid h-[300px] grid-cols-1 overflow-hidden rounded-lg md:grid-cols-[3fr_2fr]">
-            <div className="flex items-center justify-center bg-g100">
-              <p className="p-3 text-[12px] font-medium text-g400 text-center">
-                Add image here — students in a session
-              </p>
+            <div className="relative bg-g100">
+              <Image
+                src="/gallery/proof-large.webp"
+                alt="EduConnect tutor and student working through a problem together"
+                fill
+                sizes="(min-width: 768px) 660px, 100vw"
+                className="object-cover object-center"
+              />
             </div>
             <div className="hidden flex-col md:flex">
-              <div className="flex flex-1 items-center justify-center border-l-4 border-b-4 border-white bg-g50">
-                <p className="p-3 text-[11px] font-medium text-g400">Add image — teacher</p>
+              <div className="relative flex-1 border-l-4 border-b-4 border-white bg-g50">
+                <Image
+                  src="/gallery/photo-5.webp"
+                  alt="EduConnect teacher preparing for a lesson"
+                  fill
+                  sizes="(min-width: 768px) 440px, 100vw"
+                  className="object-cover object-top"
+                />
               </div>
-              <div className="flex flex-1 items-center justify-center border-l-4 border-white bg-navy">
-                <p className="p-3 text-[11px] font-medium text-white/30">Add image — student</p>
+              <div className="relative flex-1 border-l-4 border-white bg-navy">
+                <Image
+                  src="/gallery/photo-2.webp"
+                  alt="EduConnect student during an online lesson"
+                  fill
+                  sizes="(min-width: 768px) 440px, 100vw"
+                  className="object-cover object-top"
+                />
               </div>
             </div>
           </div>
