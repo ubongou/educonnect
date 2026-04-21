@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandLogo } from "./BrandLogo";
 
 type Mode = "marketing" | "authed";
 
@@ -38,7 +39,7 @@ export function Footer({
   return (
     <footer className="border-t border-white/5 bg-[#020d13] p-10">
       <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-between gap-4">
-        <div className="font-heading text-xl font-extrabold text-blue">e educonnect</div>
+        <BrandLogo mode="on-navy" size="md" />
         <ul className="flex gap-6">
           {links.map((l) => (
             <li key={l.href}>

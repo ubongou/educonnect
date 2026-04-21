@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import clsx from "clsx";
 import { Button } from "./Button";
+import { BrandLogo } from "./BrandLogo";
 
 const BOOKING_URL = "https://calendar.app.google/ZiNbAvQkBaYHMVY69";
 
@@ -54,12 +55,10 @@ export function Nav(props: Props) {
       <nav className="mx-auto flex max-w-[1100px] items-center justify-between rounded-pill border-2 border-navy bg-blue py-2 pr-2 pl-6">
         <Link
           href={props.mode === "authed" ? (props.role === "admin" ? "/admin" : "/dashboard") : "/"}
-          className="flex shrink-0 items-center gap-2 font-heading text-xl font-extrabold text-white"
+          aria-label="EduConnect home"
+          className="shrink-0"
         >
-          <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-white text-[13px] font-extrabold text-blue">
-            e
-          </span>
-          educonnect
+          <BrandLogo mode="on-blue" size="md" />
         </Link>
 
         <div className="ml-auto flex items-center">
