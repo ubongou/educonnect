@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(__dirname),
   },
+  images: {
+    // Next 16 requires any non-default quality used in an <Image> to be
+    // whitelisted here. The Hero uses 95 to keep the cutout crisp.
+    qualities: [75, 95],
+  },
 };
 
 export default nextConfig;
