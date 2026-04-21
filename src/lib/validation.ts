@@ -138,6 +138,41 @@ export const intakeSchema = z.object({
 export type IntakeInput = z.infer<typeof intakeSchema>;
 
 // -----------------------------------------------------------------------------
+// Onboarding (child details + intake) — mirrors public.students CHECK clauses
+// and the create_student_with_intake RPC signature.
+// -----------------------------------------------------------------------------
+
+export const childInfoSchema = z.object({
+  full_name: z.string().trim().min(1, "Child's full name is required"),
+  preferred_name: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => (v ? v : undefined)),
+  age: z.coerce.number().int().min(3).max(25),
+  gender: z.enum(["male", "female", "prefer_not_to_say"]),
+  current_school: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => (v ? v : undefined)),
+  curriculum: z.enum(["british", "nigerian", "american", "not_sure", "other"]),
+  curriculum_other: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => (v ? v : undefined)),
+});
+
+export type ChildInfoInput = z.infer<typeof childInfoSchema>;
+
+export const onboardingSchema = intakeSchema.extend({
+  childInfo: childInfoSchema,
+});
+
+export type OnboardingInput = z.infer<typeof onboardingSchema>;
+
+// -----------------------------------------------------------------------------
 // Enrollment request
 // -----------------------------------------------------------------------------
 
