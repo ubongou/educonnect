@@ -35,6 +35,8 @@ educlone/
 .playwright-mcp/
 legacy-*.png
 /hero.avif
+# hero source (the 10MB JPG stays local; hero.png is what ships)
+/public/home/hero.jpg
 
 # debug
 npm-debug.log*

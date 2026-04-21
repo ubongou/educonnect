@@ -66,7 +66,7 @@ export function Hero() {
           </span>
           <div className="relative z-10 h-[480px] w-[340px] overflow-hidden rounded-t-[20px] shadow-[0_24px_60px_-18px_rgba(4,19,28,0.35)]">
             <Image
-              src="/home/hero.jpg"
+              src="/home/hero.png"
               alt="EduConnect student engaged in a one-on-one lesson"
               fill
               priority
