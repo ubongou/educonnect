@@ -43,11 +43,11 @@ export function HowItWorks() {
             </div>
             <div className="absolute -bottom-5 -right-5 aspect-[4/3] w-[55%] overflow-hidden rounded-md border-4 border-navy bg-yellow">
               <Image
-                src="/home/student-card.avif"
+                src="/gallery/photo-6.webp"
                 alt="EduConnect student at their lesson"
                 fill
                 sizes="(min-width: 768px) 240px, 40vw"
-                className="object-cover object-center"
+                className="object-cover object-top"
               />
             </div>
           </IntersectionFade>
