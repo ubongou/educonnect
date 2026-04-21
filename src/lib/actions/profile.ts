@@ -53,3 +53,43 @@ export async function requestPasswordReset(
   const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
   return error ? { ok: false, error: error.message } : { ok: true };
 }
+
+export async function updateProfile(
+  _prev: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  const full_name = String(formData.get("full_name") ?? "").trim();
+  const phone = String(formData.get("phone") ?? "").trim();
+  if (!full_name) return { ok: false, error: "Full name is required" };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Auth required" };
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ full_name, phone: phone || null })
+    .eq("id", user.id);
+
+  return error ? { ok: false, error: error.message } : { ok: true };
+}
+
+export async function changePassword(
+  _prev: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  const password = String(formData.get("password") ?? "");
+  const confirm = String(formData.get("confirm_password") ?? "");
+  if (password.length < 8) {
+    return { ok: false, error: "Password must be at least 8 characters" };
+  }
+  if (password !== confirm) {
+    return { ok: false, error: "Passwords do not match" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({ password });
+  return error ? { ok: false, error: error.message } : { ok: true };
+}
