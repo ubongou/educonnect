@@ -5,6 +5,7 @@ import { Marquee } from "@/components/marketing/Marquee";
 import { IntroStrip } from "@/components/marketing/IntroStrip";
 import { WhyGrid } from "@/components/marketing/WhyGrid";
 import { Subjects } from "@/components/marketing/Subjects";
+import { ExpertiseStrip } from "@/components/marketing/ExpertiseStrip";
 import { HowItWorks } from "@/components/marketing/HowItWorks";
 import { Testimonials } from "@/components/marketing/Testimonials";
 import { FoundersAbout } from "@/components/marketing/FoundersAbout";
@@ -20,6 +21,7 @@ export default function Home() {
       <IntroStrip />
       <WhyGrid />
       <Subjects />
+      <ExpertiseStrip />
       <HowItWorks />
       <Testimonials />
       <FoundersAbout />

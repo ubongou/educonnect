@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { IntersectionFade } from "@/components/ui/IntersectionFade";
@@ -63,10 +64,15 @@ export function Hero() {
           >
             Maths, English &amp; Science
           </span>
-          <div className="relative z-10 flex h-[420px] w-[320px] items-center justify-center overflow-hidden rounded-t-[20px] bg-navy/10">
-            <p className="p-5 text-center text-[12px] font-medium text-navy/35">
-              Add your hero image here
-            </p>
+          <div className="relative z-10 h-[480px] w-[340px] overflow-hidden rounded-t-[20px] border-[3px] border-navy bg-navy/10 shadow-[0_24px_60px_-18px_rgba(4,19,28,0.35)]">
+            <Image
+              src="/home/hero.avif"
+              alt="EduConnect student engaged in a one-on-one lesson"
+              fill
+              priority
+              sizes="340px"
+              className="object-cover object-center"
+            />
           </div>
         </div>
       </Container>
