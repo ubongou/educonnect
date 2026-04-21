@@ -1,22 +1,24 @@
+import Image from "next/image";
 import clsx from "clsx";
 
 type Mode = "on-blue" | "on-navy" | "on-white" | "on-yellow";
 
-const palettes: Record<Mode, { mark: string; markFg: string; word: string }> = {
-  // Inside the marketing blue nav pill.
-  "on-blue":   { mark: "bg-white",  markFg: "text-blue",  word: "text-white" },
-  // Inside an authenticated-area navy nav.
-  "on-navy":   { mark: "bg-yellow", markFg: "text-navy",  word: "text-white" },
-  // Inside a light background (footer of signed-out areas, email headers).
-  "on-white":  { mark: "bg-navy",   markFg: "text-white", word: "text-navy"  },
-  // Inside the marketing yellow strip (rare — email footers).
-  "on-yellow": { mark: "bg-navy",   markFg: "text-white", word: "text-navy"  },
-};
-
+// Heights in px. Width scales from the source aspect (~6.4:1 for both assets
+// after the blue logo was cropped to match the white one).
 const sizes = {
-  sm: { mark: "h-6 w-6 text-[11px]", word: "text-base",   gap: "gap-[7px]" },
-  md: { mark: "h-7 w-7 text-[13px]", word: "text-[20px]", gap: "gap-[9px]" },
-  lg: { mark: "h-9 w-9 text-[17px]", word: "text-[28px]", gap: "gap-3"     },
+  sm: 26,
+  md: 34,
+  lg: 44,
+} as const;
+
+// The approved wordmark files (from the client brand guide).
+//   - logo-white.png: white wordmark on transparent — for dark backgrounds.
+//   - logo-blue.png:  blue wordmark on transparent  — for light backgrounds.
+const assets: Record<Mode, { src: string; w: number; h: number }> = {
+  "on-blue": { src: "/brand/logo-white.png", w: 1452, h: 226 },
+  "on-navy": { src: "/brand/logo-white.png", w: 1452, h: 226 },
+  "on-yellow": { src: "/brand/logo-blue.png", w: 1536, h: 240 },
+  "on-white": { src: "/brand/logo-blue.png", w: 1536, h: 240 },
 };
 
 export function BrandLogo({
@@ -28,31 +30,19 @@ export function BrandLogo({
   size?: keyof typeof sizes;
   className?: string;
 }) {
-  const palette = palettes[mode];
-  const sz = sizes[size];
+  const { src, w, h } = assets[mode];
+  const height = sizes[size];
+  const width = Math.round(height * (w / h));
 
   return (
-    <span className={clsx("inline-flex items-center", sz.gap, className)}>
-      <span
-        className={clsx(
-          "flex shrink-0 items-center justify-center rounded-[8px] font-heading font-extrabold leading-none",
-          palette.mark,
-          palette.markFg,
-          sz.mark,
-        )}
-        aria-hidden="true"
-      >
-        e
-      </span>
-      <span
-        className={clsx(
-          "font-heading font-extrabold leading-none tracking-[-0.01em]",
-          palette.word,
-          sz.word,
-        )}
-      >
-        educonnect
-      </span>
-    </span>
+    <Image
+      src={src}
+      alt="EduConnect"
+      width={width}
+      height={height}
+      priority
+      className={clsx("h-auto w-auto", className)}
+      style={{ width, height }}
+    />
   );
 }
