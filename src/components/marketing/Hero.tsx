@@ -70,7 +70,8 @@ export function Hero() {
               alt="EduConnect student engaged in a one-on-one lesson"
               fill
               priority
-              sizes="340px"
+              quality={95}
+              sizes="(min-width: 768px) 400px, 340px"
               className="object-cover object-top"
             />
           </div>
