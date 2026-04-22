@@ -23,33 +23,24 @@ export function FoundersAbout() {
     <section id="founders" className="bg-navy bg-dot-blue px-10 py-28">
       <Container>
         {/* Section intro */}
-        <div className="mb-20 grid items-end gap-12 md:grid-cols-[1.1fr_1fr]">
-          <IntersectionFade>
-            <Eyebrow>About EduConnect</Eyebrow>
-            <h2 className="mt-2 font-heading text-[clamp(28px,4vw,46px)] font-extrabold leading-[1.08] text-white">
-              Built on one belief:{" "}
-              <span className="text-yellow">teaching quality determines everything.</span>
-            </h2>
-            <p className="mt-6 max-w-[520px] text-[17px] leading-[1.75] text-white/60">
-              EduConnect was built on a simple belief: the quality of teaching determines
-              everything. We recruit and vet Nigeria&apos;s most capable teachers, then work with
-              families across Nigeria, the UK, the US, and Canada to give every child access to
-              genuinely excellent instruction. We are a tutoring service — not a platform — and
-              stay accountable for every teacher we place and every child we serve.
-            </p>
-            <p className="mt-7 inline-flex items-center gap-2 rounded-pill border border-white/15 bg-white/5 px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-white/70">
-              <span className="h-1.5 w-1.5 rounded-full bg-yellow" />
-              Backed by MIT
-            </p>
-          </IntersectionFade>
-          <IntersectionFade delay={120}>
-            <p className="font-heading text-[clamp(40px,6vw,72px)] font-extrabold uppercase leading-[0.95] tracking-tight text-white/10">
-              Meet the
-              <br />
-              founders.
-            </p>
-          </IntersectionFade>
-        </div>
+        <IntersectionFade className="mb-20 max-w-[760px]">
+          <Eyebrow>About EduConnect</Eyebrow>
+          <h2 className="mt-2 font-heading text-[clamp(28px,4vw,46px)] font-extrabold leading-[1.08] text-white">
+            Built on one belief:{" "}
+            <span className="text-yellow">teaching quality determines everything.</span>
+          </h2>
+          <p className="mt-6 text-[17px] leading-[1.75] text-white/60">
+            EduConnect was built on a simple belief: the quality of teaching determines
+            everything. We recruit and vet Nigeria&apos;s most capable teachers, then work with
+            families across Nigeria, the UK, the US, and Canada to give every child access to
+            genuinely excellent instruction. We are a tutoring service — not a platform — and
+            stay accountable for every teacher we place and every child we serve.
+          </p>
+          <p className="mt-7 inline-flex items-center gap-2 rounded-pill border border-white/15 bg-white/5 px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-white/70">
+            <span className="h-1.5 w-1.5 rounded-full bg-yellow" />
+            Backed by MIT
+          </p>
+        </IntersectionFade>
 
         {/* Founders — alternating large portrait + bio */}
         <div className="flex flex-col gap-20">
