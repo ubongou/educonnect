@@ -38,3 +38,36 @@ export async function requestEnrollments(
   revalidatePath(`/dashboard/children/${studentId}`);
   return { ok: true };
 }
+
+export type EnrollmentDecision = "approved" | "rejected";
+
+/**
+ * Admin-only: approve or reject a pending enrollment. RLS restricts writes on
+ * the `enrollments` table to admin profiles, so a non-admin caller gets a
+ * benign "not found" error from PostgREST rather than a security bypass.
+ */
+export async function decideEnrollment(
+  id: string,
+  decision: EnrollmentDecision,
+): Promise<EnrollmentRequestResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Auth required" };
+
+  const { error } = await supabase
+    .from("enrollments")
+    .update({
+      status: decision,
+      decided_by: user.id,
+      decided_at: new Date().toISOString(),
+    })
+    .eq("id", id);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/enrollments");
+  revalidatePath("/admin");
+  return { ok: true };
+}
