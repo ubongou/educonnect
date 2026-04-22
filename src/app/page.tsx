@@ -2,9 +2,7 @@ import { Nav } from "@/components/ui/Nav";
 import { Footer } from "@/components/ui/Footer";
 import { Hero } from "@/components/marketing/Hero";
 import { Marquee } from "@/components/marketing/Marquee";
-import { IntroStrip } from "@/components/marketing/IntroStrip";
 import { WhyGrid } from "@/components/marketing/WhyGrid";
-import { Subjects } from "@/components/marketing/Subjects";
 import { ExpertiseStrip } from "@/components/marketing/ExpertiseStrip";
 import { HowItWorks } from "@/components/marketing/HowItWorks";
 import { Testimonials } from "@/components/marketing/Testimonials";
@@ -18,9 +16,7 @@ export default function Home() {
       <Nav mode="marketing" />
       <Hero />
       <Marquee />
-      <IntroStrip />
       <WhyGrid />
-      <Subjects />
       <ExpertiseStrip />
       <HowItWorks />
       <Testimonials />
