@@ -5,11 +5,13 @@ import { updateSession } from "@/lib/supabase/middleware";
 // Route guards
 //
 // Policy:
-//   • /dashboard/**, /admin/**, /onboarding require an authenticated session.
-//     Unauthenticated visits bounce to /login?from=<pathname>.
+//   • /dashboard/**, /admin/**, /teacher/**, /onboarding require an
+//     authenticated session. Unauthenticated visits bounce to
+//     /login?from=<pathname>.
 //
 //   • /login and /signup are for signed-out users only. Signed-in visitors
-//     bounce to their home (/admin for admins, /dashboard for parents).
+//     bounce to their home (/admin for admins, /teacher for teachers,
+//     /dashboard for parents).
 //
 //   • Parents hitting /dashboard/** must have at least one linked child.
 //     Otherwise they bounce to /onboarding to complete intake.
@@ -17,13 +19,20 @@ import { updateSession } from "@/lib/supabase/middleware";
 //   • Parents visiting /onboarding after linking their first child bounce to
 //     /dashboard — onboarding is a one-time flow.
 //
-// Admin access to /dashboard (and vice-versa) renders 404 at the layout level
-// (see src/lib/auth.ts::requireParent/requireAdmin). The middleware does not
-// 404 here so the authed-landing redirect stays simple.
+// Cross-role access (a teacher hitting /dashboard, a parent hitting /admin,
+// etc.) renders 404 at the layout level via requireParent / requireAdmin /
+// requireTeacher in src/lib/auth.ts. The middleware keeps the authed-landing
+// redirect simple and leaves 404-ing to the layouts.
 // -----------------------------------------------------------------------------
 
-const protectedPrefixes = ["/dashboard", "/admin", "/onboarding"];
+const protectedPrefixes = ["/dashboard", "/admin", "/teacher", "/onboarding"];
 const signedOutOnly = new Set(["/login", "/signup"]);
+
+function homeForRole(role: string | null | undefined): string {
+  if (role === "admin") return "/admin";
+  if (role === "teacher") return "/teacher";
+  return "/dashboard";
+}
 
 function isProtected(pathname: string): boolean {
   return protectedPrefixes.some((p) => pathname === p || pathname.startsWith(`${p}/`));
@@ -50,7 +59,7 @@ export async function middleware(request: NextRequest) {
       .single();
 
     const url = request.nextUrl.clone();
-    url.pathname = profile?.role === "admin" ? "/admin" : "/dashboard";
+    url.pathname = homeForRole(profile?.role);
     return NextResponse.redirect(url);
   }
 
