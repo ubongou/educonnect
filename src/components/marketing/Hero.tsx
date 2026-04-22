@@ -10,23 +10,22 @@ export function Hero() {
     <section className="relative overflow-hidden bg-yellow bg-dot-navy px-10 pt-[72px]">
       <Container className="grid items-end gap-16 md:grid-cols-2 pb-0">
         <IntersectionFade className="pb-20">
-          <div className="mb-7 inline-flex items-center gap-3 rounded-lg bg-[#6B1A1A] py-[10px] pl-3 pr-4">
-            <span className="font-heading text-[13px] font-bold text-yellow">Backed by</span>
-            <div className="flex items-center gap-2 rounded-md bg-white px-[10px] py-[5px]">
-              <div className="flex items-end gap-[3px]">
-                <span className="block h-[14px] w-[4px] rounded-[1px] bg-navy" />
-                <span className="block h-[14px] w-[4px] rounded-[1px] bg-navy" />
-                <span className="block h-[8px] w-[4px] rounded-[1px] bg-navy" />
-                <span className="block h-[14px] w-[4px] rounded-[1px] bg-navy" />
-              </div>
-              <div className="font-heading text-[10px] font-bold leading-tight text-navy">
-                Massachusetts
-                <br />
-                Institute of
-                <br />
-                Technology
-              </div>
-            </div>
+          {/* Backed-by-MIT badge. The source PNG is 1536×1024 with no alpha
+              channel — the "transparent" area is actually an opaque
+              light-grey checker baked into RGB pixels. To avoid that
+              background leaking onto the yellow hero, we frame the pill
+              (~1250×340 in the source) in a container whose aspect matches
+              the pill itself and object-cover the image so the grey edges
+              overflow and get clipped. */}
+          <div className="relative mb-6 h-[54px] w-[210px] overflow-hidden">
+            <Image
+              src="/MIT-logo.png"
+              alt="Backed by MIT — Massachusetts Institute of Technology"
+              fill
+              priority
+              sizes="210px"
+              className="object-cover object-center"
+            />
           </div>
 
           <h1 className="font-heading text-[clamp(34px,4.5vw,54px)] font-extrabold leading-[1.1] text-navy">
