@@ -17,6 +17,9 @@ const marketingLinks: NavLink[] = [
   { href: "/#contact", label: "Contact" },
 ];
 
+// Parent nav IA is rebuilt in Phase 4 (Overview/Sessions/Documents/Account).
+// Keeping the current links here until those routes exist so logged-in
+// parents don't get dead links between phases.
 const parentLinks: NavLink[] = [
   { href: "/dashboard", label: "My children" },
   { href: "/dashboard/settings", label: "Settings" },
@@ -25,36 +28,54 @@ const parentLinks: NavLink[] = [
 const adminLinks: NavLink[] = [
   { href: "/admin", label: "Overview" },
   { href: "/admin/students", label: "Students" },
+  { href: "/admin/teachers", label: "Teachers" },
   { href: "/admin/enrollments", label: "Enrollments" },
+  { href: "/admin/schedule", label: "Schedule" },
   { href: "/admin/subjects", label: "Subjects" },
-  { href: "/admin/reports", label: "Reports" },
 ];
+
+const teacherLinks: NavLink[] = [
+  { href: "/teacher", label: "Overview" },
+  { href: "/teacher/sessions", label: "Sessions" },
+  { href: "/teacher/students", label: "Students" },
+  { href: "/teacher/schedule", label: "Schedule" },
+];
+
+type Role = "parent" | "admin" | "teacher";
 
 type Props =
   | { mode: "marketing"; activeHref?: string }
   | {
       mode: "authed";
       activeHref?: string;
-      role: "parent" | "admin";
+      role: Role;
       displayName: string;
       onLogout: () => void | Promise<void>;
     };
+
+function homeForRole(role: Role): string {
+  if (role === "admin") return "/admin";
+  if (role === "teacher") return "/teacher";
+  return "/dashboard";
+}
+
+function linksForRole(role: Role): NavLink[] {
+  if (role === "admin") return adminLinks;
+  if (role === "teacher") return teacherLinks;
+  return parentLinks;
+}
 
 export function Nav(props: Props) {
   const [open, setOpen] = useState(false);
 
   const links =
-    props.mode === "marketing"
-      ? marketingLinks
-      : props.role === "admin"
-        ? adminLinks
-        : parentLinks;
+    props.mode === "marketing" ? marketingLinks : linksForRole(props.role);
 
   return (
     <div className="sticky top-0 z-50 bg-yellow px-7 py-3">
       <nav className="mx-auto flex max-w-[1100px] items-center justify-between rounded-pill border-2 border-navy bg-blue py-2 pr-2 pl-6">
         <Link
-          href={props.mode === "authed" ? (props.role === "admin" ? "/admin" : "/dashboard") : "/"}
+          href={props.mode === "authed" ? homeForRole(props.role) : "/"}
           aria-label="EduConnect home"
           className="shrink-0"
         >

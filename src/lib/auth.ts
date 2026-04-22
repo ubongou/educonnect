@@ -66,6 +66,22 @@ export async function requireAdmin(): Promise<CurrentProfile> {
 }
 
 /**
+ * Enforces that the viewer is an authenticated teacher. Same shape as
+ * requireAdmin — 404s non-teachers so /teacher's existence doesn't leak to
+ * a parent who stumbles onto the URL.
+ */
+export async function requireTeacher(): Promise<CurrentProfile> {
+  const profile = await getProfile();
+  if (!profile) {
+    redirect("/login");
+  }
+  if (profile.role !== "teacher") {
+    notFound();
+  }
+  return profile;
+}
+
+/**
  * Must be called from within routes already gated by `requireParent`.
  * Redirects to `/onboarding` if the parent has not yet linked any child.
  */

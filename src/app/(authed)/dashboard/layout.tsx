@@ -12,10 +12,10 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       <Nav
         mode="authed"
         role="parent"
-        displayName={profile.full_name ?? "Parent"}
+        displayName={profile.full_name || "Parent"}
         onLogout={logout}
       />
-      <main className="min-h-screen bg-g50 pb-24 pt-12">{children}</main>
+      <main className="min-h-screen bg-g50 pb-24 pt-24">{children}</main>
     </>
   );
 }
