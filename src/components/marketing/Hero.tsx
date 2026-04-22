@@ -10,21 +10,19 @@ export function Hero() {
     <section className="relative overflow-hidden bg-yellow px-10 pt-[72px] bg-[url('/hero-doodles.svg')] bg-repeat [background-size:480px_480px] text-navy">
       <Container className="grid items-end gap-16 md:grid-cols-2 pb-0">
         <IntersectionFade className="pb-20">
-          {/* Backed-by-MIT badge. mit-logo-1.png is an RGBA PNG (real alpha)
-              with the pill centered in a 1536×1024 canvas. Sizing the box
-              to the source's 3:2 aspect lets object-contain fill both axes
-              so the pill lands at its natural proportions; the transparent
-              margin blends into the yellow hero. */}
-          <div className="relative mb-4 -ml-3 h-[140px] w-[210px]">
-            <Image
-              src="/mit-logo-1.png"
-              alt="Backed by MIT — Massachusetts Institute of Technology"
-              fill
-              priority
-              sizes="210px"
-              className="object-contain object-left"
-            />
-          </div>
+          {/* Backed-by-MIT badge. public/mit_badge.svg is the hand-built
+              vector — 1200×250, maroon pill, yellow "Backed by", white
+              MIT wordmark + wordblock. SVG scales crisply, no PNG alpha
+              tricks needed. Rendered height fixes the display size; width
+              auto so the 4.8:1 ratio is preserved. */}
+          <Image
+            src="/mit_badge.svg"
+            alt="Backed by MIT — Massachusetts Institute of Technology"
+            width={1200}
+            height={250}
+            priority
+            className="mb-6 h-[66px] w-auto"
+          />
 
           <h1 className="font-heading text-[clamp(34px,4.5vw,54px)] font-extrabold leading-[1.1] text-navy">
             Personal Tutoring from Nigeria&apos;s Best Teachers
