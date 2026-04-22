@@ -7,7 +7,7 @@ const BOOKING_URL = "https://calendar.app.google/ZiNbAvQkBaYHMVY69";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-yellow bg-dot-navy px-10 pt-[72px]">
+    <section className="relative overflow-hidden bg-yellow px-10 pt-[72px] bg-[url('/hero-doodles.svg')] bg-repeat [background-size:480px_480px] text-navy">
       <Container className="grid items-end gap-16 md:grid-cols-2 pb-0">
         <IntersectionFade className="pb-20">
           {/* Backed-by-MIT badge. The source PNG is 1536×1024 with no alpha
