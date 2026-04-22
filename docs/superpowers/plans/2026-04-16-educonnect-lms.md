@@ -2310,9 +2310,22 @@ git commit -m "add resend email client and lesson report template"
 
 ---
 
-## Task 29: Admin — compose lesson report + send email
+## Task 29: Admin — compose lesson report + send email  ⚠️ SUPERSEDED
 
-**Files:**
+**Status:** Superseded by the teacher scope change (see
+`/Users/hashpotato/.claude/plans/abstract-dazzling-crystal.md`, Phase 3).
+Lesson-report composition moved from admin to teacher. The actual form
+lives at `src/app/(authed)/teacher/sessions/page.tsx` +
+`src/components/teacher/LessonReportForm.tsx`, backed by
+`src/lib/actions/reports.ts::submitLessonReport` which delegates to the
+`create_lesson_report` RPC (now authorizes admin OR the session's
+assigned teacher). Resend email delivery on submit is explicitly out of
+scope for now — see the scope-change plan's "Out of scope" section.
+
+Leave this task description below for historical context only — do not
+implement it.
+
+**Files (original plan — do not create):**
 - Create: `src/app/(authed)/admin/reports/new/page.tsx`
 - Create: `src/components/admin/reports/ReportForm.tsx` + section components
 - Create: `src/lib/actions/reports.ts`
