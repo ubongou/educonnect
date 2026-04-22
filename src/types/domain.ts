@@ -11,7 +11,7 @@
  * `supabase/migrations/0001_init.sql`.
  */
 
-export type Role = "parent" | "admin";
+export type Role = "parent" | "admin" | "teacher";
 
 export type Gender = "male" | "female" | "prefer_not_to_say";
 
@@ -25,6 +25,14 @@ export type Curriculum =
 export type IntakeFileKind = "curriculum" | "school_report" | "class_notes";
 
 export type EnrollmentStatus = "pending" | "approved" | "rejected";
+
+export type SessionStatus = "scheduled" | "completed" | "cancelled" | "no_show";
+
+export type StudentDocumentKind =
+  | "test_paper"
+  | "school_report"
+  | "exam_result"
+  | "other";
 
 // -----------------------------------------------------------------------------
 // Intake JSONB (validated at the app layer via zod in src/lib/validation)
