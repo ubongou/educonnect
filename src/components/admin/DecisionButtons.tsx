@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { decideEnrollment, type EnrollmentDecision } from "@/lib/actions/enrollments";
+import { inputBase } from "@/components/ui/FormField";
 
 export type PendingEnrollmentRow = {
   id: string;
@@ -17,14 +18,30 @@ export type PendingEnrollmentRow = {
   requester: { id: string; full_name: string | null; email: string | null } | null;
 };
 
-export function DecisionButtons({ id }: { id: string }) {
+export type TeacherOption = {
+  id: string;
+  full_name: string | null;
+};
+
+export function DecisionButtons({
+  id,
+  teachers,
+}: {
+  id: string;
+  teachers: TeacherOption[];
+}) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [teacherId, setTeacherId] = useState<string>("");
 
   const decide = (decision: EnrollmentDecision) => {
     setError(null);
     startTransition(async () => {
-      const res = await decideEnrollment(id, decision);
+      const res = await decideEnrollment(
+        id,
+        decision,
+        decision === "approved" ? teacherId || null : null,
+      );
       if (!res.ok) setError(res.error);
     });
   };
@@ -34,6 +51,27 @@ export function DecisionButtons({ id }: { id: string }) {
 
   return (
     <div className="flex flex-col items-end gap-2">
+      {teachers.length > 0 && (
+        <label className="flex items-center gap-2">
+          <span className="font-heading text-[11px] font-bold uppercase tracking-[0.08em] text-g400">
+            Teacher
+          </span>
+          <select
+            value={teacherId}
+            onChange={(e) => setTeacherId(e.target.value)}
+            disabled={pending}
+            className={`${inputBase} py-1 text-[13px]`}
+          >
+            <option value="">— unassigned —</option>
+            {teachers.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.full_name ?? "Unnamed"}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+
       <div className="flex items-center justify-end gap-2">
         <button
           type="button"

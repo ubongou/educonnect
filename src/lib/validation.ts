@@ -21,6 +21,33 @@ export const loginSchema = z.object({
 export type LoginInput = z.infer<typeof loginSchema>;
 
 // -----------------------------------------------------------------------------
+// Admin creates a teacher account (service-role path)
+// -----------------------------------------------------------------------------
+
+export const teacherCreateSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  full_name: z.string().min(1),
+  phone: z.string().optional().default(""),
+});
+
+export type TeacherCreateInput = z.infer<typeof teacherCreateSchema>;
+
+// -----------------------------------------------------------------------------
+// Admin schedules a one-off session for an approved enrollment
+// -----------------------------------------------------------------------------
+
+export const sessionCreateSchema = z.object({
+  enrollment_id: z.string().uuid(),
+  scheduled_at: z
+    .string()
+    .refine((s) => !Number.isNaN(Date.parse(s)), "Expected an ISO timestamp"),
+  duration_minutes: z.coerce.number().int().min(15).max(240),
+});
+
+export type SessionCreateInput = z.infer<typeof sessionCreateSchema>;
+
+// -----------------------------------------------------------------------------
 // Intake — mirrors IntakeJson in src/types/domain.ts
 // -----------------------------------------------------------------------------
 

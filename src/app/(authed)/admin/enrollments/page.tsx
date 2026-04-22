@@ -5,25 +5,34 @@ import { formatDate } from "@/lib/format";
 import {
   DecisionButtons,
   type PendingEnrollmentRow,
+  type TeacherOption,
 } from "@/components/admin/DecisionButtons";
 
 export default async function AdminEnrollmentsQueue() {
   const supabase = await createClient();
 
-  const { data } = await supabase
-    .from("enrollments")
-    .select(
-      `
-      id, status, created_at,
-      students ( id, full_name, preferred_name, registration_number ),
-      subjects ( id, name, slug ),
-      requester:profiles!enrollments_requested_by_fkey ( id, full_name, email )
-      `,
-    )
-    .eq("status", "pending")
-    .order("created_at", { ascending: true });
+  const [{ data }, { data: teachers }] = await Promise.all([
+    supabase
+      .from("enrollments")
+      .select(
+        `
+        id, status, created_at,
+        students ( id, full_name, preferred_name, registration_number ),
+        subjects ( id, name, slug ),
+        requester:profiles!enrollments_requested_by_fkey ( id, full_name, email )
+        `,
+      )
+      .eq("status", "pending")
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("profiles")
+      .select("id, full_name")
+      .eq("role", "teacher")
+      .order("full_name"),
+  ]);
 
   const rows = (data ?? []) as unknown as PendingEnrollmentRow[];
+  const teacherOptions = (teachers ?? []) as TeacherOption[];
 
   return (
     <Container>
@@ -95,7 +104,7 @@ export default async function AdminEnrollmentsQueue() {
                     </td>
                     <td className="px-5 py-3 text-g600">{formatDate(r.created_at)}</td>
                     <td className="px-5 py-3">
-                      <DecisionButtons id={r.id} />
+                      <DecisionButtons id={r.id} teachers={teacherOptions} />
                     </td>
                   </tr>
                 );
