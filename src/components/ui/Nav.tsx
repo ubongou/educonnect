@@ -17,12 +17,11 @@ const marketingLinks: NavLink[] = [
   { href: "/#contact", label: "Contact" },
 ];
 
-// Parent nav IA is rebuilt in Phase 4 (Overview/Sessions/Documents/Account).
-// Keeping the current links here until those routes exist so logged-in
-// parents don't get dead links between phases.
 const parentLinks: NavLink[] = [
-  { href: "/dashboard", label: "My children" },
-  { href: "/dashboard/settings", label: "Settings" },
+  { href: "/dashboard", label: "Overview" },
+  { href: "/dashboard/sessions", label: "Sessions" },
+  { href: "/dashboard/documents", label: "Documents" },
+  { href: "/dashboard/account", label: "Account" },
 ];
 
 const adminLinks: NavLink[] = [
