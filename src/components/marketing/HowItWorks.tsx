@@ -31,22 +31,37 @@ export function HowItWorks() {
       <Container>
         <div className="grid items-start gap-[72px] md:grid-cols-2">
           <IntersectionFade className="relative hidden md:block">
-            <div className="relative aspect-[3/4] max-h-[520px] w-full overflow-hidden rounded-lg border border-white/10 bg-white/5">
-              <Image
-                src="/gallery/session-large.webp"
-                alt="Tutor leading an online one-on-one session"
-                fill
-                sizes="(min-width: 768px) 440px, 100vw"
-                className="object-cover object-top"
-              />
-              <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-navy/70 to-transparent" />
+            {/* Shows the real parent dashboard so prospective parents see
+                the end product — the IA they'll use, and the progress
+                reporting they'll receive. Browser-chrome wrapper keeps the
+                screenshot in context. */}
+            <div className="relative rounded-lg border border-white/10 bg-white shadow-[0_24px_60px_-20px_rgba(4,19,28,0.6)]">
+              <div className="flex items-center gap-2 border-b border-g100 bg-g50 px-4 py-[10px]">
+                <span className="h-2.5 w-2.5 rounded-full bg-coral" />
+                <span className="h-2.5 w-2.5 rounded-full bg-yellow" />
+                <span className="h-2.5 w-2.5 rounded-full bg-blue" />
+                <span className="ml-3 font-sans text-[12px] text-g600 truncate">
+                  joineduconnect.com/dashboard
+                </span>
+              </div>
+              <div className="relative aspect-[3/2] w-full overflow-hidden rounded-b-lg bg-white">
+                <Image
+                  src="/product/parent-overview.png"
+                  alt="Parent dashboard showing the child tab, confidence and skill charts, latest lesson, and account status"
+                  fill
+                  sizes="(min-width: 768px) 520px, 100vw"
+                  className="object-cover object-top"
+                />
+              </div>
             </div>
-            <div className="absolute -bottom-5 -right-5 aspect-[4/3] w-[55%] overflow-hidden rounded-md border-4 border-navy bg-yellow">
+            {/* Floating photo accent keeps the section visually anchored
+                to real humans rather than purely a product shot. */}
+            <div className="absolute -bottom-7 -right-6 aspect-[4/5] w-[42%] overflow-hidden rounded-md border-4 border-navy bg-yellow">
               <Image
-                src="/gallery/photo-6.webp"
-                alt="EduConnect student at their lesson"
+                src="/gallery/photo-4.webp"
+                alt="EduConnect student engaged during a lesson"
                 fill
-                sizes="(min-width: 768px) 240px, 40vw"
+                sizes="(min-width: 768px) 220px, 40vw"
                 className="object-cover object-top"
               />
             </div>

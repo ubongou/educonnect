@@ -91,11 +91,15 @@ export function WhyGrid() {
         </div>
 
         <IntersectionFade delay={150} className="mt-7">
-          <div className="grid h-[300px] grid-cols-1 overflow-hidden rounded-lg md:grid-cols-[3fr_2fr]">
+          {/* The original layout forced portrait stock photos into landscape
+              panels, which cropped faces awkwardly. Using the landscape
+              session-large for the big left panel and portrait photos for
+              the right-stack makes each crop hit its natural orientation. */}
+          <div className="grid h-[420px] grid-cols-1 overflow-hidden rounded-lg md:grid-cols-[3fr_2fr]">
             <div className="relative bg-g100">
               <Image
-                src="/gallery/proof-large.webp"
-                alt="EduConnect tutor and student working through a problem together"
+                src="/gallery/session-large.webp"
+                alt="EduConnect student working through a live lesson on their laptop"
                 fill
                 sizes="(min-width: 768px) 660px, 100vw"
                 className="object-cover object-center"
@@ -104,8 +108,8 @@ export function WhyGrid() {
             <div className="hidden flex-col md:flex">
               <div className="relative flex-1 border-l-4 border-b-4 border-white bg-g50">
                 <Image
-                  src="/gallery/photo-5.webp"
-                  alt="EduConnect teacher preparing for a lesson"
+                  src="/gallery/photo-1.webp"
+                  alt="Student listening through headphones during a lesson"
                   fill
                   sizes="(min-width: 768px) 440px, 100vw"
                   className="object-cover object-top"
@@ -113,8 +117,8 @@ export function WhyGrid() {
               </div>
               <div className="relative flex-1 border-l-4 border-white bg-navy">
                 <Image
-                  src="/gallery/photo-2.webp"
-                  alt="EduConnect student during an online lesson"
+                  src="/gallery/photo-4.webp"
+                  alt="Student engaged during an online session"
                   fill
                   sizes="(min-width: 768px) 440px, 100vw"
                   className="object-cover object-top"
