@@ -3,13 +3,16 @@ import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { IntersectionFade } from "@/components/ui/IntersectionFade";
 
+// Order matters: the strip duplicates this list for a seamless loop, so
+// visually similar compositions (top-down laptop views) are split apart to
+// reduce the "same image twice" feel. photo-5 was near-duplicate of
+// photo-6 (both top-down laptop frames) so we drop it from the set.
 const photos = [
-  { src: "/gallery/photo-1.webp", alt: "EduConnect tutor preparing a lesson" },
+  { src: "/gallery/photo-1.webp", alt: "Student listening on headphones during a lesson" },
+  { src: "/gallery/photo-3.webp", alt: "Student writing in a notebook beside open reading" },
+  { src: "/gallery/photo-6.webp", alt: "Student on a live video lesson with a teacher" },
+  { src: "/gallery/photo-4.webp", alt: "Student raising a hand, engaged mid-class" },
   { src: "/gallery/photo-2.webp", alt: "Student working through practice problems" },
-  { src: "/gallery/photo-3.webp", alt: "One-on-one reading session in progress" },
-  { src: "/gallery/photo-4.webp", alt: "Tutor guiding a student through a worked example" },
-  { src: "/gallery/photo-5.webp", alt: "Student showing work to the tutor" },
-  { src: "/gallery/photo-6.webp", alt: "Tutor giving encouraging feedback" },
 ];
 
 export function ExpertiseStrip() {
