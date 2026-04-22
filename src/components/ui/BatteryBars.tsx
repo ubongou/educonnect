@@ -47,7 +47,12 @@ export function BatteryBars({
                 aria-label={`Set rating to ${b} of ${max}`}
                 aria-pressed={filled}
                 className={clsx(
-                  "h-6 w-10 rounded-[4px] border-[1.5px] border-navy transition-colors",
+                  "rounded-[4px] border-[1.5px] border-navy transition-colors",
+                  // When the scale is 0..10 (behaviours + skill tracker) the
+                  // row would be 400px+ with the default bar width, so narrow
+                  // each segment. Keeps the overall strip similar in size to
+                  // the 5-bar form used on intake's verbal-expression scale.
+                  max > 5 ? "h-5 w-4" : "h-6 w-10",
                   filled ? "bg-yellow" : "bg-white",
                   interactive && "cursor-pointer hover:brightness-95",
                   !interactive && "cursor-default",

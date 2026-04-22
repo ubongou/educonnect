@@ -124,8 +124,18 @@ describe("lessonReportSchema", () => {
     expect(lessonReportSchema.safeParse(valid).success).toBe(true);
   });
 
-  it("rejects rating > 5", () => {
-    const r = lessonReportSchema.safeParse({ ...valid, participation: 6 });
+  it("rejects behaviour rating > 10", () => {
+    const r = lessonReportSchema.safeParse({ ...valid, participation: 11 });
+    expect(r.success).toBe(false);
+  });
+
+  it("accepts understanding_check = 10 (top of 1–10 scale)", () => {
+    const r = lessonReportSchema.safeParse({ ...valid, understanding_check: 10 });
+    expect(r.success).toBe(true);
+  });
+
+  it("rejects understanding_check = 0 (scale starts at 1)", () => {
+    const r = lessonReportSchema.safeParse({ ...valid, understanding_check: 0 });
     expect(r.success).toBe(false);
   });
 
@@ -139,10 +149,10 @@ describe("lessonReportSchema", () => {
     expect(r.success).toBe(false);
   });
 
-  it("rejects skill ratings > 5", () => {
+  it("rejects skill ratings > 10", () => {
     const r = lessonReportSchema.safeParse({
       ...valid,
-      skill_ratings: [{ skill_id: UUID_C, rating: 9 }],
+      skill_ratings: [{ skill_id: UUID_C, rating: 11 }],
     });
     expect(r.success).toBe(false);
   });

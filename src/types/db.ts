@@ -7,30 +7,10 @@ export type Json =
   | Json[]
 
 export type Database = {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -44,6 +24,7 @@ export type Database = {
           status: string
           student_id: string
           subject_id: string
+          teacher_id: string | null
         }
         Insert: {
           created_at?: string
@@ -54,6 +35,7 @@ export type Database = {
           status?: string
           student_id: string
           subject_id: string
+          teacher_id?: string | null
         }
         Update: {
           created_at?: string
@@ -64,6 +46,7 @@ export type Database = {
           status?: string
           student_id?: string
           subject_id?: string
+          teacher_id?: string | null
         }
         Relationships: [
           {
@@ -92,6 +75,13 @@ export type Database = {
             columns: ["subject_id"]
             isOneToOne: false
             referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enrollments_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -185,6 +175,7 @@ export type Database = {
           lesson_highlights: string | null
           next_focus: string | null
           participation: number
+          session_id: string | null
           student_id: string
           subject_id: string
           understanding_check: number
@@ -204,6 +195,7 @@ export type Database = {
           lesson_highlights?: string | null
           next_focus?: string | null
           participation: number
+          session_id?: string | null
           student_id: string
           subject_id: string
           understanding_check: number
@@ -223,12 +215,20 @@ export type Database = {
           lesson_highlights?: string | null
           next_focus?: string | null
           participation?: number
+          session_id?: string | null
           student_id?: string
           subject_id?: string
           understanding_check?: number
           uploaded_by?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "lesson_reports_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "lesson_reports_student_id_fkey"
             columns: ["student_id"]
@@ -292,6 +292,7 @@ export type Database = {
           full_name: string | null
           id: string
           phone: string | null
+          renewal_at: string | null
           role: string
         }
         Insert: {
@@ -300,6 +301,7 @@ export type Database = {
           full_name?: string | null
           id: string
           phone?: string | null
+          renewal_at?: string | null
           role?: string
         }
         Update: {
@@ -308,9 +310,136 @@ export type Database = {
           full_name?: string | null
           id?: string
           phone?: string | null
+          renewal_at?: string | null
           role?: string
         }
         Relationships: []
+      }
+      sessions: {
+        Row: {
+          created_at: string
+          duration_minutes: number
+          enrollment_id: string
+          id: string
+          lesson_report_id: string | null
+          scheduled_at: string
+          status: string
+          student_id: string
+          subject_id: string
+          teacher_id: string
+        }
+        Insert: {
+          created_at?: string
+          duration_minutes?: number
+          enrollment_id: string
+          id?: string
+          lesson_report_id?: string | null
+          scheduled_at: string
+          status?: string
+          student_id: string
+          subject_id: string
+          teacher_id: string
+        }
+        Update: {
+          created_at?: string
+          duration_minutes?: number
+          enrollment_id?: string
+          id?: string
+          lesson_report_id?: string | null
+          scheduled_at?: string
+          status?: string
+          student_id?: string
+          subject_id?: string
+          teacher_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sessions_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "enrollments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_lesson_report_id_fkey"
+            columns: ["lesson_report_id"]
+            isOneToOne: false
+            referencedRelation: "lesson_reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_documents: {
+        Row: {
+          id: string
+          kind: string
+          mime_type: string | null
+          original_filename: string
+          size_bytes: number | null
+          storage_path: string
+          student_id: string
+          uploaded_at: string
+          uploaded_by: string
+        }
+        Insert: {
+          id?: string
+          kind: string
+          mime_type?: string | null
+          original_filename: string
+          size_bytes?: number | null
+          storage_path: string
+          student_id: string
+          uploaded_at?: string
+          uploaded_by: string
+        }
+        Update: {
+          id?: string
+          kind?: string
+          mime_type?: string | null
+          original_filename?: string
+          size_bytes?: number | null
+          storage_path?: string
+          student_id?: string
+          uploaded_at?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_documents_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_documents_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       students: {
         Row: {
@@ -441,6 +570,7 @@ export type Database = {
           p_lesson_highlights: string
           p_next_focus: string
           p_participation: number
+          p_session_id?: string
           p_skill_ratings: Json
           p_student_id: string
           p_subject_id: string
@@ -460,6 +590,7 @@ export type Database = {
           lesson_highlights: string | null
           next_focus: string | null
           participation: number
+          session_id: string | null
           student_id: string
           subject_id: string
           understanding_check: number
@@ -506,6 +637,7 @@ export type Database = {
         }
       }
       is_admin: { Args: { uid: string }; Returns: boolean }
+      is_teacher: { Args: { uid: string }; Returns: boolean }
       next_registration_number: { Args: never; Returns: string }
     }
     Enums: {
@@ -635,11 +767,7 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },
 } as const
-

@@ -187,7 +187,11 @@ export type EnrollmentRequestInput = z.infer<typeof enrollmentRequestSchema>;
 // Lesson report — mirrors public.lesson_reports CHECK constraints
 // -----------------------------------------------------------------------------
 
-const rating0to5 = z.number().int().min(0).max(5);
+// Understanding + confidence use 1..10 and map to six named levels via
+// src/lib/scales.ts. Behaviours and per-skill trackers use 0..10 (client
+// decision: scale change from 0..5 after the inspiration was reviewed).
+const rating1to10 = z.number().int().min(1).max(10);
+const rating0to10 = z.number().int().min(0).max(10);
 
 export const lessonReportSchema = z.object({
   student_id: z.string().uuid(),
@@ -195,19 +199,19 @@ export const lessonReportSchema = z.object({
   lesson_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Expected YYYY-MM-DD"),
   duration_minutes: z.number().int().min(1).max(600),
   lesson_focus: z.string().min(1),
-  understanding_check: rating0to5,
-  confidence_level: rating0to5,
+  understanding_check: rating1to10,
+  confidence_level: rating1to10,
   lesson_highlights: z.string().optional(),
-  participation: rating0to5,
-  focus_rating: rating0to5,
-  homework: rating0to5,
+  participation: rating0to10,
+  focus_rating: rating0to10,
+  homework: rating0to10,
   next_focus: z.string().optional(),
   how_to_help_at_home: z.string().optional(),
   skill_ratings: z
     .array(
       z.object({
         skill_id: z.string().uuid(),
-        rating: rating0to5,
+        rating: rating0to10,
       }),
     )
     .default([]),
