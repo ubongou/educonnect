@@ -10,21 +10,19 @@ export function Hero() {
     <section className="relative overflow-hidden bg-yellow px-10 pt-[72px] bg-[url('/hero-doodles.svg')] bg-repeat [background-size:480px_480px] text-navy">
       <Container className="grid items-end gap-16 md:grid-cols-2 pb-0">
         <IntersectionFade className="pb-20">
-          {/* Backed-by-MIT badge. The source PNG is 1536×1024 with no alpha
-              channel — the "transparent" area is actually an opaque
-              light-grey checker baked into RGB pixels. To avoid that
-              background leaking onto the yellow hero, we frame the pill
-              (~1250×340 in the source) in a container whose aspect matches
-              the pill itself and object-cover the image so the grey edges
-              overflow and get clipped. */}
-          <div className="relative mb-6 h-[54px] w-[210px] overflow-hidden">
+          {/* Backed-by-MIT badge. mit-logo-1.png is an RGBA PNG (real alpha)
+              with the pill centered in a 1536×1024 canvas. Sizing the box
+              to the source's 3:2 aspect lets object-contain fill both axes
+              so the pill lands at its natural proportions; the transparent
+              margin blends into the yellow hero. */}
+          <div className="relative mb-4 -ml-3 h-[140px] w-[210px]">
             <Image
-              src="/MIT-logo.png"
+              src="/mit-logo-1.png"
               alt="Backed by MIT — Massachusetts Institute of Technology"
               fill
               priority
               sizes="210px"
-              className="object-cover object-center"
+              className="object-contain object-left"
             />
           </div>
 
