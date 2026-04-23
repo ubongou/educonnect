@@ -65,7 +65,10 @@ const items: Item[] = [
 
 export function WhyGrid() {
   return (
-    <section id="why" className="px-10 py-24">
+    <section
+      id="why"
+      className="relative bg-blue bg-[url('/hero-doodles.svg')] bg-repeat [background-size:480px_480px] px-10 py-24"
+    >
       <Container>
         <IntersectionFade>
           <SectionHeader

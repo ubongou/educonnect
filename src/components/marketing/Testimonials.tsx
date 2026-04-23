@@ -23,7 +23,7 @@ const quotes = [
 
 export function Testimonials() {
   return (
-    <section className="bg-g50 px-10 py-24">
+    <section className="relative bg-blue bg-[url('/hero-doodles.svg')] bg-repeat [background-size:480px_480px] px-10 py-24">
       <Container>
         <IntersectionFade>
           <SectionHeader eyebrow="What parents say" title="Real results, real families" />
