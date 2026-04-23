@@ -38,6 +38,12 @@ legacy-*.png
 # hero source (the 10MB JPG stays local; hero.png is what ships)
 /public/home/hero.jpg
 
+# working-tree scratch artifacts — audits + throwaway screenshots
+audit-screenshots/
+docs/UI_AUDIT.md
+docs/reference/
+/*.png
+
 # debug
 npm-debug.log*
 yarn-debug.log*
