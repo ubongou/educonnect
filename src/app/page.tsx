@@ -1,29 +1,12 @@
-import { Nav } from "@/components/ui/Nav";
-import { Footer } from "@/components/ui/Footer";
-import { Hero } from "@/components/marketing/Hero";
-import { Marquee } from "@/components/marketing/Marquee";
-import { WhyGrid } from "@/components/marketing/WhyGrid";
-import { ExpertiseStrip } from "@/components/marketing/ExpertiseStrip";
-import { HowItWorks } from "@/components/marketing/HowItWorks";
-import { Testimonials } from "@/components/marketing/Testimonials";
-import { FoundersAbout } from "@/components/marketing/FoundersAbout";
-import { FinalCta } from "@/components/marketing/FinalCta";
-import { Contact } from "@/components/marketing/Contact";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 
 export default function Home() {
   return (
-    <>
-      <Nav mode="marketing" />
-      <Hero />
-      <Marquee />
-      <WhyGrid />
-      <ExpertiseStrip />
-      <HowItWorks />
-      <Testimonials />
-      <FoundersAbout />
-      <FinalCta />
-      <Contact />
-      <Footer mode="marketing" />
-    </>
+    <main className="flex min-h-screen flex-col items-center justify-center gap-10 bg-yellow bg-[url('/hero-doodles.svg')] bg-repeat [background-size:480px_480px] px-6 text-navy">
+      <BrandLogo mode="on-yellow" size="lg" />
+      <h1 className="font-heading text-[clamp(40px,8vw,88px)] font-extrabold leading-none">
+        Coming soon
+      </h1>
+    </main>
   );
 }
