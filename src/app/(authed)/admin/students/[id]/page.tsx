@@ -9,13 +9,16 @@ import {
 } from "@/lib/format";
 import type { IntakeJson } from "@/types/domain";
 import { IntakeSummary } from "@/components/dashboard/IntakeSummary";
+import { TeacherAssign, type TeacherOption } from "@/components/admin/TeacherAssign";
 
 type EnrollmentRow = {
   id: string;
   status: string;
   decided_at: string | null;
   created_at: string;
+  teacher_id: string | null;
   subjects: { name: string; slug: string } | null;
+  teacher: { id: string; full_name: string | null } | null;
 };
 
 type ReportRow = {
@@ -60,22 +63,35 @@ export default async function AdminStudentDetail({
   const { id } = await params;
   const supabase = await createClient();
 
-  const { data: student } = await supabase
-    .from("students")
-    .select(
-      `
-      id, registration_number, full_name, preferred_name, age, gender,
-      current_school, curriculum, curriculum_other, intake, intake_submitted_at,
-      parent_students ( profiles ( id, full_name, email, phone ) ),
-      enrollments (id, status, decided_at, created_at, subjects(name, slug)),
-      lesson_reports (id, lesson_date, understanding_check, confidence_level, subjects(name, slug)),
-      intake_files (id, kind, original_filename, size_bytes, uploaded_at)
-      `,
-    )
-    .eq("id", id)
-    .maybeSingle();
+  const [{ data: student }, { data: teacherList }] = await Promise.all([
+    supabase
+      .from("students")
+      .select(
+        `
+        id, registration_number, full_name, preferred_name, age, gender,
+        current_school, curriculum, curriculum_other, intake, intake_submitted_at,
+        parent_students ( profiles ( id, full_name, email, phone ) ),
+        enrollments (
+          id, status, decided_at, created_at, teacher_id,
+          subjects(name, slug),
+          teacher:profiles!enrollments_teacher_id_fkey(id, full_name)
+        ),
+        lesson_reports (id, lesson_date, understanding_check, confidence_level, subjects(name, slug)),
+        intake_files (id, kind, original_filename, size_bytes, uploaded_at)
+        `,
+      )
+      .eq("id", id)
+      .maybeSingle(),
+    supabase
+      .from("profiles")
+      .select("id, full_name")
+      .eq("role", "teacher")
+      .order("full_name"),
+  ]);
 
   if (!student) notFound();
+
+  const teacherOptions = (teacherList ?? []) as TeacherOption[];
 
   const displayName = student.preferred_name ?? student.full_name;
   const parents = ((student.parent_students ?? []) as unknown as ParentLink[])
@@ -169,7 +185,7 @@ export default async function AdminStudentDetail({
             {enrollments.map((e) => (
               <li
                 key={e.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-lg border-[1.5px] border-navy/10 bg-white px-5 py-4"
+                className="flex flex-wrap items-center justify-between gap-4 rounded-lg border-[1.5px] border-navy/10 bg-white px-5 py-4"
               >
                 <div>
                   <p className="font-heading text-[15px] font-extrabold text-navy">
@@ -180,7 +196,16 @@ export default async function AdminStudentDetail({
                     {e.decided_at && ` · decided ${formatDate(e.decided_at)}`}
                   </p>
                 </div>
-                <StatusPill status={e.status} />
+                <div className="flex flex-wrap items-center justify-end gap-4">
+                  {e.status !== "rejected" && (
+                    <TeacherAssign
+                      enrollmentId={e.id}
+                      currentTeacherId={e.teacher_id}
+                      teachers={teacherOptions}
+                    />
+                  )}
+                  <StatusPill status={e.status} />
+                </div>
               </li>
             ))}
           </ul>

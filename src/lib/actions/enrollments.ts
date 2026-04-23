@@ -87,3 +87,41 @@ export async function decideEnrollment(
   if (teacherId) revalidatePath(`/admin/teachers/${teacherId}`);
   return { ok: true };
 }
+
+/**
+ * Admin-only: (re)assign the teacher on an already-decided enrollment.
+ * Set `teacherId` to null to unassign. RLS restricts writes on
+ * `enrollments` to admins, so non-admin callers get a benign error.
+ */
+export async function assignEnrollmentTeacher(
+  enrollmentId: string,
+  teacherId: string | null,
+): Promise<EnrollmentRequestResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Auth required" };
+
+  const { data: previous } = await supabase
+    .from("enrollments")
+    .select("teacher_id, student_id")
+    .eq("id", enrollmentId)
+    .single();
+
+  const { error } = await supabase
+    .from("enrollments")
+    .update({ teacher_id: teacherId })
+    .eq("id", enrollmentId);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/enrollments");
+  revalidatePath("/admin");
+  if (previous?.student_id) {
+    revalidatePath(`/admin/students/${previous.student_id}`);
+  }
+  if (previous?.teacher_id) revalidatePath(`/admin/teachers/${previous.teacher_id}`);
+  if (teacherId) revalidatePath(`/admin/teachers/${teacherId}`);
+  return { ok: true };
+}
