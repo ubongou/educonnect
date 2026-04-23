@@ -1,14 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="250" viewBox="0 0 1200 250">
-  <rect x="0" y="0" width="1200" height="250" rx="28" ry="28" fill="#8B0015"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="180" viewBox="0 0 900 180">
+  <rect x="0" y="0" width="900" height="180" rx="22" ry="22" fill="#8B0015"/>
 
-  <text x="35" y="105"
+  <text x="22" y="113"
         font-family="Arial, Helvetica, sans-serif"
-        font-size="64"
+        font-size="54"
         font-weight="500"
         fill="#F4B326">Backed by</text>
 
   <!-- MIT logo -->
-  <g fill="#FFFFFF" transform="translate(370,30)">
+  <g fill="#FFFFFF" transform="translate(305,22) scale(0.85)">
     <rect x="0" y="0" width="40" height="160"/>
     <rect x="55" y="0" width="40" height="110"/>
     <rect x="110" y="0" width="40" height="160"/>
@@ -18,19 +18,19 @@
     <rect x="220" y="55" width="40" height="105"/>
   </g>
 
-  <text x="720" y="75"
+  <text x="595" y="60"
         font-family="Arial, Helvetica, sans-serif"
-        font-size="52"
+        font-size="42"
         font-weight="700"
         fill="#FFFFFF">Massachusetts</text>
-  <text x="720" y="135"
+  <text x="595" y="107"
         font-family="Arial, Helvetica, sans-serif"
-        font-size="52"
+        font-size="42"
         font-weight="700"
         fill="#FFFFFF">Institute of</text>
-  <text x="720" y="195"
+  <text x="595" y="154"
         font-family="Arial, Helvetica, sans-serif"
-        font-size="52"
+        font-size="42"
         font-weight="700"
         fill="#FFFFFF">Technology</text>
 </svg>

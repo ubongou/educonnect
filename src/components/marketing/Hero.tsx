@@ -7,19 +7,14 @@ const BOOKING_URL = "https://calendar.app.google/ZiNbAvQkBaYHMVY69";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-yellow px-10 pt-[72px] bg-[url('/hero-doodles.svg')] bg-repeat [background-size:480px_480px] text-navy">
+    <section className="relative overflow-hidden bg-yellow px-10 pt-6 bg-[url('/hero-doodles.svg')] bg-repeat [background-size:480px_480px] text-navy">
       <Container className="grid items-end gap-16 md:grid-cols-2 pb-0">
         <IntersectionFade className="pb-20">
-          {/* Backed-by-MIT badge. public/mit_badge.svg is the hand-built
-              vector — 1200×250, maroon pill, yellow "Backed by", white
-              MIT wordmark + wordblock. SVG scales crisply, no PNG alpha
-              tricks needed. Rendered height fixes the display size; width
-              auto so the 4.8:1 ratio is preserved. */}
           <Image
             src="/mit_badge.svg"
             alt="Backed by MIT — Massachusetts Institute of Technology"
-            width={1200}
-            height={250}
+            width={900}
+            height={180}
             priority
             className="mb-6 h-[66px] w-auto"
           />

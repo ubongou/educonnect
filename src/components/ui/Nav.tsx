@@ -30,7 +30,6 @@ const adminLinks: NavLink[] = [
   { href: "/admin/teachers", label: "Teachers" },
   { href: "/admin/enrollments", label: "Enrollments" },
   { href: "/admin/schedule", label: "Schedule" },
-  { href: "/admin/subjects", label: "Subjects" },
 ];
 
 const teacherLinks: NavLink[] = [
@@ -71,7 +70,7 @@ export function Nav(props: Props) {
     props.mode === "marketing" ? marketingLinks : linksForRole(props.role);
 
   return (
-    <div className="sticky top-0 z-50 bg-yellow px-7 py-3">
+    <div className="bg-yellow px-7 py-3">
       <nav className="mx-auto flex max-w-[1100px] items-center justify-between rounded-pill border-2 border-navy bg-blue py-2 pr-2 pl-6">
         <Link
           href={props.mode === "authed" ? homeForRole(props.role) : "/"}
