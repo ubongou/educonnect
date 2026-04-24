@@ -93,41 +93,42 @@ export function WhyGrid() {
           ))}
         </div>
 
-        <IntersectionFade delay={150} className="mt-7">
-          {/* The original layout forced portrait stock photos into landscape
-              panels, which cropped faces awkwardly. Using the landscape
-              session-large for the big left panel and portrait photos for
-              the right-stack makes each crop hit its natural orientation. */}
-          <div className="grid h-[420px] grid-cols-1 overflow-hidden rounded-lg md:grid-cols-[3fr_2fr]">
-            <div className="relative bg-g100">
-              <Image
-                src="/gallery/session-large.webp"
-                alt="EduConnect student working through a live lesson on their laptop"
-                fill
-                sizes="(min-width: 768px) 660px, 100vw"
-                className="object-cover object-center"
-              />
-            </div>
-            <div className="hidden flex-col md:flex">
-              <div className="relative flex-1 border-l-4 border-b-4 border-white bg-g50">
+        <IntersectionFade delay={150} className="mt-10">
+          {/* Three equally-weighted portrait cards with a tactile polaroid
+              feel — white border + drop-shadow + gentle alternating tilt.
+              Reads lighter than the old edge-to-edge collage on the busy
+              sky-blue background. */}
+          <div className="grid gap-5 md:grid-cols-3">
+            {[
+              {
+                src: "/gallery/photo-5.webp",
+                alt: "Student working through maths problems at home",
+                tilt: "-rotate-[1.5deg]",
+              },
+              {
+                src: "/gallery/session-large.webp",
+                alt: "EduConnect student working through a live lesson on their laptop",
+                tilt: "rotate-[1deg]",
+              },
+              {
+                src: "/gallery/proof-large.webp",
+                alt: "Student celebrating progress during a session",
+                tilt: "-rotate-[1deg]",
+              },
+            ].map((img) => (
+              <div
+                key={img.src}
+                className={`relative aspect-[4/5] overflow-hidden rounded-lg border-[6px] border-white bg-white shadow-[0_12px_30px_-8px_rgba(4,19,28,0.35)] transition-transform duration-300 hover:rotate-0 ${img.tilt}`}
+              >
                 <Image
-                  src="/gallery/photo-1.webp"
-                  alt="Student listening through headphones during a lesson"
+                  src={img.src}
+                  alt={img.alt}
                   fill
-                  sizes="(min-width: 768px) 440px, 100vw"
+                  sizes="(min-width: 768px) 380px, 100vw"
                   className="object-cover object-top"
                 />
               </div>
-              <div className="relative flex-1 border-l-4 border-white bg-navy">
-                <Image
-                  src="/gallery/photo-4.webp"
-                  alt="Student engaged during an online session"
-                  fill
-                  sizes="(min-width: 768px) 440px, 100vw"
-                  className="object-cover object-top"
-                />
-              </div>
-            </div>
+            ))}
           </div>
         </IntersectionFade>
       </Container>
