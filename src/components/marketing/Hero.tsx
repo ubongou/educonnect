@@ -38,33 +38,33 @@ export function Hero() {
           <p className="mt-[14px] text-[13px] text-navy/50">No commitment. Takes 15 minutes.</p>
         </IntersectionFade>
 
-        <div className="relative hidden min-h-[440px] items-end justify-center md:flex">
-          <span className="animate-float absolute left-0 top-[12%] rounded-md border-[1.5px] border-navy/15 bg-navy/10 px-4 py-[10px] font-heading text-[13px] font-bold text-navy whitespace-nowrap">
-            Every child can excel
-          </span>
-          <span
-            className="animate-float absolute right-0 top-[12%] rounded-md border-[1.5px] border-navy/15 bg-navy/10 px-4 py-[10px] font-heading text-[13px] font-bold text-navy whitespace-nowrap"
-            style={{ animationDelay: "1.5s" }}
-          >
-            Nigeria&apos;s finest teachers
-          </span>
-          <span
-            className="animate-float absolute bottom-[30%] left-[4%] rounded-md border-[1.5px] border-navy/15 bg-navy/10 px-4 py-[10px] font-heading text-[13px] font-bold text-navy whitespace-nowrap"
-            style={{ animationDelay: "0.8s" }}
-          >
-            Maths, English &amp; Science
-          </span>
-          <div className="relative z-10 h-[480px] w-[340px] overflow-hidden rounded-t-[20px] shadow-[0_24px_60px_-18px_rgba(4,19,28,0.35)]">
+        <div className="relative hidden items-end justify-center md:flex">
+          <div className="relative h-[500px] w-full max-w-[420px] -translate-y-10">
             <Image
               src="/home/hero.png"
               alt="EduConnect student engaged in a one-on-one lesson"
               fill
               priority
               quality={95}
-              sizes="(min-width: 768px) 400px, 340px"
-              className="object-cover object-top"
+              sizes="(min-width: 768px) 420px, 100vw"
+              className="object-contain object-bottom drop-shadow-[0_12px_24px_rgba(4,19,28,0.25)]"
             />
           </div>
+          <span className="animate-float absolute left-[2%] top-[30%] z-20 rounded-md border-[1.5px] border-navy/15 bg-navy/10 px-4 py-[10px] font-heading text-[13px] font-bold text-navy whitespace-nowrap">
+            Results beyond grades
+          </span>
+          <span
+            className="animate-float absolute right-[2%] top-[30%] z-20 rounded-md border-[1.5px] border-navy/15 bg-navy/10 px-4 py-[10px] font-heading text-[13px] font-bold text-navy whitespace-nowrap"
+            style={{ animationDelay: "1.5s" }}
+          >
+            Nigeria&apos;s finest teachers
+          </span>
+          <span
+            className="animate-float absolute bottom-[14%] left-[2%] z-20 rounded-md border-[1.5px] border-navy/15 bg-navy/10 px-4 py-[10px] font-heading text-[13px] font-bold text-navy whitespace-nowrap"
+            style={{ animationDelay: "0.8s" }}
+          >
+            Maths, English &amp; Science
+          </span>
         </div>
       </Container>
     </section>
