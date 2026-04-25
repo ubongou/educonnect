@@ -6,7 +6,7 @@ const BOOKING_URL = "https://calendar.app.google/ZiNbAvQkBaYHMVY69";
 export function FinalCta() {
   return (
     <div className="relative overflow-hidden bg-yellow bg-[url('/hero-doodles.svg')] bg-repeat [background-size:480px_480px] px-10 py-[104px] text-center">
-      <div className="relative mx-auto max-w-[1100px]">
+      <div className="relative mx-auto max-w-[1280px]">
         <IntersectionFade>
           <h2 className="font-heading text-[clamp(28px,4vw,48px)] font-extrabold text-navy">
             Ready to get started?
@@ -23,7 +23,7 @@ export function FinalCta() {
           </Button>
         </IntersectionFade>
         <IntersectionFade delay={300}>
-          <p className="mt-[14px] text-[13px] text-navy/40">No commitment. Takes 15 minutes.</p>
+          <p className="mt-[14px] text-[13px] font-semibold text-navy/80">No commitment. Takes 15 minutes.</p>
         </IntersectionFade>
       </div>
     </div>

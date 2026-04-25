@@ -48,7 +48,7 @@ export function Contact() {
             </div>
             <div className="mt-7 flex flex-wrap gap-[10px]">
               <a
-                href="https://instagram.com/joineduconnect"
+                href="https://www.instagram.com/educonnectng/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-pill border-[1.5px] border-white/15 px-[18px] py-[10px] text-[13px] font-semibold text-white/70 transition-colors hover:border-white/50 hover:bg-white/5 hover:text-white"
@@ -61,7 +61,7 @@ export function Contact() {
                 Instagram
               </a>
               <a
-                href="https://facebook.com/joineduconnect"
+                href="https://www.facebook.com/profile.php?id=61572098883786"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-pill border-[1.5px] border-white/15 px-[18px] py-[10px] text-[13px] font-semibold text-white/70 transition-colors hover:border-white/50 hover:bg-white/5 hover:text-white"

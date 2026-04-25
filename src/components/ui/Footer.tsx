@@ -38,7 +38,7 @@ export function Footer({
 
   return (
     <footer className="border-t border-white/5 bg-[#020d13] p-10">
-      <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-between gap-4">
+      <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-4">
         <BrandLogo mode="on-navy" size="md" />
         <ul className="flex gap-6">
           {links.map((l) => (

@@ -3,7 +3,6 @@ import { Footer } from "@/components/ui/Footer";
 import { Hero } from "@/components/marketing/Hero";
 import { Marquee } from "@/components/marketing/Marquee";
 import { WhyGrid } from "@/components/marketing/WhyGrid";
-import { ExpertiseStrip } from "@/components/marketing/ExpertiseStrip";
 import { HowItWorks } from "@/components/marketing/HowItWorks";
 import { Testimonials } from "@/components/marketing/Testimonials";
 import { FoundersAbout } from "@/components/marketing/FoundersAbout";
@@ -17,7 +16,6 @@ export default function Home() {
       <Hero />
       <Marquee />
       <WhyGrid />
-      <ExpertiseStrip />
       <HowItWorks />
       <Testimonials />
       <FoundersAbout />
