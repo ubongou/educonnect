@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { sendLessonReportEmail } from "@/lib/email/sendLessonReport";
 import { lessonReportSchema } from "@/lib/validation";
 
 export type SubmitReportResult =
@@ -64,11 +65,28 @@ export async function submitLessonReport(input: unknown): Promise<SubmitReportRe
     return { ok: false, error: "Report created but no id returned" };
   }
 
+  // Fire-and-log: a Resend hiccup must not roll back a saved report.
+  // The /admin/reports page surfaces emailed_at status so a failed send
+  // can be retried from the admin side.
+  try {
+    const sendResult = await sendLessonReportEmail(reportId);
+    if (!sendResult.ok) {
+      console.error("[lesson-report email] send failed:", sendResult.error);
+    } else if (sendResult.skipped) {
+      console.warn(
+        `[lesson-report email] skipped for ${reportId}: ${sendResult.reason}`,
+      );
+    }
+  } catch (err) {
+    console.error("[lesson-report email] unexpected error:", err);
+  }
+
   revalidatePath("/teacher");
   revalidatePath("/teacher/sessions");
   revalidatePath("/teacher/schedule");
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/sessions");
+  revalidatePath("/admin/reports");
   revalidatePath(`/admin/students/${parsed.data.student_id}`);
 
   return { ok: true, reportId };
