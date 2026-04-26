@@ -7,16 +7,19 @@ export function SectionHeader({
   title,
   subtitle,
   light = false,
+  align = "left",
   className,
 }: {
   eyebrow?: string;
   title: ReactNode;
   subtitle?: ReactNode;
   light?: boolean;
+  align?: "left" | "center";
   className?: string;
 }) {
+  const centered = align === "center";
   return (
-    <div className={clsx("mb-[52px]", className)}>
+    <div className={clsx("mb-[52px]", centered && "text-center", className)}>
       {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
       <h2
         className={clsx(
@@ -29,7 +32,8 @@ export function SectionHeader({
       {subtitle && (
         <p
           className={clsx(
-            "max-w-[520px] text-base leading-[1.75]",
+            "text-base leading-[1.75]",
+            centered ? "mx-auto max-w-[560px]" : "max-w-[520px]",
             light ? "text-white/55" : "text-g600",
           )}
         >
