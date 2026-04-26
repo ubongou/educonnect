@@ -6,8 +6,6 @@ import clsx from "clsx";
 import { Button } from "./Button";
 import { BrandLogo } from "./BrandLogo";
 
-const BOOKING_URL = "https://calendar.app.google/ZiNbAvQkBaYHMVY69";
-
 type NavLink = { href: string; label: string };
 
 const marketingLinks: NavLink[] = [
@@ -42,7 +40,7 @@ const teacherLinks: NavLink[] = [
 type Role = "parent" | "admin" | "teacher";
 
 type Props =
-  | { mode: "marketing"; activeHref?: string }
+  | { mode: "marketing"; activeHref?: string; bookingUrl: string }
   | {
       mode: "authed";
       activeHref?: string;
@@ -108,7 +106,7 @@ export function Nav(props: Props) {
               >
                 Log in
               </Link>
-              <Button href={BOOKING_URL} target="_blank" size="md">
+              <Button href={props.bookingUrl} target="_blank" size="md">
                 Book a Free Session
               </Button>
             </div>
@@ -159,7 +157,7 @@ export function Nav(props: Props) {
                 Log in
               </Link>
               <a
-                href={BOOKING_URL}
+                href={props.bookingUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block px-6 py-[14px] text-[15px] font-semibold text-navy"

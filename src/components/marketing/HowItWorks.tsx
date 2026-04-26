@@ -2,29 +2,15 @@ import { Container } from "@/components/ui/Container";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Button } from "@/components/ui/Button";
 import { IntersectionFade } from "@/components/ui/IntersectionFade";
+import type { HowItWorksContent } from "@/lib/marketing/schemas";
 
-const BOOKING_URL = "https://calendar.app.google/ZiNbAvQkBaYHMVY69";
-
-const steps = [
-  {
-    title: "Book a free consultation",
-    body: "Tell us your child's year group, subjects, and goals. Takes 15 minutes.",
-  },
-  {
-    title: "We match your teacher",
-    body: "We select a teacher based on your child's needs, learning style, and personality — not just availability.",
-  },
-  {
-    title: "Sessions begin",
-    body: "Flexible scheduling, one-on-one, fully online. Lessons adapt as your child grows.",
-  },
-  {
-    title: "Results and updates",
-    body: "Better grades, stronger confidence, and a changed attitude toward learning. You receive regular progress updates throughout.",
-  },
-];
-
-export function HowItWorks() {
+export function HowItWorks({
+  content,
+  bookingUrl,
+}: {
+  content: HowItWorksContent;
+  bookingUrl: string;
+}) {
   return (
     <section id="how-it-works" className="bg-navy px-10 py-24">
       <Container>
@@ -37,14 +23,14 @@ export function HowItWorks() {
           <div>
             <IntersectionFade delay={100}>
               <SectionHeader
-                eyebrow="How it works"
-                title="Four steps to better results"
-                subtitle="From your first conversation to visible progress at school — here is what to expect."
+                eyebrow={content.eyebrow}
+                title={content.title}
+                subtitle={content.subtitle}
                 light
               />
             </IntersectionFade>
             <div className="flex flex-col">
-              {steps.map((s, i) => (
+              {content.steps.map((s, i) => (
                 <IntersectionFade key={s.title} delay={150 + i * 70}>
                   <div className="flex gap-5 border-b border-white/10 py-6 last:border-b-0">
                     <div className="min-w-[44px] font-heading text-[36px] font-extrabold leading-none text-yellow">
@@ -59,8 +45,8 @@ export function HowItWorks() {
               ))}
             </div>
             <IntersectionFade delay={400} className="mt-9">
-              <Button href={BOOKING_URL} target="_blank">
-                Book a free session
+              <Button href={bookingUrl} target="_blank">
+                {content.ctaLabel}
               </Button>
             </IntersectionFade>
           </div>
