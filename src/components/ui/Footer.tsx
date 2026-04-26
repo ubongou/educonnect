@@ -20,6 +20,7 @@ const adminLinks = [
   { href: "/admin/students", label: "Students" },
   { href: "/admin/enrollments", label: "Enrollments" },
   { href: "/admin/reports", label: "Reports" },
+  { href: "/admin/content", label: "Content" },
 ];
 
 export function Footer({

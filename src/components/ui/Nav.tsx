@@ -28,6 +28,7 @@ const adminLinks: NavLink[] = [
   { href: "/admin/teachers", label: "Teachers" },
   { href: "/admin/enrollments", label: "Enrollments" },
   { href: "/admin/schedule", label: "Schedule" },
+  { href: "/admin/content", label: "Content" },
 ];
 
 const teacherLinks: NavLink[] = [
