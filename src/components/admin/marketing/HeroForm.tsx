@@ -18,14 +18,33 @@ export function HeroForm({ initial }: { initial: HeroContent }) {
       getContent={() => content}
     >
       <FieldGroup title="Copy">
-        <TextArea
-          label="Heading"
-          value={content.heading}
-          rows={2}
-          onChange={(v) => setContent({ ...content, heading: v })}
+        <TextInput
+          label="Eyebrow (small uppercase label)"
+          value={content.eyebrow}
+          onChange={(v) => setContent({ ...content, eyebrow: v })}
         />
+        <div className="grid gap-4 md:grid-cols-3">
+          <TextInput
+            label="Heading — before accent"
+            value={content.headingPart1}
+            onChange={(v) => setContent({ ...content, headingPart1: v })}
+            hint='Example: "Personal Tutoring from "'
+          />
+          <TextInput
+            label="Heading accent (yellow highlight)"
+            value={content.headingAccent}
+            onChange={(v) => setContent({ ...content, headingAccent: v })}
+            hint='Example: "Nigeria’s Best"'
+          />
+          <TextInput
+            label="Heading — after accent"
+            value={content.headingPart2}
+            onChange={(v) => setContent({ ...content, headingPart2: v })}
+            hint='Example: " Teachers"'
+          />
+        </div>
         <TextArea
-          label="Subheading"
+          label="Subheading (lead paragraph)"
           value={content.subheading}
           rows={4}
           onChange={(v) => setContent({ ...content, subheading: v })}
@@ -43,36 +62,64 @@ export function HeroForm({ initial }: { initial: HeroContent }) {
           />
         </div>
         <TextInput
-          label="Disclaimer (under CTAs)"
-          value={content.disclaimer}
-          onChange={(v) => setContent({ ...content, disclaimer: v })}
+          label="Microcopy (under CTAs)"
+          value={content.microcopy}
+          onChange={(v) => setContent({ ...content, microcopy: v })}
         />
+      </FieldGroup>
+
+      <FieldGroup title="Floating cards over the hero photo">
+        <div className="grid gap-4 md:grid-cols-2">
+          <TextInput
+            label="Card 1 — title"
+            value={content.card1Title}
+            onChange={(v) => setContent({ ...content, card1Title: v })}
+          />
+          <TextInput
+            label="Card 1 — body"
+            value={content.card1Body}
+            onChange={(v) => setContent({ ...content, card1Body: v })}
+          />
+          <TextInput
+            label="Card 2 — title"
+            value={content.card2Title}
+            onChange={(v) => setContent({ ...content, card2Title: v })}
+          />
+          <TextInput
+            label="Card 2 — body"
+            value={content.card2Body}
+            onChange={(v) => setContent({ ...content, card2Body: v })}
+          />
+        </div>
       </FieldGroup>
 
       <FieldGroup title="Images">
         <ImageUploadField
           label="Hero photo"
-          helpText="Square-ish portrait of a student. Shown right of the heading on desktop. Recommend 1000×1200 PNG with a transparent background or matching yellow."
+          helpText="Portrait of a student. Sits over a sky-blue panel on the right."
           section="hero"
           slot="hero-photo"
           storagePath={content.heroImagePath}
           fallbackPreview={bundledAssets.heroImage}
-          onChange={(storagePath) => setContent({ ...content, heroImagePath: storagePath })}
+          onChange={(storagePath) =>
+            setContent({ ...content, heroImagePath: storagePath })
+          }
         />
         <TextInput
           label="Hero alt text"
           value={content.heroImageAlt}
           onChange={(v) => setContent({ ...content, heroImageAlt: v })}
-          hint="Read by screen readers. Describe what's in the image."
         />
         <ImageUploadField
           label="Backed-by-MIT badge"
-          helpText="Small SVG/PNG shown above the heading. Wide aspect, transparent background."
+          helpText="White MIT lockup on transparent background."
           section="hero"
           slot="mit-badge"
           storagePath={content.mitBadgePath}
           fallbackPreview={bundledAssets.mitBadge}
-          onChange={(storagePath) => setContent({ ...content, mitBadgePath: storagePath })}
+          onChange={(storagePath) =>
+            setContent({ ...content, mitBadgePath: storagePath })
+          }
         />
         <TextInput
           label="MIT badge alt text"

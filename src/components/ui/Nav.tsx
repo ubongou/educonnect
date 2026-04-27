@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import clsx from "clsx";
 import { Button } from "./Button";
 import { BrandLogo } from "./BrandLogo";
@@ -10,7 +10,7 @@ type NavLink = { href: string; label: string };
 
 const marketingLinks: NavLink[] = [
   { href: "/#why", label: "Why EduConnect" },
-  { href: "/#founders", label: "About" },
+  { href: "/#about", label: "About" },
   { href: "/pricing", label: "Pricing" },
   { href: "/#contact", label: "Contact" },
 ];
@@ -63,16 +63,129 @@ function linksForRole(role: Role): NavLink[] {
 }
 
 export function Nav(props: Props) {
+  if (props.mode === "marketing") {
+    return (
+      <MarketingNav
+        activeHref={props.activeHref}
+        bookingUrl={props.bookingUrl}
+      />
+    );
+  }
+  return <AuthedNav {...props} />;
+}
+
+function MarketingNav({
+  activeHref,
+  bookingUrl,
+}: {
+  activeHref?: string;
+  bookingUrl: string;
+}) {
+  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const links =
-    props.mode === "marketing" ? marketingLinks : linksForRole(props.role);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
+  const closeMenu = () => setOpen(false);
+
+  return (
+    <>
+      <header
+        className={clsx("nav", scrolled && "is-scrolled", open && "is-open")}
+        role="banner"
+      >
+        <div className="nav-inner">
+          <Link href="/" className="brand" aria-label="EduConnect — go to home">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand-v2/logo-light.jpeg" alt="EduConnect" />
+          </Link>
+          <nav className="nav-links" aria-label="Primary navigation">
+            {marketingLinks.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                className="nav-link"
+                aria-current={activeHref === l.href ? "page" : undefined}
+              >
+                {l.label}
+              </Link>
+            ))}
+          </nav>
+          <div className="nav-cta">
+            <Link href="/login" className="login">
+              Log in
+            </Link>
+            <a
+              href={bookingUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-coral"
+            >
+              Book a Free Session
+            </a>
+          </div>
+          <button
+            type="button"
+            className="hamburger"
+            aria-label={open ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={open}
+            aria-controls="mkt-mobile-menu"
+            onClick={() => setOpen((v) => !v)}
+          >
+            <span aria-hidden="true" />
+          </button>
+        </div>
+        <div
+          id="mkt-mobile-menu"
+          className="mobile-menu"
+          role="navigation"
+          aria-label="Mobile navigation"
+        >
+          {marketingLinks.map((l) => (
+            <Link key={l.href} href={l.href} onClick={closeMenu}>
+              {l.label}
+            </Link>
+          ))}
+          <Link href="/login" onClick={closeMenu}>
+            Log in
+          </Link>
+          <a
+            href={bookingUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-coral"
+            onClick={closeMenu}
+          >
+            Book a Free Session
+          </a>
+        </div>
+      </header>
+    </>
+  );
+}
+
+function AuthedNav(props: Extract<Props, { mode: "authed" }>) {
+  const [open, setOpen] = useState(false);
+  const links = linksForRole(props.role);
 
   return (
     <div className="bg-yellow px-7 py-3">
       <nav className="mx-auto flex max-w-[1280px] items-center justify-between rounded-pill border-2 border-navy bg-blue py-2 pr-2 pl-6">
         <Link
-          href={props.mode === "authed" ? homeForRole(props.role) : "/"}
+          href={homeForRole(props.role)}
           aria-label="EduConnect home"
           className="shrink-0"
         >
@@ -99,28 +212,14 @@ export function Nav(props: Props) {
             })}
           </ul>
 
-          {props.mode === "marketing" ? (
-            <div className="hidden items-center gap-2 md:flex">
-              <Link
-                href="/login"
-                className="text-[14px] font-semibold text-navy hover:text-white transition-colors"
-              >
-                Log in
-              </Link>
-              <Button href={props.bookingUrl} target="_blank" size="md">
-                Book a Free Session
-              </Button>
-            </div>
-          ) : (
-            <div className="hidden items-center gap-3 md:flex">
-              <span className="font-heading text-[13px] font-semibold text-navy">
-                {props.displayName}
-              </span>
-              <Button variant="outline" size="md" onClick={() => void props.onLogout()}>
-                Log out
-              </Button>
-            </div>
-          )}
+          <div className="hidden items-center gap-3 md:flex">
+            <span className="font-heading text-[13px] font-semibold text-navy">
+              {props.displayName}
+            </span>
+            <Button variant="outline" size="md" onClick={() => void props.onLogout()}>
+              Log out
+            </Button>
+          </div>
 
           <button
             type="button"
@@ -148,36 +247,16 @@ export function Nav(props: Props) {
               {l.label}
             </Link>
           ))}
-          {props.mode === "marketing" ? (
-            <>
-              <Link
-                href="/login"
-                onClick={() => setOpen(false)}
-                className="block border-b border-navy/10 px-6 py-[14px] text-[15px] font-semibold text-navy"
-              >
-                Log in
-              </Link>
-              <a
-                href={props.bookingUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block px-6 py-[14px] text-[15px] font-semibold text-navy"
-              >
-                Book a Free Session
-              </a>
-            </>
-          ) : (
-            <button
-              type="button"
-              onClick={() => {
-                setOpen(false);
-                void props.onLogout();
-              }}
-              className="block w-full px-6 py-[14px] text-left text-[15px] font-semibold text-navy"
-            >
-              Log out ({props.displayName})
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => {
+              setOpen(false);
+              void props.onLogout();
+            }}
+            className="block w-full px-6 py-[14px] text-left text-[15px] font-semibold text-navy"
+          >
+            Log out ({props.displayName})
+          </button>
         </div>
       )}
     </div>

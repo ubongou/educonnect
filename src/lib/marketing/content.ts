@@ -1,35 +1,38 @@
 import { createClient } from "@/lib/supabase/server";
 import {
-  defaultFinalCta,
+  defaultContact,
   defaultFounders,
   defaultGlobals,
   defaultHero,
   defaultHowItWorks,
-  defaultPricingInfoCards,
+  defaultMarquee,
+  defaultPricingFaq,
   defaultPricingIntro,
   defaultPricingTiers,
   defaultTestimonials,
   defaultWhyGrid,
 } from "./defaults";
 import type {
-  FinalCtaContent,
+  ContactContent,
   FoundersContent,
   GlobalsContent,
   HeroContent,
   HowItWorksContent,
-  PricingInfoCardsContent,
+  MarqueeContent,
+  PricingFaqContent,
   PricingIntroContent,
   PricingTiersContent,
   TestimonialsContent,
   WhyGridContent,
 } from "./schemas";
 import {
-  finalCtaSchema,
+  contactSchema,
   foundersSchema,
   globalsSchema,
   heroSchema,
   howItWorksSchema,
-  pricingInfoCardsSchema,
+  marqueeSchema,
+  pricingFaqSchema,
   pricingIntroSchema,
   pricingTiersSchema,
   testimonialsSchema,
@@ -50,11 +53,6 @@ function key(pageSlug: string, sectionKey: string): string {
   return `${pageSlug}/${sectionKey}`;
 }
 
-/**
- * Pulls a section out of the map and parses it through Zod, falling back
- * to the supplied default when the row is missing or malformed. Logs
- * (server-side only) on parse failure so silent drift is observable.
- */
 function pickSection<T>(
   map: SectionMap,
   pageSlug: string,
@@ -86,8 +84,6 @@ async function fetchSections(pageSlugs: string[]): Promise<SectionMap> {
       .in("page_slug", pageSlugs);
 
     if (error) {
-      // Most likely cause: migration 0009 hasn't been applied yet. Defaults
-      // will kick in for every section. Log once so it surfaces in Vercel.
       console.warn("[marketing] site_sections fetch failed:", error.message);
       return map;
     }
@@ -109,17 +105,18 @@ export type WithUpdatedAt<T> = { content: T; updatedAt: string | null };
 
 export type HomeContent = {
   hero: WithUpdatedAt<HeroContent>;
+  marquee: WithUpdatedAt<MarqueeContent>;
   whyGrid: WithUpdatedAt<WhyGridContent>;
   howItWorks: WithUpdatedAt<HowItWorksContent>;
   testimonials: WithUpdatedAt<TestimonialsContent>;
   founders: WithUpdatedAt<FoundersContent>;
-  finalCta: WithUpdatedAt<FinalCtaContent>;
+  contact: WithUpdatedAt<ContactContent>;
 };
 
 export type PricingContent = {
   intro: WithUpdatedAt<PricingIntroContent>;
   tiers: WithUpdatedAt<PricingTiersContent>;
-  infoCards: WithUpdatedAt<PricingInfoCardsContent>;
+  faq: WithUpdatedAt<PricingFaqContent>;
 };
 
 export async function getGlobals(): Promise<WithUpdatedAt<GlobalsContent>> {
@@ -131,6 +128,7 @@ export async function getHomeContent(): Promise<HomeContent> {
   const map = await fetchSections(["home"]);
   return {
     hero: pickSection(map, "home", "hero", heroSchema, defaultHero),
+    marquee: pickSection(map, "home", "marquee", marqueeSchema, defaultMarquee),
     whyGrid: pickSection(map, "home", "why_grid", whyGridSchema, defaultWhyGrid),
     howItWorks: pickSection(
       map,
@@ -147,7 +145,7 @@ export async function getHomeContent(): Promise<HomeContent> {
       defaultTestimonials,
     ),
     founders: pickSection(map, "home", "founders", foundersSchema, defaultFounders),
-    finalCta: pickSection(map, "home", "final_cta", finalCtaSchema, defaultFinalCta),
+    contact: pickSection(map, "home", "contact", contactSchema, defaultContact),
   };
 }
 
@@ -156,19 +154,12 @@ export async function getPricingContent(): Promise<PricingContent> {
   return {
     intro: pickSection(map, "pricing", "intro", pricingIntroSchema, defaultPricingIntro),
     tiers: pickSection(map, "pricing", "tiers", pricingTiersSchema, defaultPricingTiers),
-    infoCards: pickSection(
-      map,
-      "pricing",
-      "info_cards",
-      pricingInfoCardsSchema,
-      defaultPricingInfoCards,
-    ),
+    faq: pickSection(map, "pricing", "faq", pricingFaqSchema, defaultPricingFaq),
   };
 }
 
 /**
- * Admin-side helper: load one section's raw content (typed) for editing.
- * Returns the default if the row hasn't been seeded yet.
+ * Admin-side helper: load one section's raw content for editing.
  */
 export async function getSectionForEdit<T>(
   pageSlug: string,

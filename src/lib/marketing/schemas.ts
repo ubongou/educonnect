@@ -12,18 +12,12 @@ import { z } from "zod";
  * time and appends a cachebuster.
  */
 
-// Trim then enforce min length so empty strings don't sneak through.
-const nonEmpty = (msg = "Required") =>
-  z.string().trim().min(1, msg);
-
+const nonEmpty = (msg = "Required") => z.string().trim().min(1, msg);
 const optionalText = z.string().trim().default("");
-
-// Storage path inside marketing-assets bucket, e.g. "hero/hero.png".
-// Empty = fall back to the bundled /public asset.
 const imagePath = z.string().trim().default("");
 
 // -----------------------------------------------------------------------------
-// Globals — the booking URL + social links + admin email
+// Globals
 // -----------------------------------------------------------------------------
 
 export const globalsSchema = z.object({
@@ -41,11 +35,18 @@ export type GlobalsContent = z.infer<typeof globalsSchema>;
 // -----------------------------------------------------------------------------
 
 export const heroSchema = z.object({
-  heading: nonEmpty(),
+  eyebrow: nonEmpty(),
+  headingPart1: optionalText,
+  headingAccent: optionalText,
+  headingPart2: optionalText,
   subheading: nonEmpty(),
   primaryCtaLabel: nonEmpty(),
   secondaryCtaLabel: nonEmpty(),
-  disclaimer: nonEmpty(),
+  microcopy: nonEmpty(),
+  card1Title: nonEmpty(),
+  card1Body: nonEmpty(),
+  card2Title: nonEmpty(),
+  card2Body: nonEmpty(),
   heroImagePath: imagePath,
   heroImageAlt: nonEmpty(),
   mitBadgePath: imagePath,
@@ -55,17 +56,23 @@ export const heroSchema = z.object({
 export type HeroContent = z.infer<typeof heroSchema>;
 
 // -----------------------------------------------------------------------------
-// Home / Why grid (3 cards + 3 polaroid photos)
+// Home / Marquee
+// -----------------------------------------------------------------------------
+
+export const marqueeSchema = z.object({
+  subjects: z.array(nonEmpty()).min(2).max(24),
+});
+
+export type MarqueeContent = z.infer<typeof marqueeSchema>;
+
+// -----------------------------------------------------------------------------
+// Home / Why grid
 // -----------------------------------------------------------------------------
 
 const whyGridCardSchema = z.object({
+  numLabel: nonEmpty(),
   title: nonEmpty(),
   body: nonEmpty(),
-});
-
-const whyGridPolaroidSchema = z.object({
-  imagePath: imagePath,
-  alt: nonEmpty(),
 });
 
 export const whyGridSchema = z.object({
@@ -73,37 +80,34 @@ export const whyGridSchema = z.object({
   title: nonEmpty(),
   subtitle: nonEmpty(),
   cards: z.array(whyGridCardSchema).length(3),
-  polaroids: z.array(whyGridPolaroidSchema).length(3),
 });
 
 export type WhyGridContent = z.infer<typeof whyGridSchema>;
 
 // -----------------------------------------------------------------------------
-// Home / How it works (4 steps)
+// Home / Data driven (was "how it works" in v1 — section_key kept for
+// migration continuity, content shape rewritten to match the new design)
 // -----------------------------------------------------------------------------
-
-const howItWorksStepSchema = z.object({
-  title: nonEmpty(),
-  body: nonEmpty(),
-});
 
 export const howItWorksSchema = z.object({
   eyebrow: nonEmpty(),
   title: nonEmpty(),
   subtitle: nonEmpty(),
-  ctaLabel: nonEmpty(),
-  steps: z.array(howItWorksStepSchema).length(4),
+  imagePath: imagePath,
+  imageAlt: nonEmpty(),
 });
 
 export type HowItWorksContent = z.infer<typeof howItWorksSchema>;
 
 // -----------------------------------------------------------------------------
-// Home / Testimonials (3 quotes)
+// Home / Testimonials
 // -----------------------------------------------------------------------------
 
 const testimonialQuoteSchema = z.object({
   body: nonEmpty(),
   author: nonEmpty(),
+  where: nonEmpty(),
+  initial: z.string().trim().min(1).max(2),
 });
 
 export const testimonialsSchema = z.object({
@@ -115,7 +119,7 @@ export const testimonialsSchema = z.object({
 export type TestimonialsContent = z.infer<typeof testimonialsSchema>;
 
 // -----------------------------------------------------------------------------
-// Home / Founders (2 founders, alternating layout)
+// Home / Founders
 // -----------------------------------------------------------------------------
 
 const founderSchema = z.object({
@@ -131,23 +135,28 @@ export const foundersSchema = z.object({
   headingLead: nonEmpty(),
   headingHighlight: nonEmpty(),
   intro: nonEmpty(),
+  intro2: optionalText,
   founders: z.array(founderSchema).length(2),
 });
 
 export type FoundersContent = z.infer<typeof foundersSchema>;
 
 // -----------------------------------------------------------------------------
-// Home / Final CTA
+// Home / Contact
 // -----------------------------------------------------------------------------
 
-export const finalCtaSchema = z.object({
-  heading: nonEmpty(),
-  subheading: nonEmpty(),
-  ctaLabel: nonEmpty(),
-  disclaimer: nonEmpty(),
+export const contactSchema = z.object({
+  eyebrow: nonEmpty(),
+  title: nonEmpty(),
+  lead: nonEmpty(),
+  email: nonEmpty().email(),
+  instagramLabel: nonEmpty(),
+  instagramUrl: optionalText,
+  facebookLabel: nonEmpty(),
+  facebookUrl: optionalText,
 });
 
-export type FinalCtaContent = z.infer<typeof finalCtaSchema>;
+export type ContactContent = z.infer<typeof contactSchema>;
 
 // -----------------------------------------------------------------------------
 // Pricing / Intro
@@ -155,14 +164,16 @@ export type FinalCtaContent = z.infer<typeof finalCtaSchema>;
 
 export const pricingIntroSchema = z.object({
   eyebrow: nonEmpty(),
-  title: nonEmpty(),
+  titlePart1: optionalText,
+  titleAccent: optionalText,
+  titlePart2: optionalText,
   subtitle: nonEmpty(),
 });
 
 export type PricingIntroContent = z.infer<typeof pricingIntroSchema>;
 
 // -----------------------------------------------------------------------------
-// Pricing / Tiers (3 tiers × 4 currencies × {perSession,total,saving,free})
+// Pricing / Tiers
 // -----------------------------------------------------------------------------
 
 export const currencyCodes = ["NGN", "USD", "GBP", "CAD"] as const;
@@ -197,39 +208,58 @@ export type Tier = z.infer<typeof tierSchema>;
 export type Price = z.infer<typeof priceSchema>;
 
 // -----------------------------------------------------------------------------
-// Pricing / Info cards (3 cards under the tier table)
+// Pricing / FAQ
 // -----------------------------------------------------------------------------
 
-const infoCardSchema = z.object({
+const faqItemSchema = z.object({
+  question: nonEmpty(),
+  answer: nonEmpty(),
+});
+
+export const pricingFaqSchema = z.object({
+  eyebrow: nonEmpty(),
   title: nonEmpty(),
-  body: nonEmpty(),
+  intro: nonEmpty(),
+  items: z.array(faqItemSchema).min(1).max(12),
 });
 
-export const pricingInfoCardsSchema = z.object({
-  cards: z.array(infoCardSchema).length(3),
-});
-
-export type PricingInfoCardsContent = z.infer<typeof pricingInfoCardsSchema>;
+export type PricingFaqContent = z.infer<typeof pricingFaqSchema>;
 
 // -----------------------------------------------------------------------------
 // Section registry — couples a (page_slug, section_key) with its schema.
-// Used by both the read path and the admin form router.
 // -----------------------------------------------------------------------------
 
 export const sectionRegistry = {
   globals: { pageSlug: "globals", sectionKey: "globals", schema: globalsSchema },
   hero: { pageSlug: "home", sectionKey: "hero", schema: heroSchema },
+  marquee: { pageSlug: "home", sectionKey: "marquee", schema: marqueeSchema },
   why_grid: { pageSlug: "home", sectionKey: "why_grid", schema: whyGridSchema },
-  how_it_works: { pageSlug: "home", sectionKey: "how_it_works", schema: howItWorksSchema },
-  testimonials: { pageSlug: "home", sectionKey: "testimonials", schema: testimonialsSchema },
+  how_it_works: {
+    pageSlug: "home",
+    sectionKey: "how_it_works",
+    schema: howItWorksSchema,
+  },
+  testimonials: {
+    pageSlug: "home",
+    sectionKey: "testimonials",
+    schema: testimonialsSchema,
+  },
   founders: { pageSlug: "home", sectionKey: "founders", schema: foundersSchema },
-  final_cta: { pageSlug: "home", sectionKey: "final_cta", schema: finalCtaSchema },
-  pricing_intro: { pageSlug: "pricing", sectionKey: "intro", schema: pricingIntroSchema },
-  pricing_tiers: { pageSlug: "pricing", sectionKey: "tiers", schema: pricingTiersSchema },
-  pricing_info_cards: {
+  contact: { pageSlug: "home", sectionKey: "contact", schema: contactSchema },
+  pricing_intro: {
     pageSlug: "pricing",
-    sectionKey: "info_cards",
-    schema: pricingInfoCardsSchema,
+    sectionKey: "intro",
+    schema: pricingIntroSchema,
+  },
+  pricing_tiers: {
+    pageSlug: "pricing",
+    sectionKey: "tiers",
+    schema: pricingTiersSchema,
+  },
+  pricing_faq: {
+    pageSlug: "pricing",
+    sectionKey: "faq",
+    schema: pricingFaqSchema,
   },
 } as const;
 

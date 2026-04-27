@@ -4,12 +4,13 @@ import { Container } from "@/components/ui/Container";
 import { requireAdmin } from "@/lib/auth";
 import { getSectionForEdit } from "@/lib/marketing/content";
 import {
-  defaultFinalCta,
+  defaultContact,
   defaultFounders,
   defaultGlobals,
   defaultHero,
   defaultHowItWorks,
-  defaultPricingInfoCards,
+  defaultMarquee,
+  defaultPricingFaq,
   defaultPricingIntro,
   defaultPricingTiers,
   defaultTestimonials,
@@ -17,14 +18,15 @@ import {
 } from "@/lib/marketing/defaults";
 import { sectionRegistry, type SectionId } from "@/lib/marketing/schemas";
 import { HeroForm } from "@/components/admin/marketing/HeroForm";
+import { MarqueeForm } from "@/components/admin/marketing/MarqueeForm";
 import { WhyGridForm } from "@/components/admin/marketing/WhyGridForm";
 import { HowItWorksForm } from "@/components/admin/marketing/HowItWorksForm";
 import { TestimonialsForm } from "@/components/admin/marketing/TestimonialsForm";
 import { FoundersForm } from "@/components/admin/marketing/FoundersForm";
-import { FinalCtaForm } from "@/components/admin/marketing/FinalCtaForm";
+import { ContactForm } from "@/components/admin/marketing/ContactForm";
 import { PricingIntroForm } from "@/components/admin/marketing/PricingIntroForm";
 import { PricingTiersForm } from "@/components/admin/marketing/PricingTiersForm";
-import { PricingInfoCardsForm } from "@/components/admin/marketing/PricingInfoCardsForm";
+import { PricingFaqForm } from "@/components/admin/marketing/PricingFaqForm";
 import { GlobalsForm } from "@/components/admin/marketing/GlobalsForm";
 
 function isSectionId(s: string): s is SectionId {
@@ -41,9 +43,6 @@ export default async function AdminContentSectionPage({
   if (!isSectionId(section)) notFound();
 
   const reg = sectionRegistry[section];
-
-  // Load typed content for this section, falling back to defaults if the
-  // row is missing. Each branch picks the right default to seed the form.
   const form = await renderForm(section, reg);
 
   return (
@@ -70,6 +69,10 @@ async function renderForm(
       const data = await getSectionForEdit(reg.pageSlug, reg.sectionKey, sectionRegistry.hero.schema, defaultHero);
       return <HeroForm initial={data.content} />;
     }
+    case "marquee": {
+      const data = await getSectionForEdit(reg.pageSlug, reg.sectionKey, sectionRegistry.marquee.schema, defaultMarquee);
+      return <MarqueeForm initial={data.content} />;
+    }
     case "why_grid": {
       const data = await getSectionForEdit(reg.pageSlug, reg.sectionKey, sectionRegistry.why_grid.schema, defaultWhyGrid);
       return <WhyGridForm initial={data.content} />;
@@ -86,9 +89,9 @@ async function renderForm(
       const data = await getSectionForEdit(reg.pageSlug, reg.sectionKey, sectionRegistry.founders.schema, defaultFounders);
       return <FoundersForm initial={data.content} />;
     }
-    case "final_cta": {
-      const data = await getSectionForEdit(reg.pageSlug, reg.sectionKey, sectionRegistry.final_cta.schema, defaultFinalCta);
-      return <FinalCtaForm initial={data.content} />;
+    case "contact": {
+      const data = await getSectionForEdit(reg.pageSlug, reg.sectionKey, sectionRegistry.contact.schema, defaultContact);
+      return <ContactForm initial={data.content} />;
     }
     case "pricing_intro": {
       const data = await getSectionForEdit(reg.pageSlug, reg.sectionKey, sectionRegistry.pricing_intro.schema, defaultPricingIntro);
@@ -98,9 +101,9 @@ async function renderForm(
       const data = await getSectionForEdit(reg.pageSlug, reg.sectionKey, sectionRegistry.pricing_tiers.schema, defaultPricingTiers);
       return <PricingTiersForm initial={data.content} />;
     }
-    case "pricing_info_cards": {
-      const data = await getSectionForEdit(reg.pageSlug, reg.sectionKey, sectionRegistry.pricing_info_cards.schema, defaultPricingInfoCards);
-      return <PricingInfoCardsForm initial={data.content} />;
+    case "pricing_faq": {
+      const data = await getSectionForEdit(reg.pageSlug, reg.sectionKey, sectionRegistry.pricing_faq.schema, defaultPricingFaq);
+      return <PricingFaqForm initial={data.content} />;
     }
     case "globals": {
       const data = await getSectionForEdit(reg.pageSlug, reg.sectionKey, sectionRegistry.globals.schema, defaultGlobals);

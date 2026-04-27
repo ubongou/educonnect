@@ -1,45 +1,27 @@
-const items = [
-  "Personal Tutoring",
-  "Nigeria's Best Teachers",
-  "One-on-One",
-  "Maths · English · Science",
-  "Backed by MIT",
-  "10+ Years Tutor Experience",
-  "British · Nigerian · American Curricula",
-  "Per-Lesson Reports",
-];
+import type { MarqueeContent } from "@/lib/marketing/schemas";
 
-export function Marquee() {
-  // Two copies in a row so the CSS animation wraps seamlessly.
-  const loop = [...items, ...items];
+export function Marquee({ content }: { content: MarqueeContent }) {
+  const subjects = content.subjects;
   return (
-    <div
-      aria-hidden="true"
-      className="overflow-hidden border-y-2 border-navy bg-yellow py-4"
-    >
-      <div className="marquee-track flex min-w-max items-center gap-8">
-        {loop.map((t, i) => (
-          <span key={i} className="flex items-center gap-8 whitespace-nowrap">
-            <span className="font-heading text-[16px] font-extrabold uppercase tracking-[0.1em] text-navy">
-              {t}
-            </span>
-            <span className="h-2 w-2 rounded-full bg-navy" aria-hidden="true" />
+    <div className="container">
+      <div className="marquee" aria-hidden="true">
+        <div className="marquee-track">
+          <span>
+            {subjects.map((s, i) => (
+              <span key={`a-${i}`}>
+                {s} <span className="pip" />
+              </span>
+            ))}
           </span>
-        ))}
+          <span aria-hidden="true">
+            {subjects.map((s, i) => (
+              <span key={`b-${i}`}>
+                {s} <span className="pip" />
+              </span>
+            ))}
+          </span>
+        </div>
       </div>
-      <style>{`
-        @keyframes marquee {
-          from { transform: translateX(0); }
-          to   { transform: translateX(-50%); }
-        }
-        .marquee-track {
-          animation: marquee 40s linear infinite;
-          will-change: transform;
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .marquee-track { animation: none; }
-        }
-      `}</style>
     </div>
   );
 }

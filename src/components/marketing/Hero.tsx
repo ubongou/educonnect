@@ -1,7 +1,3 @@
-import Image from "next/image";
-import { Container } from "@/components/ui/Container";
-import { Button } from "@/components/ui/Button";
-import { IntersectionFade } from "@/components/ui/IntersectionFade";
 import { resolveAssetUrl } from "@/lib/marketing/assetUrl";
 import { bundledAssets } from "@/lib/marketing/defaults";
 import type { HeroContent } from "@/lib/marketing/schemas";
@@ -27,66 +23,84 @@ export function Hero({
   );
 
   return (
-    <section className="relative overflow-hidden bg-yellow px-10 pt-2 bg-[url('/hero-doodles.svg')] bg-repeat [background-size:480px_480px] text-navy">
-      <Container className="grid items-end gap-10 md:grid-cols-2 pb-0">
-        <IntersectionFade className="pb-10">
-          <Image
-            src={mitBadge}
-            alt={content.mitBadgeAlt}
-            width={920}
-            height={180}
-            priority
-            className="mb-5 h-[72px] w-auto"
-          />
-
-          <h1 className="font-heading text-[clamp(38px,5.2vw,62px)] font-extrabold leading-[1.05] text-navy">
-            {content.heading}
+    <section className="hero" id="top">
+      <div className="container hero-grid">
+        <div className="hero-copy">
+          <span className="eyebrow hero-eyebrow reveal">{content.eyebrow}</span>
+          <h1 className="reveal delay-1">
+            {content.headingPart1}
+            {content.headingAccent && (
+              <span className="accent">{content.headingAccent}</span>
+            )}
+            {content.headingPart2}
           </h1>
-          <p className="mt-5 max-w-[480px] text-[18px] leading-[1.7] text-navy/70">
-            {content.subheading}
-          </p>
-          <div className="mt-7 flex flex-wrap gap-[14px]">
-            <Button href={bookingUrl} target="_blank" size="lg">
-              {content.primaryCtaLabel}
-            </Button>
-            <Button href="#how-it-works" size="lg" variant="outline">
+          <p className="lead reveal delay-2">{content.subheading}</p>
+          <div className="hero-ctas reveal delay-3">
+            <a
+              href={bookingUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-coral"
+            >
+              {content.primaryCtaLabel}{" "}
+              <span className="arrow" aria-hidden="true">
+                →
+              </span>
+            </a>
+            <a href="/pricing" className="btn btn-ghost">
               {content.secondaryCtaLabel}
-            </Button>
+            </a>
           </div>
-          <p className="mt-[12px] text-[13px] font-semibold text-navy/80">
-            {content.disclaimer}
-          </p>
-        </IntersectionFade>
-
-        <div className="relative hidden items-end justify-center md:flex">
-          <div className="relative h-[580px] w-full max-w-[500px]">
-            <Image
-              src={heroImage}
-              alt={content.heroImageAlt}
-              fill
-              priority
-              quality={95}
-              sizes="(min-width: 768px) 420px, 100vw"
-              className="object-contain object-bottom drop-shadow-[0_12px_24px_rgba(4,19,28,0.25)]"
-            />
+          <div className="hero-microcopy reveal delay-3">
+            <span className="dot" aria-hidden="true" /> {content.microcopy}
           </div>
-          <span className="animate-float absolute left-[14%] top-[44%] z-20 rounded-md border-[1.5px] border-navy/15 bg-navy/10 px-4 py-[10px] font-heading text-[13px] font-bold text-navy whitespace-nowrap">
-            Results beyond grades
-          </span>
-          <span
-            className="animate-float absolute right-[14%] top-[44%] z-20 rounded-md border-[1.5px] border-navy/15 bg-navy/10 px-4 py-[10px] font-heading text-[13px] font-bold text-navy whitespace-nowrap"
-            style={{ animationDelay: "1.5s" }}
-          >
-            Nigeria&apos;s finest teachers
-          </span>
-          <span
-            className="animate-float absolute bottom-[8%] left-[14%] z-20 rounded-md border-[1.5px] border-navy/15 bg-navy/10 px-4 py-[10px] font-heading text-[13px] font-bold text-navy whitespace-nowrap"
-            style={{ animationDelay: "0.8s" }}
-          >
-            Maths, English &amp; Science
-          </span>
         </div>
-      </Container>
+
+        <div className="hero-visual reveal delay-2">
+          <div className="mit-banner">
+            <div className="mit-pill">
+              <span className="backed">Backed by</span>
+              <span className="sep" aria-hidden="true" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={mitBadge}
+                alt={content.mitBadgeAlt}
+                width={120}
+                height={46}
+              />
+            </div>
+          </div>
+          <div className="hero-photo-shell">
+            <div className="hero-photo" aria-hidden="true">
+              <span className="blob-y" />
+              <span className="blob-c" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={heroImage} alt={content.heroImageAlt} />
+            </div>
+            <div className="hero-card c1" aria-hidden="true">
+              <div className="tick-icon" aria-hidden="true">
+                ★
+              </div>
+              <div className="label">
+                <strong>{content.card1Title}</strong>
+                {content.card1Body}
+              </div>
+            </div>
+            <div className="hero-card c2" aria-hidden="true">
+              <div className="avatar-stack" aria-hidden="true">
+                <span className="a1">A</span>
+                <span className="a2">M</span>
+                <span className="a3">J</span>
+                <span className="a4">+</span>
+              </div>
+              <div className="label">
+                <strong>{content.card2Title}</strong>
+                {content.card2Body}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }

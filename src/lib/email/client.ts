@@ -16,7 +16,9 @@ export function getResend(): Resend | null {
 }
 
 export function getFromAddress(): string {
-  return process.env.RESEND_FROM ?? "EduConnect <onboarding@resend.dev>";
+  return (
+    process.env.RESEND_FROM_EMAIL ?? "EduConnect <onboarding@resend.dev>"
+  );
 }
 
 export function getAppUrl(): string {

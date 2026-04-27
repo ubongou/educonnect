@@ -21,25 +21,33 @@ const tiles: Tile[] = [
   {
     id: "hero",
     title: "Hero",
-    description: "Top-of-page heading, subheading, CTA buttons, hero photo.",
+    description:
+      "Top-of-page heading with yellow accent, lead text, CTAs, MIT badge, hero photo, and the two floating cards.",
+    group: "Homepage",
+  },
+  {
+    id: "marquee",
+    title: "Subjects marquee",
+    description: "The scrolling list of subjects under the hero.",
     group: "Homepage",
   },
   {
     id: "why_grid",
     title: "Why EduConnect grid",
-    description: "Three info cards plus the polaroid photo strip.",
+    description: "Three pillar cards explaining what sets EduConnect apart.",
     group: "Homepage",
   },
   {
     id: "how_it_works",
-    title: "How it works",
-    description: "Numbered four-step explainer.",
+    title: "Data driven results",
+    description:
+      "Dark navy section with copy and the parent dashboard preview.",
     group: "Homepage",
   },
   {
     id: "testimonials",
     title: "Testimonials",
-    description: "Three parent quotes.",
+    description: "Three parent quotes with author + location.",
     group: "Homepage",
   },
   {
@@ -49,16 +57,15 @@ const tiles: Tile[] = [
     group: "Homepage",
   },
   {
-    id: "final_cta",
-    title: "Final CTA",
-    description:
-      'The "Ready to get started?" yellow band — appears at the bottom of both / and /pricing.',
+    id: "contact",
+    title: "Contact section",
+    description: "The 'Let's talk' block with email, Instagram, and Facebook.",
     group: "Homepage",
   },
   {
     id: "pricing_intro",
     title: "Pricing intro",
-    description: "Header above the tier cards.",
+    description: "Header above the tier cards (yellow-accent title).",
     group: "Pricing page",
   },
   {
@@ -68,9 +75,9 @@ const tiles: Tile[] = [
     group: "Pricing page",
   },
   {
-    id: "pricing_info_cards",
-    title: "Info cards",
-    description: "Three reassurance cards under the tier table.",
+    id: "pricing_faq",
+    title: "Pricing FAQ",
+    description: "Accordion of frequently-asked questions under the tiers.",
     group: "Pricing page",
   },
 ];
