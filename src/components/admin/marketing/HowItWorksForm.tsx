@@ -3,25 +3,21 @@
 import { useState } from "react";
 import { SectionFormShell } from "./SectionFormShell";
 import { TextArea, TextInput, FieldGroup } from "./fields";
+import { ImageUploadField } from "./ImageUploadField";
+import { bundledAssets } from "@/lib/marketing/defaults";
 import type { HowItWorksContent } from "@/lib/marketing/schemas";
 
 export function HowItWorksForm({ initial }: { initial: HowItWorksContent }) {
   const [content, setContent] = useState<HowItWorksContent>(initial);
 
-  function updateStep(i: number, patch: Partial<HowItWorksContent["steps"][number]>) {
-    const next = [...content.steps] as HowItWorksContent["steps"];
-    next[i] = { ...next[i], ...patch };
-    setContent({ ...content, steps: next });
-  }
-
   return (
     <SectionFormShell
       sectionId="how_it_works"
-      title="How it works"
-      description="Numbered four-step explainer next to the dashboard preview."
+      title="Data driven results"
+      description="Dark navy section with the parent dashboard preview."
       getContent={() => content}
     >
-      <FieldGroup title="Section heading">
+      <FieldGroup title="Copy">
         <TextInput
           label="Eyebrow"
           value={content.eyebrow}
@@ -38,29 +34,26 @@ export function HowItWorksForm({ initial }: { initial: HowItWorksContent }) {
           rows={3}
           onChange={(v) => setContent({ ...content, subtitle: v })}
         />
-        <TextInput
-          label="CTA button label"
-          value={content.ctaLabel}
-          onChange={(v) => setContent({ ...content, ctaLabel: v })}
-          hint="The destination URL is the booking link from Site globals."
-        />
       </FieldGroup>
 
-      {content.steps.map((s, i) => (
-        <FieldGroup key={i} title={`Step ${i + 1}`}>
-          <TextInput
-            label="Title"
-            value={s.title}
-            onChange={(v) => updateStep(i, { title: v })}
-          />
-          <TextArea
-            label="Body"
-            value={s.body}
-            rows={3}
-            onChange={(v) => updateStep(i, { body: v })}
-          />
-        </FieldGroup>
-      ))}
+      <FieldGroup title="Dashboard preview image">
+        <ImageUploadField
+          label="Image"
+          helpText="Wide screenshot of the parent dashboard. Recommended 1440×740 PNG."
+          section="how_it_works"
+          slot="dashboard"
+          storagePath={content.imagePath}
+          fallbackPreview={bundledAssets.dashboardImage}
+          onChange={(storagePath) =>
+            setContent({ ...content, imagePath: storagePath })
+          }
+        />
+        <TextInput
+          label="Alt text"
+          value={content.imageAlt}
+          onChange={(v) => setContent({ ...content, imageAlt: v })}
+        />
+      </FieldGroup>
     </SectionFormShell>
   );
 }

@@ -1,145 +1,275 @@
 "use client";
 
-import { useState } from "react";
-import { Container } from "@/components/ui/Container";
-import { Eyebrow } from "@/components/ui/Eyebrow";
-import { IntersectionFade } from "@/components/ui/IntersectionFade";
-import { Button } from "@/components/ui/Button";
+import { useState, useTransition, type FormEvent } from "react";
+import clsx from "clsx";
+import { submitContactMessage } from "@/lib/actions/contact";
+import type { ContactContent } from "@/lib/marketing/schemas";
 
-export function Contact() {
-  const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+type FieldKey = "name" | "email" | "subject" | "message";
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+const validators: Record<FieldKey, (v: string) => boolean> = {
+  name: (v) => v.trim().length >= 2,
+  email: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()),
+  subject: (v) => v.trim().length >= 2,
+  message: (v) => v.trim().length >= 5,
+};
+
+type Errors = Partial<Record<FieldKey, boolean>>;
+
+export function Contact({ content }: { content: ContactContent }) {
+  const [errors, setErrors] = useState<Errors>({});
+  const [success, setSuccess] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+
+  function clearError(field: FieldKey, value: string) {
+    if (validators[field](value) && errors[field]) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
+    }
+  }
+
+  function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setSubmitting(true);
-    const form = new FormData(e.currentTarget);
-    // MVP stub — POST to a server route once the email provider is wired.
-    await new Promise((r) => setTimeout(r, 400));
-    console.info("contact form submitted:", Object.fromEntries(form.entries()));
-    setSubmitted(true);
-    setSubmitting(false);
+    setServerError(null);
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    const next: Errors = {};
+    let firstInvalid: HTMLInputElement | HTMLTextAreaElement | null = null;
+
+    (["name", "email", "subject", "message"] as FieldKey[]).forEach((k) => {
+      const value = String(data.get(k) ?? "");
+      if (!validators[k](value)) {
+        next[k] = true;
+        if (!firstInvalid) {
+          firstInvalid = form.querySelector<
+            HTMLInputElement | HTMLTextAreaElement
+          >(`[name="${k}"]`);
+        }
+      }
+    });
+
+    setErrors(next);
+    if (Object.keys(next).length > 0) {
+      (firstInvalid as HTMLInputElement | HTMLTextAreaElement | null)?.focus();
+      return;
+    }
+
+    const payload = {
+      name: String(data.get("name") ?? ""),
+      email: String(data.get("email") ?? ""),
+      subject: String(data.get("subject") ?? ""),
+      message: String(data.get("message") ?? ""),
+    };
+
+    startTransition(async () => {
+      const result = await submitContactMessage(payload);
+      if (!result.ok) {
+        setServerError(result.error);
+        return;
+      }
+      setSuccess(true);
+      form.reset();
+      window.setTimeout(() => setSuccess(false), 6000);
+    });
   }
 
   return (
-    <section id="contact" className="bg-navy px-10 py-24">
-      <Container>
-        <div className="grid items-start gap-[72px] md:grid-cols-[1fr_1.4fr]">
-          <IntersectionFade>
-            <Eyebrow>Get in touch</Eyebrow>
-            <h2 className="mb-4 font-heading text-[clamp(26px,3.5vw,40px)] font-extrabold leading-[1.15] text-white">
-              Let&apos;s talk
-            </h2>
-            <p className="mb-7 text-[15px] leading-[1.75] text-white/55">
-              Have questions before booking? Send us a message and we&apos;ll get back to you
-              within 24 hours.
-            </p>
-            <div className="mb-2 flex items-center gap-[10px] text-[14px] text-white/55">
-              <span>✉</span>
-              <a href="mailto:admin@joineduconnect.com" className="text-blue">
-                admin@joineduconnect.com
-              </a>
-            </div>
-            <div className="flex items-center gap-[10px] text-[14px] text-white/55">
-              <span>🌐</span>
-              <a href="https://www.joineduconnect.com" className="text-blue">
-                joineduconnect.com
-              </a>
-            </div>
-            <div className="mt-7 flex flex-wrap gap-[10px]">
+    <section className="contact" id="contact" aria-labelledby="contact-heading">
+      <div className="container contact-grid">
+        <div className="reveal">
+          <span className="eyebrow" style={{ marginBottom: 18 }}>
+            {content.eyebrow}
+          </span>
+          <h2 id="contact-heading" style={{ marginTop: 14 }}>
+            {content.title}
+          </h2>
+          <p className="lead">{content.lead}</p>
+          <div className="contact-meta">
+            <a href={`mailto:${content.email}`}>
+              <span className="ico" aria-hidden="true">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect x="3" y="5" width="18" height="14" rx="2" />
+                  <path d="m3 7 9 6 9-6" />
+                </svg>
+              </span>
+              {content.email}
+            </a>
+            {content.instagramUrl && (
               <a
-                href="https://www.instagram.com/educonnectng/"
+                href={content.instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-pill border-[1.5px] border-white/15 px-[18px] py-[10px] text-[13px] font-semibold text-white/70 transition-colors hover:border-white/50 hover:bg-white/5 hover:text-white"
               >
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <rect x="2" y="2" width="20" height="20" rx="5" />
-                  <circle cx="12" cy="12" r="4" />
-                  <circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none" />
-                </svg>
-                Instagram
-              </a>
-              <a
-                href="https://www.facebook.com/profile.php?id=61572098883786"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-pill border-[1.5px] border-white/15 px-[18px] py-[10px] text-[13px] font-semibold text-white/70 transition-colors hover:border-white/50 hover:bg-white/5 hover:text-white"
-              >
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-                </svg>
-                Facebook
-              </a>
-            </div>
-          </IntersectionFade>
-
-          <IntersectionFade delay={150}>
-            {submitted ? (
-              <div className="rounded-md border border-blue/25 bg-blue/5 p-6 text-center text-[15px] font-semibold text-blue">
-                Message sent! We&apos;ll be in touch within 24 hours.
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-[14px]">
-                <div className="grid gap-[14px] md:grid-cols-2">
-                  <div className="flex flex-col gap-[7px]">
-                    <label className="font-heading text-[13px] font-semibold text-white/55">
-                      Your name
-                    </label>
-                    <input
-                      name="name"
-                      type="text"
-                      placeholder="e.g. Adaeze Obi"
-                      required
-                      className="rounded-md border-[1.5px] border-white/15 bg-white/5 px-4 py-3 text-[14px] text-white placeholder:text-white/30 focus:border-blue focus:outline-none"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-[7px]">
-                    <label className="font-heading text-[13px] font-semibold text-white/55">
-                      Email address
-                    </label>
-                    <input
-                      name="email"
-                      type="email"
-                      placeholder="your@email.com"
-                      required
-                      className="rounded-md border-[1.5px] border-white/15 bg-white/5 px-4 py-3 text-[14px] text-white placeholder:text-white/30 focus:border-blue focus:outline-none"
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-col gap-[7px]">
-                  <label className="font-heading text-[13px] font-semibold text-white/55">Subject</label>
-                  <select
-                    name="subject"
-                    className="rounded-md border-[1.5px] border-white/15 bg-white/5 px-4 py-3 text-[14px] text-white focus:border-blue focus:outline-none"
-                    defaultValue=""
+                <span className="ico" aria-hidden="true">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   >
-                    <option value="" disabled>
-                      Select a subject
-                    </option>
-                    <option>Maths</option>
-                    <option>English</option>
-                    <option>Science</option>
-                    <option>Multiple subjects</option>
-                    <option>General enquiry</option>
-                  </select>
-                </div>
-                <div className="flex flex-col gap-[7px]">
-                  <label className="font-heading text-[13px] font-semibold text-white/55">Message</label>
-                  <textarea
-                    name="message"
-                    placeholder="Tell us about your child and what support you're looking for..."
-                    className="min-h-[110px] resize-y rounded-md border-[1.5px] border-white/15 bg-white/5 px-4 py-3 text-[14px] text-white placeholder:text-white/30 focus:border-blue focus:outline-none"
-                  />
-                </div>
-                <Button type="submit" disabled={submitting} className="self-start">
-                  {submitting ? "Sending…" : "Send message"}
-                </Button>
-              </form>
+                    <rect x="2" y="2" width="20" height="20" rx="5" />
+                    <circle cx="12" cy="12" r="4" />
+                    <circle
+                      cx="17.5"
+                      cy="6.5"
+                      r="1"
+                      fill="currentColor"
+                      stroke="none"
+                    />
+                  </svg>
+                </span>
+                {content.instagramLabel}
+              </a>
             )}
-          </IntersectionFade>
+            {content.facebookUrl && (
+              <a
+                href={content.facebookUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span className="ico" aria-hidden="true">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                  </svg>
+                </span>
+                {content.facebookLabel}
+              </a>
+            )}
+          </div>
         </div>
-      </Container>
+
+        <form
+          className="contact-form reveal delay-1"
+          aria-label="Contact form"
+          noValidate
+          onSubmit={onSubmit}
+        >
+          <div className={clsx("field", errors.name && "error")}>
+            <label htmlFor="f-name">Your name</label>
+            <input
+              type="text"
+              id="f-name"
+              name="name"
+              required
+              autoComplete="name"
+              aria-required="true"
+              aria-invalid={errors.name ? true : undefined}
+              aria-describedby="err-name"
+              onInput={(e) => clearError("name", e.currentTarget.value)}
+            />
+            <div className="err" id="err-name" role="alert">
+              Please enter your name (at least 2 characters).
+            </div>
+          </div>
+          <div className={clsx("field", errors.email && "error")}>
+            <label htmlFor="f-email">Email address</label>
+            <input
+              type="email"
+              id="f-email"
+              name="email"
+              required
+              autoComplete="email"
+              aria-required="true"
+              aria-invalid={errors.email ? true : undefined}
+              aria-describedby="err-email"
+              onInput={(e) => clearError("email", e.currentTarget.value)}
+            />
+            <div className="err" id="err-email" role="alert">
+              Please enter a valid email address.
+            </div>
+          </div>
+          <div className={clsx("field", errors.subject && "error")}>
+            <label htmlFor="f-subject">Subject</label>
+            <input
+              type="text"
+              id="f-subject"
+              name="subject"
+              required
+              autoComplete="off"
+              aria-required="true"
+              aria-invalid={errors.subject ? true : undefined}
+              aria-describedby="err-subject"
+              onInput={(e) => clearError("subject", e.currentTarget.value)}
+            />
+            <div className="err" id="err-subject" role="alert">
+              Please add a subject.
+            </div>
+          </div>
+          <div className={clsx("field", errors.message && "error")}>
+            <label htmlFor="f-message">Message</label>
+            <textarea
+              id="f-message"
+              name="message"
+              required
+              aria-required="true"
+              aria-invalid={errors.message ? true : undefined}
+              aria-describedby="err-message"
+              onInput={(e) => clearError("message", e.currentTarget.value)}
+            />
+            <div className="err" id="err-message" role="alert">
+              Please write a short message (at least 5 characters).
+            </div>
+          </div>
+          <button
+            type="submit"
+            className="btn btn-coral"
+            disabled={pending}
+          >
+            {pending ? "Sending…" : "Send message"}{" "}
+            <span className="arrow" aria-hidden="true">
+              →
+            </span>
+          </button>
+          {serverError && (
+            <div
+              className="form-success show"
+              role="alert"
+              aria-live="assertive"
+              style={{
+                background: "#fdecea",
+                borderColor: "#f5b7b1",
+                color: "#a83a2a",
+              }}
+            >
+              Sorry — we couldn&apos;t send your message. {serverError}
+            </div>
+          )}
+          <div
+            className={clsx("form-success", success && "show")}
+            role="status"
+            aria-live="polite"
+          >
+            Thanks — your message is on its way. We&apos;ll get back to you
+            within 24 hours.
+          </div>
+        </form>
+      </div>
     </section>
   );
 }

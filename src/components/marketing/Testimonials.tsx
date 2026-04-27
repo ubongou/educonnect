@@ -1,30 +1,41 @@
-import { Container } from "@/components/ui/Container";
-import { SectionHeader } from "@/components/ui/SectionHeader";
-import { Card } from "@/components/ui/Card";
-import { IntersectionFade } from "@/components/ui/IntersectionFade";
 import type { TestimonialsContent } from "@/lib/marketing/schemas";
 
 export function Testimonials({ content }: { content: TestimonialsContent }) {
   return (
-    <section className="relative bg-blue bg-[url('/hero-doodles.svg')] bg-repeat [background-size:480px_480px] px-10 py-24">
-      <Container>
-        <IntersectionFade>
-          <SectionHeader eyebrow={content.eyebrow} title={content.title} />
-        </IntersectionFade>
-        <div className="grid gap-5 md:grid-cols-3">
+    <section className="testimonials" aria-labelledby="testi-heading">
+      <div className="container">
+        <div className="section-head">
+          <div className="reveal">
+            <span className="eyebrow">{content.eyebrow}</span>
+            <h2 id="testi-heading" style={{ marginTop: 14 }}>
+              {content.title}
+            </h2>
+          </div>
+        </div>
+
+        <div className="testi-grid">
           {content.quotes.map((q, i) => (
-            <IntersectionFade key={q.author} delay={i * 120}>
-              <Card className="hover:-translate-y-[3px]">
-                <span className="mb-4 block font-heading text-[64px] font-extrabold leading-[0.8] text-yellow">
-                  &ldquo;
-                </span>
-                <p className="mb-5 text-[14px] italic leading-[1.78] text-g600">{q.body}</p>
-                <span className="text-[13px] font-bold text-navy">{q.author}</span>
-              </Card>
-            </IntersectionFade>
+            <article
+              key={i}
+              className={`testi reveal${i > 0 ? ` delay-${i}` : ""}`}
+            >
+              <div className="quote-mark" aria-hidden="true">
+                &ldquo;
+              </div>
+              <blockquote>{q.body}</blockquote>
+              <div className="by">
+                <div className="av" aria-hidden="true">
+                  {q.initial}
+                </div>
+                <div>
+                  <div className="who">{q.author}</div>
+                  <div className="where">{q.where}</div>
+                </div>
+              </div>
+            </article>
           ))}
         </div>
-      </Container>
+      </div>
     </section>
   );
 }

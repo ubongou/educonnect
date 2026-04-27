@@ -39,7 +39,7 @@ export function FoundersForm({ initial }: { initial: FoundersContent }) {
           hint='Example: "Built on one belief: "'
         />
         <TextInput
-          label="Heading highlight (yellow text)"
+          label="Heading highlight (coral italic)"
           value={content.headingHighlight}
           onChange={(v) => setContent({ ...content, headingHighlight: v })}
           hint='Example: "teaching quality determines everything."'
@@ -47,8 +47,14 @@ export function FoundersForm({ initial }: { initial: FoundersContent }) {
         <TextArea
           label="Intro paragraph"
           value={content.intro}
-          rows={6}
+          rows={5}
           onChange={(v) => setContent({ ...content, intro: v })}
+        />
+        <TextArea
+          label="Second paragraph (optional)"
+          value={content.intro2}
+          rows={3}
+          onChange={(v) => setContent({ ...content, intro2: v })}
         />
       </FieldGroup>
 
@@ -60,9 +66,10 @@ export function FoundersForm({ initial }: { initial: FoundersContent }) {
             onChange={(v) => updateFounder(i, { name: v })}
           />
           <TextInput
-            label="Role"
+            label="Role tag (shown on photo)"
             value={f.role}
             onChange={(v) => updateFounder(i, { role: v })}
+            hint='Example: "Co-founder"'
           />
           <TextArea
             label="Bio"
@@ -72,14 +79,16 @@ export function FoundersForm({ initial }: { initial: FoundersContent }) {
           />
           <ImageUploadField
             label="Portrait"
-            helpText="4:5 portrait. JPEG/PNG."
+            helpText="16:10 landscape crop, photo taken from a slight distance."
             section="founders"
             slot={`founder-${i}`}
             storagePath={f.photoPath}
             fallbackPreview={
               bundledAssets.founderPhotos[i] ?? bundledAssets.founderPhotos[0]
             }
-            onChange={(storagePath) => updateFounder(i, { photoPath: storagePath })}
+            onChange={(storagePath) =>
+              updateFounder(i, { photoPath: storagePath })
+            }
           />
           <TextInput
             label="Photo alt text"

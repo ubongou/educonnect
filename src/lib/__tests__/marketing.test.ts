@@ -1,23 +1,25 @@
 import { describe, expect, it } from "vitest";
 import {
-  defaultFinalCta,
+  defaultContact,
   defaultFounders,
   defaultGlobals,
   defaultHero,
   defaultHowItWorks,
-  defaultPricingInfoCards,
+  defaultMarquee,
+  defaultPricingFaq,
   defaultPricingIntro,
   defaultPricingTiers,
   defaultTestimonials,
   defaultWhyGrid,
 } from "@/lib/marketing/defaults";
 import {
-  finalCtaSchema,
+  contactSchema,
   foundersSchema,
   globalsSchema,
   heroSchema,
   howItWorksSchema,
-  pricingInfoCardsSchema,
+  marqueeSchema,
+  pricingFaqSchema,
   pricingIntroSchema,
   pricingTiersSchema,
   sectionRegistry,
@@ -30,14 +32,15 @@ describe("marketing/schemas — defaults round-trip", () => {
   it.each([
     ["globals", globalsSchema, defaultGlobals],
     ["hero", heroSchema, defaultHero],
+    ["marquee", marqueeSchema, defaultMarquee],
     ["why_grid", whyGridSchema, defaultWhyGrid],
     ["how_it_works", howItWorksSchema, defaultHowItWorks],
     ["testimonials", testimonialsSchema, defaultTestimonials],
     ["founders", foundersSchema, defaultFounders],
-    ["final_cta", finalCtaSchema, defaultFinalCta],
+    ["contact", contactSchema, defaultContact],
     ["pricing_intro", pricingIntroSchema, defaultPricingIntro],
     ["pricing_tiers", pricingTiersSchema, defaultPricingTiers],
-    ["pricing_info_cards", pricingInfoCardsSchema, defaultPricingInfoCards],
+    ["pricing_faq", pricingFaqSchema, defaultPricingFaq],
   ] as const)("%s default parses cleanly", (_, schema, defaults) => {
     const parsed = schema.safeParse(defaults);
     expect(parsed.success).toBe(true);
@@ -45,8 +48,8 @@ describe("marketing/schemas — defaults round-trip", () => {
 });
 
 describe("marketing/schemas — rejection cases", () => {
-  it("rejects empty hero heading", () => {
-    const result = heroSchema.safeParse({ ...defaultHero, heading: "" });
+  it("rejects empty hero eyebrow", () => {
+    const result = heroSchema.safeParse({ ...defaultHero, eyebrow: "" });
     expect(result.success).toBe(false);
   });
 
@@ -58,10 +61,10 @@ describe("marketing/schemas — rejection cases", () => {
     expect(result.success).toBe(false);
   });
 
-  it("rejects a missing how-it-works step", () => {
+  it("rejects an empty data-driven image alt", () => {
     const result = howItWorksSchema.safeParse({
       ...defaultHowItWorks,
-      steps: defaultHowItWorks.steps.slice(0, 3),
+      imageAlt: "",
     });
     expect(result.success).toBe(false);
   });
@@ -91,6 +94,24 @@ describe("marketing/schemas — rejection cases", () => {
     const result = pricingTiersSchema.safeParse(tiers);
     expect(result.success).toBe(false);
   });
+
+  it("rejects a marquee with fewer than two subjects", () => {
+    const result = marqueeSchema.safeParse({ subjects: ["Mathematics"] });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a pricing FAQ with no items", () => {
+    const result = pricingFaqSchema.safeParse({
+      ...defaultPricingFaq,
+      items: [],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a contact section without an email", () => {
+    const result = contactSchema.safeParse({ ...defaultContact, email: "" });
+    expect(result.success).toBe(false);
+  });
 });
 
 describe("marketing/schemas — section registry", () => {
@@ -99,7 +120,9 @@ describe("marketing/schemas — section registry", () => {
     expect(ids).toContain("hero");
     expect(ids).toContain("globals");
     expect(ids).toContain("pricing_tiers");
-    expect(ids.length).toBe(10);
+    expect(ids).toContain("pricing_faq");
+    expect(ids).toContain("contact");
+    expect(ids.length).toBe(11);
   });
 
   it("uses unique (pageSlug, sectionKey) tuples", () => {

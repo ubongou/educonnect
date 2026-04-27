@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Nunito, Nunito_Sans } from "next/font/google";
+import { Nunito, Nunito_Sans, Outfit, Inter } from "next/font/google";
 import "./globals.css";
+import "../styles/marketing.css";
 
 const nunito = Nunito({
   subsets: ["latin"],
@@ -16,6 +17,20 @@ const nunitoSans = Nunito_Sans({
   display: "swap",
 });
 
+const outfit = Outfit({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-outfit",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "EduConnect | Personal Tutoring from Nigeria's Best Teachers",
   description:
@@ -28,7 +43,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${nunito.variable} ${nunitoSans.variable} h-full`}>
+    <html
+      lang="en"
+      className={`${nunito.variable} ${nunitoSans.variable} ${outfit.variable} ${inter.variable} h-full`}
+    >
       <body className="min-h-full flex flex-col font-sans text-navy bg-white antialiased">
         {children}
       </body>

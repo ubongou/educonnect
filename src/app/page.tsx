@@ -6,8 +6,8 @@ import { WhyGrid } from "@/components/marketing/WhyGrid";
 import { HowItWorks } from "@/components/marketing/HowItWorks";
 import { Testimonials } from "@/components/marketing/Testimonials";
 import { FoundersAbout } from "@/components/marketing/FoundersAbout";
-import { FinalCta } from "@/components/marketing/FinalCta";
 import { Contact } from "@/components/marketing/Contact";
+import { MarketingScrollReveal } from "@/components/marketing/MarketingScrollReveal";
 import { getGlobals, getHomeContent } from "@/lib/marketing/content";
 
 export default async function Home() {
@@ -15,24 +15,32 @@ export default async function Home() {
   const bookingUrl = globals.content.bookingUrl;
 
   return (
-    <>
+    <div className="mkt-root">
+      <MarketingScrollReveal />
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       <Nav mode="marketing" bookingUrl={bookingUrl} />
-      <Hero
-        content={home.hero.content}
-        bookingUrl={bookingUrl}
-        updatedAt={home.hero.updatedAt}
-      />
-      <Marquee />
-      <WhyGrid content={home.whyGrid.content} updatedAt={home.whyGrid.updatedAt} />
-      <HowItWorks content={home.howItWorks.content} bookingUrl={bookingUrl} />
-      <Testimonials content={home.testimonials.content} />
-      <FoundersAbout
-        content={home.founders.content}
-        updatedAt={home.founders.updatedAt}
-      />
-      <FinalCta content={home.finalCta.content} bookingUrl={bookingUrl} />
-      <Contact />
+      <main id="main-content">
+        <Hero
+          content={home.hero.content}
+          bookingUrl={bookingUrl}
+          updatedAt={home.hero.updatedAt}
+        />
+        <Marquee content={home.marquee.content} />
+        <WhyGrid content={home.whyGrid.content} />
+        <HowItWorks
+          content={home.howItWorks.content}
+          updatedAt={home.howItWorks.updatedAt}
+        />
+        <Testimonials content={home.testimonials.content} />
+        <FoundersAbout
+          content={home.founders.content}
+          updatedAt={home.founders.updatedAt}
+        />
+        <Contact content={home.contact.content} />
+      </main>
       <Footer mode="marketing" />
-    </>
+    </div>
   );
 }

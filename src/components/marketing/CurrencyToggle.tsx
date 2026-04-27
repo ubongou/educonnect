@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 
-export type Currency = "USD" | "GBP" | "CAD" | "NGN";
+export type Currency = "NGN" | "USD" | "GBP" | "CAD";
 
 export const currencySymbols: Record<Currency, string> = {
   USD: "$",
@@ -11,6 +11,8 @@ export const currencySymbols: Record<Currency, string> = {
   NGN: "₦",
 };
 
+const order: Currency[] = ["USD", "GBP", "CAD", "NGN"];
+
 export function CurrencyToggle({
   value,
   onChange,
@@ -18,23 +20,19 @@ export function CurrencyToggle({
   value: Currency;
   onChange: (c: Currency) => void;
 }) {
-  const currencies: Currency[] = ["USD", "GBP", "CAD", "NGN"];
   return (
     <div
+      className="currency-toggle"
       role="group"
-      aria-label="Currency"
-      className="inline-flex items-center gap-1 rounded-pill border-[1.5px] border-white/15 bg-white/10 p-1"
+      aria-label="Select currency"
     >
-      {currencies.map((c) => (
+      {order.map((c) => (
         <button
           key={c}
           type="button"
           onClick={() => onChange(c)}
           aria-pressed={value === c}
-          className={clsx(
-            "rounded-pill px-5 py-2 font-heading text-[13px] font-bold transition-colors",
-            value === c ? "bg-yellow text-navy" : "text-white/55 hover:text-white",
-          )}
+          className={clsx("currency-btn", value === c && "active")}
         >
           {currencySymbols[c]} {c}
         </button>
