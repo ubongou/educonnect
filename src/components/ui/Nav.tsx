@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import { Button } from "./Button";
 import { BrandLogo } from "./BrandLogo";
@@ -83,6 +83,11 @@ function MarketingNav({
 }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const navInnerRef = useRef<HTMLDivElement | null>(null);
+  const brandRef = useRef<HTMLAnchorElement | null>(null);
+  const linksRef = useRef<HTMLElement | null>(null);
+  const ctaRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -99,20 +104,61 @@ function MarketingNav({
     return () => document.removeEventListener("keydown", onKey);
   }, []);
 
+  useEffect(() => {
+    const navInner = navInnerRef.current;
+    const brand = brandRef.current;
+    const links = linksRef.current;
+    const cta = ctaRef.current;
+    if (!navInner || !brand || !links || !cta) return;
+
+    const measure = () => {
+      // Temporarily un-hide the desktop bits to read their natural width,
+      // then decide whether the row actually fits.
+      const prevLinksDisplay = links.style.display;
+      const prevCtaDisplay = cta.style.display;
+      links.style.display = "flex";
+      cta.style.display = "flex";
+      const needed =
+        brand.offsetWidth + links.offsetWidth + cta.offsetWidth + 100;
+      const available = navInner.offsetWidth;
+      links.style.display = prevLinksDisplay;
+      cta.style.display = prevCtaDisplay;
+      const next = needed > available;
+      setCollapsed(next);
+      // Drop the open mobile menu the moment we expand back to desktop.
+      if (!next) setOpen(false);
+    };
+
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(navInner);
+    return () => ro.disconnect();
+  }, []);
+
   const closeMenu = () => setOpen(false);
 
   return (
     <>
       <header
-        className={clsx("nav", scrolled && "is-scrolled", open && "is-open")}
+        className={clsx(
+          "nav",
+          scrolled && "is-scrolled",
+          open && "is-open",
+          collapsed && "nav-collapsed",
+        )}
         role="banner"
       >
-        <div className="nav-inner">
-          <Link href="/" className="brand" aria-label="EduConnect — go to home">
+        <div className="nav-inner" ref={navInnerRef}>
+          <Link
+            href="/"
+            className="brand"
+            aria-label="EduConnect — go to home"
+            ref={brandRef}
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/brand-v2/logo-light.jpeg" alt="EduConnect" />
           </Link>
-          <nav className="nav-links" aria-label="Primary navigation">
+          <nav className="nav-links" aria-label="Primary navigation" ref={linksRef}>
             {marketingLinks.map((l) => (
               <Link
                 key={l.href}
@@ -124,7 +170,7 @@ function MarketingNav({
               </Link>
             ))}
           </nav>
-          <div className="nav-cta">
+          <div className="nav-cta" ref={ctaRef}>
             <Link href="/login" className="login">
               Log in
             </Link>

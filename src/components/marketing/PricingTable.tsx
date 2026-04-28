@@ -75,9 +75,17 @@ export function PricingTable({
                   )}
                 </div>
                 <div className="pricing-duration">{tier.duration}</div>
-                <div className="pricing-label">Pay today</div>
-                <div className="pricing-total">{fmt(p.total, currency)}</div>
+                <div className="pricing-per-session-label">Per session</div>
+                <div className="pricing-per-session-price">
+                  {fmt(p.perSession, currency)}
+                </div>
                 <hr className="pricing-divider" />
+                <div className="pricing-today-block">
+                  <div className="pricing-today-label">Pay today</div>
+                  <div className="pricing-today-total">
+                    {fmt(p.total, currency)}
+                  </div>
+                </div>
                 <div className="pricing-savings-block">
                   {hasSaving ? (
                     <>
@@ -93,9 +101,6 @@ export function PricingTable({
                       {tier.noCommitmentMessage}
                     </div>
                   )}
-                </div>
-                <div className="pricing-per-session">
-                  {fmt(p.perSession, currency)} per session
                 </div>
                 <div className="pricing-cta">
                   <a
