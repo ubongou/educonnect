@@ -41,7 +41,7 @@ const teacherLinks: NavLink[] = [
 type Role = "parent" | "admin" | "teacher";
 
 type Props =
-  | { mode: "marketing"; activeHref?: string; bookingUrl: string }
+  | { mode: "marketing"; activeHref?: string }
   | {
       mode: "authed";
       activeHref?: string;
@@ -64,23 +64,12 @@ function linksForRole(role: Role): NavLink[] {
 
 export function Nav(props: Props) {
   if (props.mode === "marketing") {
-    return (
-      <MarketingNav
-        activeHref={props.activeHref}
-        bookingUrl={props.bookingUrl}
-      />
-    );
+    return <MarketingNav activeHref={props.activeHref} />;
   }
   return <AuthedNav {...props} />;
 }
 
-function MarketingNav({
-  activeHref,
-  bookingUrl,
-}: {
-  activeHref?: string;
-  bookingUrl: string;
-}) {
+function MarketingNav({ activeHref }: { activeHref?: string }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
@@ -174,14 +163,9 @@ function MarketingNav({
             <Link href="/login" className="login">
               Log in
             </Link>
-            <a
-              href={bookingUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-coral"
-            >
+            <Link href="/book?source=nav" className="btn btn-coral">
               Book a Free Session
-            </a>
+            </Link>
           </div>
           <button
             type="button"
@@ -208,15 +192,13 @@ function MarketingNav({
           <Link href="/login" onClick={closeMenu}>
             Log in
           </Link>
-          <a
-            href={bookingUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/book?source=nav"
             className="btn btn-coral"
             onClick={closeMenu}
           >
             Book a Free Session
-          </a>
+          </Link>
         </div>
       </header>
     </>

@@ -1,14 +1,13 @@
 import { resolveAssetUrl } from "@/lib/marketing/assetUrl";
 import { bundledAssets } from "@/lib/marketing/defaults";
 import type { HeroContent } from "@/lib/marketing/schemas";
+import Link from "next/link";
 
 export function Hero({
   content,
-  bookingUrl,
   updatedAt,
 }: {
   content: HeroContent;
-  bookingUrl: string;
   updatedAt: string | null;
 }) {
   const heroImage = resolveAssetUrl(
@@ -36,17 +35,12 @@ export function Hero({
           </h1>
           <p className="lead reveal delay-2">{content.subheading}</p>
           <div className="hero-ctas reveal delay-3">
-            <a
-              href={bookingUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-coral"
-            >
+            <Link href="/book?source=hero" className="btn btn-coral">
               {content.primaryCtaLabel}{" "}
               <span className="arrow" aria-hidden="true">
                 →
               </span>
-            </a>
+            </Link>
             <a href="/pricing" className="btn btn-ghost">
               {content.secondaryCtaLabel}
             </a>
