@@ -126,8 +126,20 @@ export async function getGlobals(): Promise<WithUpdatedAt<GlobalsContent>> {
 
 export async function getHomeContent(): Promise<HomeContent> {
   const map = await fetchSections(["home"]);
+  const hero = pickSection(map, "home", "hero", heroSchema, defaultHero);
+  // Legacy DB rows can have empty heading parts (pre-redesign or admin-saved
+  // blanks). Restore the default split-title so the h1 never ships empty.
+  const h = hero.content;
+  if (!h.headingPart1.trim() && !h.headingAccent.trim() && !h.headingPart2.trim()) {
+    hero.content = {
+      ...h,
+      headingPart1: defaultHero.headingPart1,
+      headingAccent: defaultHero.headingAccent,
+      headingPart2: defaultHero.headingPart2,
+    };
+  }
   return {
-    hero: pickSection(map, "home", "hero", heroSchema, defaultHero),
+    hero,
     marquee: pickSection(map, "home", "marquee", marqueeSchema, defaultMarquee),
     whyGrid: pickSection(map, "home", "why_grid", whyGridSchema, defaultWhyGrid),
     howItWorks: pickSection(
@@ -151,8 +163,18 @@ export async function getHomeContent(): Promise<HomeContent> {
 
 export async function getPricingContent(): Promise<PricingContent> {
   const map = await fetchSections(["pricing"]);
+  const intro = pickSection(map, "pricing", "intro", pricingIntroSchema, defaultPricingIntro);
+  const c = intro.content;
+  if (!c.titlePart1.trim() && !c.titleAccent.trim() && !c.titlePart2.trim()) {
+    intro.content = {
+      ...c,
+      titlePart1: defaultPricingIntro.titlePart1,
+      titleAccent: defaultPricingIntro.titleAccent,
+      titlePart2: defaultPricingIntro.titlePart2,
+    };
+  }
   return {
-    intro: pickSection(map, "pricing", "intro", pricingIntroSchema, defaultPricingIntro),
+    intro,
     tiers: pickSection(map, "pricing", "tiers", pricingTiersSchema, defaultPricingTiers),
     faq: pickSection(map, "pricing", "faq", pricingFaqSchema, defaultPricingFaq),
   };

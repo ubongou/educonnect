@@ -154,6 +154,8 @@ export const contactSchema = z.object({
   instagramUrl: optionalText,
   facebookLabel: nonEmpty(),
   facebookUrl: optionalText,
+  whatsappLabel: optionalText,
+  whatsappUrl: optionalText,
 });
 
 export type ContactContent = z.infer<typeof contactSchema>;

@@ -120,9 +120,9 @@ export const defaultTestimonials: TestimonialsContent = {
   quotes: [
     {
       body: "The tutors have been outstanding — patient, professional, and deeply committed. I would wholeheartedly recommend EduConnect to any parent looking to see tangible improvement in their children's learning journey.",
-      author: "Andrew Ugbehe",
+      author: "Mr. Ugbehe",
       where: "Scotland, UK",
-      initial: "A",
+      initial: "U",
     },
     {
       body: "Since I started using this service, my child's performance has improved. The lesson teacher is good at what she does, and I have recommended their services to other parents and will continue to do so.",
@@ -175,6 +175,8 @@ export const defaultContact: ContactContent = {
   instagramUrl: "https://www.instagram.com/educonnectng/",
   facebookLabel: "Facebook · EduConnect",
   facebookUrl: "https://www.facebook.com/profile.php?id=61572098883786",
+  whatsappLabel: "WhatsApp · +234 901 724 6528",
+  whatsappUrl: "https://wa.me/2349017246528",
 };
 
 // -----------------------------------------------------------------------------

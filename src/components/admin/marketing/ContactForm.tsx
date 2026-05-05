@@ -65,6 +65,18 @@ export function ContactForm({ initial }: { initial: ContactContent }) {
             onChange={(v) => setContent({ ...content, facebookUrl: v })}
             hint="Leave blank to hide the link."
           />
+          <TextInput
+            label="WhatsApp label"
+            value={content.whatsappLabel}
+            onChange={(v) => setContent({ ...content, whatsappLabel: v })}
+            hint='Example: "WhatsApp · +234 901 724 6528"'
+          />
+          <TextInput
+            label="WhatsApp URL"
+            value={content.whatsappUrl}
+            onChange={(v) => setContent({ ...content, whatsappUrl: v })}
+            hint='Example: "https://wa.me/2349017246528". Leave blank to hide.'
+          />
         </div>
       </FieldGroup>
     </SectionFormShell>

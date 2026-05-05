@@ -279,22 +279,23 @@
   white-space: nowrap;
 }
 .mkt-root .nav .hamburger {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--coral);
   display: none;
   flex-shrink: 0;
   width: clamp(36px, 8vw, 44px);
   height: clamp(36px, 8vw, 44px);
-  border-radius: 10px;
+  border-radius: var(--radius-pill);
   align-items: center;
   justify-content: center;
   margin-left: auto;
-  border: 1px solid rgba(4, 19, 28, 0.18);
+  border: 1px solid transparent;
+  box-shadow: 0 4px 12px -4px rgba(255, 105, 63, 0.5);
 }
 .mkt-root .hamburger span {
   display: block;
   width: clamp(14px, 3vw, 18px);
   height: 2px;
-  background: var(--ink);
+  background: #fff;
   position: relative;
   transition: transform 0.25s ease, opacity 0.2s ease;
 }
@@ -305,7 +306,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: var(--ink);
+  background: #fff;
   transition: transform 0.25s ease;
 }
 .mkt-root .hamburger span::before {
@@ -361,7 +362,7 @@
 }
 .mkt-root .hero-grid {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
+  grid-template-columns: 1fr 1fr;
   gap: 64px;
   align-items: center;
 }
@@ -493,8 +494,8 @@
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 88%;
-  max-height: 108%;
+  width: 96%;
+  max-height: 116%;
   height: auto;
   object-fit: contain;
   filter: drop-shadow(0 24px 30px rgba(0, 0, 0, 0.25));
@@ -1033,6 +1034,10 @@
 .mkt-root .contact-meta a:nth-child(3) .ico {
   background: var(--sky-soft);
   color: #1877f2;
+}
+.mkt-root .contact-meta a:nth-child(4) .ico {
+  background: #e7f9ee;
+  color: #25d366;
 }
 .mkt-root .contact-form {
   background: #fff;
