@@ -11,6 +11,10 @@ import {
 import type { IntakeJson } from "@/types/domain";
 import { IntakeSummary } from "@/components/dashboard/IntakeSummary";
 import { confidenceBadge, understandingBadge } from "@/lib/scales";
+import {
+  MaterialsUpload,
+  type TeacherMaterial,
+} from "@/components/teacher/MaterialsUpload";
 
 type ReportRow = {
   id: string;
@@ -77,27 +81,35 @@ export default async function TeacherStudentDetail({
     .maybeSingle();
   if (!student) notFound();
 
-  const [{ data: reports }, { data: documents }] = await Promise.all([
-    supabase
-      .from("lesson_reports")
-      .select(
-        `
+  const [{ data: reports }, { data: documents }, { data: materials }] =
+    await Promise.all([
+      supabase
+        .from("lesson_reports")
+        .select(
+          `
         id, lesson_date, understanding_check, confidence_level,
         subjects ( name )
         `,
-      )
-      .eq("student_id", id)
-      .order("lesson_date", { ascending: false })
-      .limit(20),
-    supabase
-      .from("student_documents")
-      .select("id, kind, original_filename, size_bytes, uploaded_at")
-      .eq("student_id", id)
-      .order("uploaded_at", { ascending: false }),
-  ]);
+        )
+        .eq("student_id", id)
+        .order("lesson_date", { ascending: false })
+        .limit(20),
+      supabase
+        .from("student_documents")
+        .select("id, kind, original_filename, size_bytes, uploaded_at")
+        .eq("student_id", id)
+        .order("uploaded_at", { ascending: false }),
+      supabase
+        .from("teacher_materials")
+        .select("id, kind, original_filename, size_bytes, uploaded_at")
+        .eq("student_id", id)
+        .eq("status", "ready")
+        .order("uploaded_at", { ascending: false }),
+    ]);
 
   const reportRows = (reports ?? []) as unknown as ReportRow[];
   const docs = (documents ?? []) as DocumentRow[];
+  const teacherMaterials = (materials ?? []) as TeacherMaterial[];
   const intake = (student.intake ?? null) as IntakeJson | null;
   const displayName = student.preferred_name ?? student.full_name;
 
@@ -128,6 +140,13 @@ export default async function TeacherStudentDetail({
           </p>
         </div>
       </div>
+
+      <section className="mt-10">
+        <h2 className="mb-4 font-heading text-[11px] font-bold uppercase tracking-[0.12em] text-g400">
+          Materials I&apos;ve shared with {displayName}
+        </h2>
+        <MaterialsUpload studentId={id} materials={teacherMaterials} />
+      </section>
 
       <section className="mt-10">
         <h2 className="mb-4 font-heading text-[11px] font-bold uppercase tracking-[0.12em] text-g400">

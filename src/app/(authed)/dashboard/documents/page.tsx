@@ -4,8 +4,33 @@ import {
   DocumentUpload,
   type UploadedDocument,
 } from "@/components/dashboard/DocumentUpload";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 import { createClient } from "@/lib/supabase/server";
+import { formatDate } from "@/lib/format";
 import { getParentChildren, pickChild, childTabColor } from "@/lib/dashboard/children";
+
+type TutorMaterialRow = {
+  id: string;
+  kind: string;
+  original_filename: string;
+  size_bytes: number | null;
+  uploaded_at: string;
+};
+
+const tutorMaterialKindLabels: Record<string, string> = {
+  lesson_material: "Lesson material",
+  homework: "Homework",
+  demo_video: "Demo video",
+  photo: "Photo",
+  other: "Other",
+};
+
+function humanSize(bytes: number | null): string {
+  if (!bytes) return "—";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 export default async function DashboardDocumentsPage({
   searchParams,
@@ -25,13 +50,21 @@ export default async function DashboardDocumentsPage({
   }
 
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("student_documents")
-    .select("id, kind, original_filename, size_bytes, uploaded_at")
-    .eq("student_id", selected.id)
-    .order("uploaded_at", { ascending: false });
+  const [{ data }, { data: materialsData }] = await Promise.all([
+    supabase
+      .from("student_documents")
+      .select("id, kind, original_filename, size_bytes, uploaded_at")
+      .eq("student_id", selected.id)
+      .order("uploaded_at", { ascending: false }),
+    supabase
+      .from("teacher_materials")
+      .select("id, kind, original_filename, size_bytes, uploaded_at")
+      .eq("student_id", selected.id)
+      .order("uploaded_at", { ascending: false }),
+  ]);
 
   const documents = (data ?? []) as UploadedDocument[];
+  const tutorMaterials = (materialsData ?? []) as TutorMaterialRow[];
   const childOptions: ChildTabOption[] = children.map((c, i) => ({
     id: c.id,
     label: c.preferred_name ?? c.full_name,
@@ -60,6 +93,47 @@ export default async function DashboardDocumentsPage({
       />
 
       <DocumentUpload studentId={selected.id} documents={documents} />
+
+      <section className="mt-10">
+        <h2 className="mb-4 font-heading text-[11px] font-bold uppercase tracking-[0.12em] text-g400">
+          Materials shared by your tutor
+        </h2>
+        {tutorMaterials.length === 0 ? (
+          <div className="rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-6 text-[14px] text-g600">
+            Your tutor hasn&apos;t shared any materials for this child yet.
+          </div>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {tutorMaterials.map((m) => (
+              <li
+                key={m.id}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-lg border-[1.5px] border-navy/10 bg-white px-5 py-3"
+              >
+                <div className="flex items-center gap-3">
+                  <StatusBadge tone="gray">
+                    {tutorMaterialKindLabels[m.kind] ?? m.kind}
+                  </StatusBadge>
+                  <div>
+                    <p className="font-heading text-[14px] font-extrabold text-navy">
+                      {m.original_filename}
+                    </p>
+                    <p className="mt-1 text-[12px] text-g400">
+                      Uploaded {formatDate(m.uploaded_at)} ·{" "}
+                      {humanSize(m.size_bytes)}
+                    </p>
+                  </div>
+                </div>
+                <a
+                  href={`/api/teacher-materials/${m.id}/download`}
+                  className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
+                >
+                  Download
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </Container>
   );
 }
