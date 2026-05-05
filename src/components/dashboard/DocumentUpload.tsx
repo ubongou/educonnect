@@ -2,7 +2,16 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { uploadStudentDocument, deleteStudentDocument } from "@/lib/actions/documents";
+import {
+  cancelStudentDocumentUpload,
+  confirmStudentDocumentUpload,
+  deleteStudentDocument,
+  requestStudentDocumentUpload,
+} from "@/lib/actions/documents";
+import {
+  studentDocumentPolicy,
+  validateUpload,
+} from "@/lib/uploads/policies";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { inputBase } from "@/components/ui/FormField";
 
@@ -21,11 +30,59 @@ const kindLabels: Record<string, string> = {
   other: "Other",
 };
 
+const ACCEPT = "application/pdf,image/png,image/jpeg,image/webp,video/mp4";
+const HINT = "Up to 200 MB · PDFs, JPG, PNG, WEBP, MP4";
+
+type UploadState =
+  | { kind: "idle" }
+  | { kind: "requesting" }
+  | { kind: "uploading"; progress: number; documentId: string }
+  | { kind: "confirming"; documentId: string }
+  | { kind: "error"; message: string };
+
 function humanSize(bytes: number | null): string {
   if (!bytes) return "—";
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+/**
+ * XHR-based PUT so we get real upload progress events. `fetch` doesn't
+ * support upload progress without ReadableStream upload support, which
+ * is spotty across mobile browsers.
+ *
+ * R2 enforces strict Content-Type equality with the value the URL was
+ * presigned with — `file.type` is what we passed to presignPut, so we
+ * MUST pass the same value here.
+ */
+async function putWithProgress(
+  url: string,
+  file: File,
+  onProgress: (pct: number) => void,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  return new Promise((resolve) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("PUT", url);
+    xhr.setRequestHeader("Content-Type", file.type);
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        onProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    };
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) resolve({ ok: true });
+      else
+        resolve({
+          ok: false,
+          error: `Upload failed with status ${xhr.status}`,
+        });
+    };
+    xhr.onerror = () =>
+      resolve({ ok: false, error: "Network error during upload" });
+    xhr.onabort = () => resolve({ ok: false, error: "Upload aborted" });
+    xhr.send(file);
+  });
 }
 
 export function DocumentUpload({
@@ -38,54 +95,102 @@ export function DocumentUpload({
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [kind, setKind] = useState<keyof typeof kindLabels>("test_paper");
-  const [error, setError] = useState<string | null>(null);
+  const [state, setState] = useState<UploadState>({ kind: "idle" });
   const [success, setSuccess] = useState<string | null>(null);
-  const [pending, startTransition] = useTransition();
+  const [deletePending, startDeleteTransition] = useTransition();
 
-  const doUpload = (file: File) => {
-    setError(null);
+  const isBusy =
+    state.kind === "requesting" ||
+    state.kind === "uploading" ||
+    state.kind === "confirming";
+
+  const doUpload = async (file: File) => {
     setSuccess(null);
-    const fd = new FormData();
-    fd.append("student_id", studentId);
-    fd.append("kind", kind);
-    fd.append("file", file);
+    setState({ kind: "idle" });
 
-    startTransition(async () => {
-      const res = await uploadStudentDocument(fd);
-      if (res.ok) {
-        setSuccess(`${file.name} uploaded.`);
-        if (fileInputRef.current) fileInputRef.current.value = "";
-        router.refresh();
-      } else {
-        setError(res.error);
-      }
+    // Pre-flight check — server is still authoritative, but reject
+    // obviously-bad files in the browser to skip a round-trip.
+    const local = validateUpload(studentDocumentPolicy, {
+      mimeType: file.type,
+      sizeBytes: file.size,
     });
+    if (!local.ok) {
+      setState({ kind: "error", message: local.error });
+      return;
+    }
+
+    setState({ kind: "requesting" });
+    const req = await requestStudentDocumentUpload({
+      studentId,
+      kind,
+      mimeType: file.type,
+      sizeBytes: file.size,
+      originalFilename: file.name,
+    });
+    if (!req.ok) {
+      setState({ kind: "error", message: req.error });
+      return;
+    }
+
+    setState({ kind: "uploading", progress: 0, documentId: req.documentId });
+    const put = await putWithProgress(req.presignedPutUrl, file, (pct) =>
+      setState({ kind: "uploading", progress: pct, documentId: req.documentId }),
+    );
+    if (!put.ok) {
+      await cancelStudentDocumentUpload(req.documentId);
+      setState({ kind: "error", message: put.error });
+      return;
+    }
+
+    setState({ kind: "confirming", documentId: req.documentId });
+    const conf = await confirmStudentDocumentUpload(req.documentId);
+    if (!conf.ok) {
+      await cancelStudentDocumentUpload(req.documentId);
+      setState({ kind: "error", message: conf.error });
+      return;
+    }
+
+    setSuccess(`${file.name} uploaded.`);
+    setState({ kind: "idle" });
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    router.refresh();
   };
 
   const onFilePicked: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const f = e.target.files?.[0];
-    if (f) doUpload(f);
+    if (f) void doUpload(f);
   };
 
   const onDrop: React.DragEventHandler<HTMLLabelElement> = (e) => {
     e.preventDefault();
+    if (isBusy) return;
     const f = e.dataTransfer.files?.[0];
-    if (f) doUpload(f);
+    if (f) void doUpload(f);
   };
 
   const onDelete = (id: string, name: string) => {
-    setError(null);
+    setSuccess(null);
+    setState({ kind: "idle" });
     if (!window.confirm(`Delete ${name}? This can't be undone.`)) return;
-    startTransition(async () => {
+    startDeleteTransition(async () => {
       const res = await deleteStudentDocument(id);
       if (res.ok) {
         setSuccess("Document removed.");
         router.refresh();
       } else {
-        setError(res.error);
+        setState({ kind: "error", message: res.error });
       }
     });
   };
+
+  const errorMessage = state.kind === "error" ? state.message : null;
+  const progressPct = state.kind === "uploading" ? state.progress : 0;
+
+  let statusLine: string | null = null;
+  if (state.kind === "requesting") statusLine = "Requesting upload URL…";
+  else if (state.kind === "uploading")
+    statusLine = `Uploading… ${progressPct}%`;
+  else if (state.kind === "confirming") statusLine = "Finalizing…";
 
   return (
     <div className="flex flex-col gap-6">
@@ -96,7 +201,7 @@ export function DocumentUpload({
               Upload a new document
             </p>
             <p className="mt-1 text-[13px] text-g600">
-              PDFs, images, or scans. The assigned teacher will see it immediately.
+              PDFs, images, scans, or short videos. The assigned teacher will see it immediately.
             </p>
           </div>
           <label className="flex flex-col gap-[6px]">
@@ -107,6 +212,7 @@ export function DocumentUpload({
               value={kind}
               onChange={(e) => setKind(e.target.value as keyof typeof kindLabels)}
               className={`${inputBase} py-2 text-[13px]`}
+              disabled={isBusy}
             >
               {Object.entries(kindLabels).map(([v, l]) => (
                 <option key={v} value={v}>
@@ -120,7 +226,9 @@ export function DocumentUpload({
         <label
           onDragOver={(e) => e.preventDefault()}
           onDrop={onDrop}
-          className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-[1.5px] border-dashed border-navy/30 bg-g50 px-6 py-10 text-center transition-colors hover:border-navy"
+          className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-[1.5px] border-dashed border-navy/30 bg-g50 px-6 py-10 text-center transition-colors hover:border-navy ${
+            isBusy ? "pointer-events-none opacity-60" : ""
+          }`}
         >
           <svg
             width="24"
@@ -139,28 +247,44 @@ export function DocumentUpload({
           <p className="text-[13px] font-semibold text-navy">
             Click to upload or drag and drop
           </p>
-          <p className="text-[11px] text-g600">
-            Up to 20 MB · PDFs, JPG, PNG
-          </p>
+          <p className="text-[11px] text-g600">{HINT}</p>
           <input
             ref={fileInputRef}
             type="file"
             onChange={onFilePicked}
-            disabled={pending}
+            disabled={isBusy}
             className="sr-only"
-            accept=".pdf,image/png,image/jpeg,image/webp"
+            accept={ACCEPT}
           />
         </label>
 
-        {pending && (
-          <p className="mt-3 text-[13px] text-g600">Uploading…</p>
+        {state.kind === "uploading" && (
+          <div
+            className="mt-3"
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={progressPct}
+          >
+            <div className="h-2 w-full overflow-hidden rounded-full bg-g100">
+              <div
+                className="h-full bg-blue transition-[width] duration-150 ease-out"
+                style={{ width: `${progressPct}%` }}
+              />
+            </div>
+          </div>
         )}
-        {error && (
+
+        {statusLine && (
+          <p className="mt-3 text-[13px] text-g600">{statusLine}</p>
+        )}
+
+        {errorMessage && (
           <p
             role="alert"
             className="mt-3 rounded-md border-[1.5px] border-coral/40 bg-coral/10 px-3 py-2 text-[13px] font-semibold text-coral"
           >
-            {error}
+            {errorMessage}
           </p>
         )}
         {success && (
@@ -216,7 +340,7 @@ export function DocumentUpload({
                   </a>
                   <button
                     type="button"
-                    disabled={pending}
+                    disabled={isBusy || deletePending}
                     onClick={() => onDelete(d.id, d.original_filename)}
                     className="font-heading text-[13px] font-semibold text-g600 underline-offset-4 hover:text-coral hover:underline disabled:opacity-50"
                   >
