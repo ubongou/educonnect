@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { presignGet } from "@/lib/r2/objects";
 
 export async function GET(
   _req: NextRequest,
@@ -8,22 +9,23 @@ export async function GET(
   const { id } = await params;
   const supabase = await createClient();
 
-  // RLS gates this read so parents only see their own intake_files rows.
+  // RLS gates this read so parents only see their own intake_files rows;
+  // non-admins additionally only see ready rows.
   const { data: file } = await supabase
     .from("intake_files")
-    .select("storage_path, original_filename")
+    .select("storage_key, original_filename")
     .eq("id", id)
     .single();
 
   if (!file) return new NextResponse("Not found", { status: 404 });
 
-  const { data, error } = await supabase.storage
-    .from("intake-files")
-    .createSignedUrl(file.storage_path, 60);
-
-  if (error || !data) {
-    return new NextResponse(error?.message ?? "Signing failed", { status: 500 });
+  try {
+    const url = await presignGet(file.storage_key, 60);
+    return NextResponse.redirect(url);
+  } catch (err) {
+    return new NextResponse(
+      err instanceof Error ? err.message : "Failed to sign download URL",
+      { status: 500 },
+    );
   }
-
-  return NextResponse.redirect(data.signedUrl);
 }
