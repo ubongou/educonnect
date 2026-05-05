@@ -28,9 +28,11 @@ export function Hero({
           <span className="eyebrow hero-eyebrow reveal">{content.eyebrow}</span>
           <h1 className="reveal delay-1">
             {content.headingPart1}
+            {content.headingPart1 && content.headingAccent ? " " : null}
             {content.headingAccent && (
               <span className="accent">{content.headingAccent}</span>
             )}
+            {content.headingAccent && content.headingPart2 ? " " : null}
             {content.headingPart2}
           </h1>
           <p className="lead reveal delay-2">{content.subheading}</p>
