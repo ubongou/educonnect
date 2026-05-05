@@ -83,6 +83,7 @@ describe("formatSource", () => {
   it("maps known IDs to human labels", () => {
     expect(formatSource("hero")).toBe("Home page · Hero CTA");
     expect(formatSource("nav")).toBe("Top navigation");
+    expect(formatSource("footer")).toBe("Footer");
     expect(formatSource("pricing-24")).toBe("Pricing page · 24 sessions plan");
   });
 
