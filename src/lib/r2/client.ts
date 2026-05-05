@@ -17,8 +17,10 @@ export function getR2Client(): S3Client | null {
     region: "auto",
     endpoint,
     credentials: { accessKeyId, secretAccessKey },
-    // R2 quirk: SigV4 expects path-style URLs.
-    forcePathStyle: true,
+    // Virtual-hosted style works most reliably with R2 presigned PUTs.
+    // Path-style works for direct server-side PutObject but observed to
+    // 403 when the SDK presigns the URL.
+    forcePathStyle: false,
     // AWS SDK v3.726+ adds a precomputed CRC32 checksum to PUT presigns.
     // R2 rejects the signature because the browser's actual body checksum
     // won't match the empty-body checksum signed at URL-generation time.
