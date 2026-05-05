@@ -5,9 +5,9 @@ import { LoginForm } from "./LoginForm";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ from?: string; email?: string }>;
+  searchParams: Promise<{ from?: string; email?: string; reset?: string }>;
 }) {
-  const { email } = await searchParams;
+  const { email, reset } = await searchParams;
 
   return (
     <AuthShell
@@ -22,6 +22,14 @@ export default async function LoginPage({
         </>
       }
     >
+      {reset && (
+        <p
+          role="status"
+          className="mb-5 rounded-md border-[1.5px] border-blue/40 bg-blue/10 px-3 py-2 text-[13px] font-semibold text-blue"
+        >
+          Password updated. Sign in with your new password.
+        </p>
+      )}
       <LoginForm defaultEmail={email} />
       <p className="mt-5 text-center text-[13px]">
         <Link href="/forgot-password" className="text-g600 underline-offset-4 hover:underline">

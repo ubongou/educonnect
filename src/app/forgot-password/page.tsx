@@ -2,7 +2,13 @@ import Link from "next/link";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { ForgotPasswordForm } from "./ForgotPasswordForm";
 
-export default function ForgotPasswordPage() {
+export default async function ForgotPasswordPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ expired?: string }>;
+}) {
+  const { expired } = await searchParams;
+
   return (
     <AuthShell
       title={<>Reset your password.</>}
@@ -16,6 +22,14 @@ export default function ForgotPasswordPage() {
         </>
       }
     >
+      {expired && (
+        <p
+          role="status"
+          className="mb-5 rounded-md border-[1.5px] border-coral/40 bg-coral/10 px-3 py-2 text-[13px] font-semibold text-coral"
+        >
+          That reset link is no longer valid. Request a fresh one below.
+        </p>
+      )}
       <ForgotPasswordForm />
     </AuthShell>
   );

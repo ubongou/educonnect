@@ -39,8 +39,21 @@ function isProtected(pathname: string): boolean {
 }
 
 export async function middleware(request: NextRequest) {
+  const { pathname, searchParams } = request.nextUrl;
+
+  // Supabase email links can land at the site root with `?code=<pkce>` when
+  // the project's Site URL points at `/`. Forward those to our callback so
+  // the code gets exchanged for a session before we touch auth state.
+  if (pathname === "/" && searchParams.has("code")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/callback";
+    if (!url.searchParams.get("next")) {
+      url.searchParams.set("next", "/reset-password");
+    }
+    return NextResponse.redirect(url);
+  }
+
   const { response, supabase, user } = await updateSession(request);
-  const { pathname } = request.nextUrl;
 
   // Unauthenticated visitor hitting a protected area.
   if (!user && isProtected(pathname)) {
