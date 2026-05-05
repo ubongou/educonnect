@@ -14,9 +14,14 @@ export type PresignPutInput = {
 };
 
 /**
- * Presigned URL the browser PUTs raw bytes to. The signed URL embeds the
- * Content-Type and Content-Length we expect — the browser MUST send those
- * exact headers or R2 rejects the upload.
+ * Presigned URL the browser PUTs raw bytes to. We deliberately do NOT pass
+ * ContentType / ContentLength on the command: when those are present the
+ * SDK signs them as required headers, and R2's strict header matching has
+ * been observed to 403 on otherwise-valid PUTs (browser-set Content-Length
+ * can't be overridden, and unsigned-payload PUTs vary subtly across
+ * fetch/XHR). Server-side validation in the action is the authoritative
+ * gate; the browser still sends Content-Type, R2 just doesn't validate it
+ * against the signature.
  */
 export async function presignPut(input: PresignPutInput): Promise<string> {
   const client = getR2Client();
@@ -27,8 +32,6 @@ export async function presignPut(input: PresignPutInput): Promise<string> {
   const cmd = new PutObjectCommand({
     Bucket: bucket,
     Key: input.key,
-    ContentType: input.contentType,
-    ContentLength: input.contentLength,
   });
   return getSignedUrl(client, cmd, { expiresIn: input.ttlSeconds ?? 600 });
 }
