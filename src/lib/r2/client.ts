@@ -19,6 +19,11 @@ export function getR2Client(): S3Client | null {
     credentials: { accessKeyId, secretAccessKey },
     // R2 quirk: SigV4 expects path-style URLs.
     forcePathStyle: true,
+    // AWS SDK v3.726+ adds a precomputed CRC32 checksum to PUT presigns.
+    // R2 rejects the signature because the browser's actual body checksum
+    // won't match the empty-body checksum signed at URL-generation time.
+    requestChecksumCalculation: "WHEN_REQUIRED",
+    responseChecksumValidation: "WHEN_REQUIRED",
   });
   return cached;
 }
