@@ -39,9 +39,11 @@ export function PricingTable({
         <span className="eyebrow pricing-eyebrow reveal">{intro.eyebrow}</span>
         <h1 id="pricing-heading" className="reveal delay-1">
           {intro.titlePart1}
+          {intro.titlePart1 && intro.titleAccent ? " " : null}
           {intro.titleAccent && (
             <span className="accent">{intro.titleAccent}</span>
           )}
+          {intro.titleAccent && intro.titlePart2 ? " " : null}
           {intro.titlePart2}
         </h1>
         <p className="reveal delay-2">{intro.subtitle}</p>
