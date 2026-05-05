@@ -55,6 +55,7 @@ export const performanceLabel: Record<Performance, string> = {
 export const sourceIds = [
   "hero",
   "nav",
+  "footer",
   "pricing-8",
   "pricing-24",
   "pricing-48",
@@ -65,6 +66,7 @@ export type SourceId = (typeof sourceIds)[number];
 const sourceLabels: Record<SourceId, string> = {
   hero: "Home page · Hero CTA",
   nav: "Top navigation",
+  footer: "Footer",
   "pricing-8": "Pricing page · 8 sessions plan",
   "pricing-24": "Pricing page · 24 sessions plan",
   "pricing-48": "Pricing page · 48 sessions plan",
