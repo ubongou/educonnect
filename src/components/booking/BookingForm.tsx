@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import clsx from "clsx";
 import {
@@ -31,6 +31,25 @@ export function BookingForm() {
       ? state.values
       : ({} as Record<string, string>);
 
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // After a failed submit, jump to the first errored field so the user can
+  // see what to fix. We re-scroll on every error state change (each action
+  // call produces a fresh state object, so the dep comparison holds).
+  useEffect(() => {
+    if (state?.status !== "error") return;
+    if (Object.keys(state.fieldErrors).length === 0) return;
+    const formEl = formRef.current;
+    if (!formEl) return;
+    const firstErr = formEl.querySelector<HTMLElement>(".field.error");
+    if (!firstErr) return;
+    firstErr.scrollIntoView({ behavior: "smooth", block: "center" });
+    const focusable = firstErr.querySelector<HTMLElement>(
+      "input, textarea, select",
+    );
+    focusable?.focus({ preventScroll: true });
+  }, [state]);
+
   return (
     <section className="contact" aria-labelledby="booking-heading">
       <div className="container">
@@ -46,6 +65,7 @@ export function BookingForm() {
         </p>
 
         <form
+          ref={formRef}
           action={formAction}
           className="contact-form booking-form"
           aria-label="Booking request form"
@@ -97,7 +117,7 @@ export function BookingForm() {
             />
           </FormSection>
 
-          <FormSection legend="School curriculum">
+          <FormSection legend="School curriculum" required>
             <RadioGroup
               name="curriculum"
               options={curriculumValues.map(
@@ -114,7 +134,7 @@ export function BookingForm() {
             />
           </FormSection>
 
-          <FormSection legend="Subject for trial session">
+          <FormSection legend="Subject for trial session" required>
             <p
               className="hint"
               style={{ fontSize: 13, color: "#6b7680", marginBottom: 8 }}
@@ -143,7 +163,7 @@ export function BookingForm() {
             />
           </FormSection>
 
-          <FormSection legend="Current performance">
+          <FormSection legend="Current performance" required>
             <p
               className="hint"
               style={{ fontSize: 13, color: "#6b7680", marginBottom: 8 }}
@@ -222,10 +242,7 @@ export function BookingForm() {
             disabled={pending}
             style={{ marginTop: 24 }}
           >
-            {pending ? "Submitting…" : "Book free trial"}{" "}
-            <span className="arrow" aria-hidden="true">
-              →
-            </span>
+            {pending ? "Submitting…" : "Book free trial"}
           </button>
         </form>
       </div>
@@ -239,9 +256,11 @@ export function BookingForm() {
 
 function FormSection({
   legend,
+  required,
   children,
 }: {
   legend: string;
+  required?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -261,6 +280,7 @@ function FormSection({
         }}
       >
         {legend}
+        {required && " *"}
       </legend>
       {children}
     </fieldset>

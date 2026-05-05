@@ -5,10 +5,10 @@ import { z } from "zod";
 // -----------------------------------------------------------------------------
 
 export const curriculumValues = [
-  "nigerian",
-  "british",
   "american",
+  "british",
   "canadian",
+  "nigerian",
   "other",
 ] as const;
 export type Curriculum = (typeof curriculumValues)[number];

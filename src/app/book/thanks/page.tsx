@@ -2,13 +2,18 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Nav } from "@/components/ui/Nav";
 import { Footer } from "@/components/ui/Footer";
+import { getGlobals } from "@/lib/marketing/content";
 
 export const metadata: Metadata = {
-  title: "Booking received — EduConnect",
-  description: "Thank you — we'll be in touch shortly to confirm your trial.",
+  title: "One more step — EduConnect",
+  description:
+    "Pick a session time on the calendar to confirm your free trial booking.",
 };
 
-export default function BookThanksPage() {
+export default async function BookThanksPage() {
+  const globals = await getGlobals();
+  const calendarUrl = globals.content.bookingUrl;
+
   return (
     <div className="mkt-root">
       <a href="#main-content" className="skip-link">
@@ -18,23 +23,47 @@ export default function BookThanksPage() {
       <main id="main-content">
         <section className="contact" aria-labelledby="thanks-heading">
           <div className="container" style={{ maxWidth: 720 }}>
-            <span className="eyebrow">Booking received</span>
+            <span className="eyebrow">One more step</span>
             <h1 id="thanks-heading" style={{ marginTop: 14 }}>
-              Thank you — we&apos;ll be in touch soon.
+              You&apos;re almost there.
             </h1>
             <p className="lead">
-              After booking, a tutor will be assigned to your child and you
-              will receive a confirmation message on WhatsApp.
+              To complete your booking, choose a session time below.{" "}
+              <strong>
+                Your slot is not confirmed until you&apos;ve picked a time on
+                the calendar.
+              </strong>
             </p>
+
+            <div style={{ marginTop: 32 }}>
+              <a
+                href={calendarUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-coral"
+              >
+                Pick your session time
+              </a>
+              <p
+                style={{
+                  marginTop: 12,
+                  fontSize: 13,
+                  color: "#6b7680",
+                }}
+              >
+                After picking a time you&apos;ll receive a confirmation by
+                email.
+              </p>
+            </div>
 
             <h2
               style={{
-                marginTop: 40,
+                marginTop: 48,
                 fontSize: 18,
                 fontWeight: 700,
               }}
             >
-              During the trial session, the tutor will:
+              During the session, we will:
             </h2>
             <ul
               style={{
@@ -43,12 +72,9 @@ export default function BookThanksPage() {
                 paddingLeft: 22,
               }}
             >
-              <li>Teach a short interactive lesson</li>
-              <li>Assess your child&apos;s strengths and gaps</li>
-              <li>
-                Share feedback and a recommended learning plan after the
-                session.
-              </li>
+              <li>Get to know you and your child</li>
+              <li>Explore your child&apos;s current level and learning goals</li>
+              <li>Answer any questions you might have</li>
             </ul>
 
             <div style={{ marginTop: 40 }}>
