@@ -471,9 +471,10 @@ for (const d of docSeeds) {
     uploaded_by: parentId,
     kind: d.kind,
     original_filename: d.filename,
-    storage_path: objectPath,
+    storage_key: objectPath,
     mime_type: "application/pdf",
     size_bytes: bytes.byteLength,
+    status: "ready",
   });
   if (metaErr) throw new Error("doc meta " + d.filename + ": " + metaErr.message);
 }
