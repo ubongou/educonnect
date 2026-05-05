@@ -1,9 +1,18 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { loginSchema } from "@/lib/validation";
 import type { Role } from "@/types/domain";
+
+async function requestOrigin(): Promise<string> {
+  const h = await headers();
+  const proto = h.get("x-forwarded-proto") ?? "https";
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  if (host) return `${proto}://${host}`;
+  return process.env.APP_URL ?? "";
+}
 
 export type AuthActionState = { ok: boolean; error?: string } | null;
 
@@ -49,9 +58,38 @@ export async function requestPasswordReset(
   if (!email) return { ok: false, error: "Email is required" };
 
   const supabase = await createClient();
-  const redirectTo = `${process.env.APP_URL ?? ""}/login`;
+  const origin = await requestOrigin();
+  const redirectTo = `${origin}/auth/callback?next=/reset-password`;
   const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
   return error ? { ok: false, error: error.message } : { ok: true };
+}
+
+export async function resetPassword(
+  _prev: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  const password = String(formData.get("password") ?? "");
+  const confirm = String(formData.get("confirm_password") ?? "");
+  if (password.length < 8) {
+    return { ok: false, error: "Password must be at least 8 characters" };
+  }
+  if (password !== confirm) {
+    return { ok: false, error: "Passwords do not match" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { ok: false, error: "Reset link expired. Request a new one." };
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) return { ok: false, error: error.message };
+
+  await supabase.auth.signOut();
+  redirect("/login?reset=1");
 }
 
 export async function updateProfile(
