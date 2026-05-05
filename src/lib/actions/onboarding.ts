@@ -1,7 +1,13 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { createClient } from "@/lib/supabase/server";
+import { getR2Bucket, getR2Client } from "@/lib/r2/client";
+import {
+  intakeUploadPolicy,
+  validateUpload,
+} from "@/lib/uploads/policies";
 import { onboardingSchema } from "@/lib/validation";
 import type { IntakeFileKind } from "@/types/domain";
 
@@ -19,8 +25,10 @@ const FILE_KINDS: IntakeFileKind[] = ["curriculum", "school_report", "class_note
  *   - "file_class_notes"   (optional): recent class notes
  *
  * Two-phase commit: the RPC atomically inserts the student + parent link,
- * THEN we upload any selected files using the caller's user-scoped Supabase
- * client. Storage RLS gates writes to the student's own folder.
+ * THEN we upload any selected files to R2 server-side. Each file is
+ * validated against `intakeUploadPolicy` (MIME allowlist + 20MB cap)
+ * before bytes leave the request — failure aborts the whole submission
+ * to match the prior abort-on-first-error behavior.
  */
 export async function submitIntake(formData: FormData): Promise<OnboardingResult> {
   const payloadRaw = formData.get("payload");
@@ -43,6 +51,24 @@ export async function submitIntake(formData: FormData): Promise<OnboardingResult
   }
 
   const v = parsed.data;
+
+  // Pre-validate every selected file BEFORE creating the student row, so a
+  // bad MIME / oversized file doesn't leave a half-committed intake behind.
+  const selectedFiles: { kind: IntakeFileKind; file: File }[] = [];
+  for (const kind of FILE_KINDS) {
+    const f = formData.get(`file_${kind}`);
+    if (!(f instanceof File) || f.size === 0) continue;
+    const mimeType = f.type || "application/octet-stream";
+    const check = validateUpload(intakeUploadPolicy, {
+      mimeType,
+      sizeBytes: f.size,
+    });
+    if (!check.ok) {
+      return { ok: false, error: `${kind}: ${check.error}` };
+    }
+    selectedFiles.push({ kind, file: f });
+  }
+
   const supabase = await createClient();
 
   // The RPC coerces "" -> NULL internally (nullif), so empty strings here map
@@ -74,28 +100,51 @@ export async function submitIntake(formData: FormData): Promise<OnboardingResult
   const student = Array.isArray(studentData) ? studentData[0] : studentData;
   if (!student?.id) return { ok: false, error: "Student not created" };
 
-  for (const kind of FILE_KINDS) {
-    const file = formData.get(`file_${kind}`);
-    if (!(file instanceof File) || file.size === 0) continue;
+  if (selectedFiles.length > 0) {
+    const r2 = getR2Client();
+    const bucket = getR2Bucket();
+    if (!r2 || !bucket) {
+      return { ok: false, error: "File storage is not configured" };
+    }
 
-    const ext = file.name.split(".").pop()?.toLowerCase() || "bin";
-    const path = `${student.id}/${kind}-${crypto.randomUUID()}.${ext}`;
+    for (const { kind, file } of selectedFiles) {
+      const ext = file.name.includes(".")
+        ? (file.name.split(".").pop() ?? "").toLowerCase()
+        : "";
+      const suffix = ext ? `.${ext}` : "";
+      const storageKey = `${intakeUploadPolicy.prefix}/${student.id}/${kind}-${crypto.randomUUID()}${suffix}`;
+      const contentType = file.type || "application/octet-stream";
 
-    const { error: upErr } = await supabase.storage
-      .from("intake-files")
-      .upload(path, file, { contentType: file.type || "application/octet-stream" });
-    if (upErr) return { ok: false, error: `${kind} upload failed: ${upErr.message}` };
+      try {
+        const body = new Uint8Array(await file.arrayBuffer());
+        await r2.send(
+          new PutObjectCommand({
+            Bucket: bucket,
+            Key: storageKey,
+            Body: body,
+            ContentType: contentType,
+            ContentLength: body.byteLength,
+          }),
+        );
+      } catch (err) {
+        return {
+          ok: false,
+          error: `${kind} upload failed: ${err instanceof Error ? err.message : String(err)}`,
+        };
+      }
 
-    const { error: metaErr } = await supabase.from("intake_files").insert({
-      student_id: student.id,
-      kind,
-      original_filename: file.name,
-      storage_path: path,
-      mime_type: file.type || null,
-      size_bytes: file.size,
-    });
-    if (metaErr) {
-      return { ok: false, error: `${kind} record failed: ${metaErr.message}` };
+      const { error: metaErr } = await supabase.from("intake_files").insert({
+        student_id: student.id,
+        kind,
+        original_filename: file.name,
+        storage_key: storageKey,
+        mime_type: file.type || null,
+        size_bytes: file.size,
+        status: "ready",
+      });
+      if (metaErr) {
+        return { ok: false, error: `${kind} record failed: ${metaErr.message}` };
+      }
     }
   }
 
