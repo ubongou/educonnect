@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import clsx from "clsx";
+import Link from "next/link";
 import { CurrencyToggle, currencySymbols, type Currency } from "./CurrencyToggle";
 import type {
   PricingIntroContent,
@@ -26,11 +27,9 @@ function fmt(value: number, currency: Currency): string {
 export function PricingTable({
   intro,
   tiers,
-  bookingUrl,
 }: {
   intro: PricingIntroContent;
   tiers: PricingTiersContent;
-  bookingUrl: string;
 }) {
   const [currency, setCurrency] = useState<Currency>("USD");
 
@@ -103,17 +102,15 @@ export function PricingTable({
                   )}
                 </div>
                 <div className="pricing-cta">
-                  <a
-                    href={bookingUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    href={`/book?source=pricing-${tier.sessions}`}
                     className="btn btn-coral"
                   >
                     Book a session{" "}
                     <span className="arrow" aria-hidden="true">
                       →
                     </span>
-                  </a>
+                  </Link>
                 </div>
               </div>
             );

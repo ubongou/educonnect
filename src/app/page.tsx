@@ -8,11 +8,10 @@ import { Testimonials } from "@/components/marketing/Testimonials";
 import { FoundersAbout } from "@/components/marketing/FoundersAbout";
 import { Contact } from "@/components/marketing/Contact";
 import { MarketingScrollReveal } from "@/components/marketing/MarketingScrollReveal";
-import { getGlobals, getHomeContent } from "@/lib/marketing/content";
+import { getHomeContent } from "@/lib/marketing/content";
 
 export default async function Home() {
-  const [globals, home] = await Promise.all([getGlobals(), getHomeContent()]);
-  const bookingUrl = globals.content.bookingUrl;
+  const home = await getHomeContent();
 
   return (
     <div className="mkt-root">
@@ -20,11 +19,10 @@ export default async function Home() {
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
-      <Nav mode="marketing" bookingUrl={bookingUrl} />
+      <Nav mode="marketing" />
       <main id="main-content">
         <Hero
           content={home.hero.content}
-          bookingUrl={bookingUrl}
           updatedAt={home.hero.updatedAt}
         />
         <Marquee content={home.marquee.content} />

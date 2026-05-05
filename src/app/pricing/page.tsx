@@ -4,7 +4,7 @@ import { Footer } from "@/components/ui/Footer";
 import { PricingTable } from "@/components/marketing/PricingTable";
 import { PricingFAQ } from "@/components/marketing/PricingFAQ";
 import { MarketingScrollReveal } from "@/components/marketing/MarketingScrollReveal";
-import { getGlobals, getPricingContent } from "@/lib/marketing/content";
+import { getPricingContent } from "@/lib/marketing/content";
 
 export const metadata: Metadata = {
   title: "Pricing — EduConnect",
@@ -13,11 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PricingPage() {
-  const [globals, pricing] = await Promise.all([
-    getGlobals(),
-    getPricingContent(),
-  ]);
-  const bookingUrl = globals.content.bookingUrl;
+  const pricing = await getPricingContent();
 
   return (
     <div className="mkt-root">
@@ -25,12 +21,11 @@ export default async function PricingPage() {
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
-      <Nav mode="marketing" activeHref="/pricing" bookingUrl={bookingUrl} />
+      <Nav mode="marketing" activeHref="/pricing" />
       <main id="main-content">
         <PricingTable
           intro={pricing.intro.content}
           tiers={pricing.tiers.content}
-          bookingUrl={bookingUrl}
         />
         <PricingFAQ content={pricing.faq.content} />
       </main>
