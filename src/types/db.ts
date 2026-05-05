@@ -167,7 +167,8 @@ export type Database = {
           mime_type: string | null
           original_filename: string
           size_bytes: number | null
-          storage_path: string
+          status: string
+          storage_key: string
           student_id: string
           uploaded_at: string
         }
@@ -177,7 +178,8 @@ export type Database = {
           mime_type?: string | null
           original_filename: string
           size_bytes?: number | null
-          storage_path: string
+          status?: string
+          storage_key: string
           student_id: string
           uploaded_at?: string
         }
@@ -187,7 +189,8 @@ export type Database = {
           mime_type?: string | null
           original_filename?: string
           size_bytes?: number | null
-          storage_path?: string
+          status?: string
+          storage_key?: string
           student_id?: string
           uploaded_at?: string
         }
@@ -503,7 +506,8 @@ export type Database = {
           mime_type: string | null
           original_filename: string
           size_bytes: number | null
-          storage_path: string
+          status: string
+          storage_key: string
           student_id: string
           uploaded_at: string
           uploaded_by: string
@@ -514,7 +518,8 @@ export type Database = {
           mime_type?: string | null
           original_filename: string
           size_bytes?: number | null
-          storage_path: string
+          status?: string
+          storage_key: string
           student_id: string
           uploaded_at?: string
           uploaded_by: string
@@ -525,7 +530,8 @@ export type Database = {
           mime_type?: string | null
           original_filename?: string
           size_bytes?: number | null
-          storage_path?: string
+          status?: string
+          storage_key?: string
           student_id?: string
           uploaded_at?: string
           uploaded_by?: string
@@ -658,6 +664,60 @@ export type Database = {
           slug?: string
         }
         Relationships: []
+      }
+      teacher_materials: {
+        Row: {
+          id: string
+          kind: string
+          mime_type: string | null
+          original_filename: string
+          size_bytes: number | null
+          status: string
+          storage_key: string
+          student_id: string
+          uploaded_at: string
+          uploaded_by: string
+        }
+        Insert: {
+          id?: string
+          kind: string
+          mime_type?: string | null
+          original_filename: string
+          size_bytes?: number | null
+          status?: string
+          storage_key: string
+          student_id: string
+          uploaded_at?: string
+          uploaded_by: string
+        }
+        Update: {
+          id?: string
+          kind?: string
+          mime_type?: string | null
+          original_filename?: string
+          size_bytes?: number | null
+          status?: string
+          storage_key?: string
+          student_id?: string
+          uploaded_at?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teacher_materials_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teacher_materials_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
