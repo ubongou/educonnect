@@ -84,11 +84,9 @@ export function ChildInfoSection({
             className={inputBase}
           />
         </FormField>
-        <FormField label="Age" required hint="Between 3 and 25.">
+        <FormField label="Age" required>
           <input
             type="number"
-            min={3}
-            max={25}
             required
             value={value.age}
             onChange={(e) => patch({ age: e.target.value })}

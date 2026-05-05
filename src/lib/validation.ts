@@ -176,7 +176,7 @@ export const childInfoSchema = z.object({
     .trim()
     .optional()
     .transform((v) => (v ? v : undefined)),
-  age: z.coerce.number().int().min(3).max(25),
+  age: z.coerce.number().int().nonnegative(),
   gender: z.enum(["male", "female", "prefer_not_to_say"]),
   current_school: z
     .string()
