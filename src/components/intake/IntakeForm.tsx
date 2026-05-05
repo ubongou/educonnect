@@ -144,6 +144,12 @@ export function IntakeForm() {
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // Block implicit submissions from earlier steps (e.g. Enter pressed in any
+    // text input). The explicit "Submit intake" button only renders on the
+    // final step, so a real submit can only originate from there.
+    if (!isLast) return;
+
     setError(null);
 
     if (!childInfoComplete(v.childInfo)) {
