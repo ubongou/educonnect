@@ -204,19 +204,6 @@
   top: 14px;
   z-index: 50;
   margin: 14px var(--gutter) 0;
-  background: #3fbefa;
-  border-radius: var(--radius-pill);
-  box-shadow: 0 8px 28px -16px rgba(4, 19, 28, 0.35),
-    0 1px 0 rgba(255, 255, 255, 0.4) inset;
-}
-.mkt-root .nav.is-scrolled {
-  box-shadow: 0 14px 30px -14px rgba(4, 19, 28, 0.45),
-    0 1px 0 rgba(255, 255, 255, 0.4) inset;
-}
-.mkt-root .nav.is-open {
-  background: transparent;
-  box-shadow: none;
-  transition: none;
 }
 .mkt-root .nav-inner {
   display: flex;
@@ -224,6 +211,14 @@
   gap: clamp(10px, 2vw, 18px);
   height: 64px;
   padding: 0 clamp(12px, 3vw, 22px) 0 clamp(14px, 3vw, 22px);
+  background: #3fbefa;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 8px 28px -16px rgba(4, 19, 28, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.4) inset;
+}
+.mkt-root .nav.is-scrolled .nav-inner {
+  box-shadow: 0 14px 30px -14px rgba(4, 19, 28, 0.45),
+    0 1px 0 rgba(255, 255, 255, 0.4) inset;
 }
 .mkt-root .brand {
   display: flex;
