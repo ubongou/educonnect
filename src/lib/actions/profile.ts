@@ -41,7 +41,13 @@ export async function login(
     .single();
 
   const role = profile?.role as Role | undefined;
-  redirect(role === "admin" ? "/admin" : "/dashboard");
+  redirect(
+    role === "admin"
+      ? "/admin"
+      : role === "teacher"
+        ? "/teacher"
+        : "/dashboard",
+  );
 }
 
 export async function logout() {
