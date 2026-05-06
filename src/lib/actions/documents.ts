@@ -126,7 +126,7 @@ export async function requestStudentDocumentUpload(
       key: storageKey,
       contentType: parsed.data.mimeType,
       contentLength: parsed.data.sizeBytes,
-      ttlSeconds: 600,
+      ttlSeconds: 3600,
     });
   } catch (err) {
     // Presigning failed — roll back the metadata row so we don't leak a
