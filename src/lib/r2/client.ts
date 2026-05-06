@@ -9,9 +9,13 @@ let cached: S3Client | null = null;
  */
 export function getR2Client(): S3Client | null {
   if (cached) return cached;
-  const endpoint = process.env.R2_ENDPOINT;
-  const accessKeyId = process.env.R2_ACCESS_KEY_ID;
-  const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
+  // Trim every value — Vercel's env-var UI can preserve trailing newlines
+  // or spaces when secrets are pasted in, and any whitespace on the secret
+  // makes SigV4 silently produce wrong signatures (R2 returns
+  // SignatureDoesNotMatch with no obvious diagnostic).
+  const endpoint = process.env.R2_ENDPOINT?.trim();
+  const accessKeyId = process.env.R2_ACCESS_KEY_ID?.trim();
+  const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY?.trim();
   if (!endpoint || !accessKeyId || !secretAccessKey) return null;
   cached = new S3Client({
     region: "auto",
