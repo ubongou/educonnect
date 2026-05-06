@@ -127,6 +127,11 @@ export async function requestStudentDocumentUpload(
     .single();
 
   if (insertErr || !inserted) {
+    console.error("[student-doc-insert]", {
+      userId: user.id,
+      studentId: parsed.data.studentId,
+      err: insertErr,
+    });
     return {
       ok: false,
       error: insertErr?.message ?? "Failed to record document",
