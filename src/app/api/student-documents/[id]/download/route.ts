@@ -1,9 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { presignGet } from "@/lib/r2/objects";
+import { contentDispositionFor } from "@/lib/r2/contentDisposition";
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
@@ -12,14 +13,26 @@ export async function GET(
   // RLS gates this read; only ready rows are visible to non-admins.
   const { data: file } = await supabase
     .from("student_documents")
-    .select("storage_key, original_filename")
+    .select("storage_key, original_filename, mime_type")
     .eq("id", id)
     .single();
 
   if (!file) return new NextResponse("Not found", { status: 404 });
 
+  const disposition =
+    req.nextUrl.searchParams.get("disposition") === "attachment"
+      ? "attachment"
+      : "inline";
+
   try {
-    const url = await presignGet(file.storage_key, 60);
+    const url = await presignGet(file.storage_key, {
+      ttlSeconds: 60,
+      contentDisposition: contentDispositionFor(
+        disposition,
+        file.original_filename,
+      ),
+      contentType: file.mime_type ?? undefined,
+    });
     return NextResponse.redirect(url);
   } catch (err) {
     return new NextResponse(

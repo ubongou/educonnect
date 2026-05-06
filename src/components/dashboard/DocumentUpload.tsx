@@ -12,6 +12,7 @@ import {
   studentDocumentPolicy,
   validateUpload,
 } from "@/lib/uploads/policies";
+import { isViewableMime } from "@/lib/uploads/viewable";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { inputBase } from "@/components/ui/FormField";
 
@@ -21,6 +22,7 @@ export type UploadedDocument = {
   original_filename: string;
   size_bytes: number | null;
   uploaded_at: string;
+  mime_type: string | null;
 };
 
 const kindLabels: Record<string, string> = {
@@ -332,8 +334,18 @@ export function DocumentUpload({
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
+                  {isViewableMime(d.mime_type) && (
+                    <a
+                      href={`/api/student-documents/${d.id}/download`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
+                    >
+                      View
+                    </a>
+                  )}
                   <a
-                    href={`/api/student-documents/${d.id}/download`}
+                    href={`/api/student-documents/${d.id}/download?disposition=attachment`}
                     className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
                   >
                     Download

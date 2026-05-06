@@ -13,6 +13,7 @@ import {
   teacherMaterialPolicy,
   validateUpload,
 } from "@/lib/uploads/policies";
+import { isViewableMime } from "@/lib/uploads/viewable";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { inputBase } from "@/components/ui/FormField";
 
@@ -22,6 +23,7 @@ export type TeacherMaterial = {
   original_filename: string;
   size_bytes: number | null;
   uploaded_at: string;
+  mime_type: string | null;
 };
 
 const kindLabels: Record<TeacherMaterialKind, string> = {
@@ -335,8 +337,18 @@ export function MaterialsUpload({
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
+                  {isViewableMime(m.mime_type) && (
+                    <a
+                      href={`/api/teacher-materials/${m.id}/download`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
+                    >
+                      View
+                    </a>
+                  )}
                   <a
-                    href={`/api/teacher-materials/${m.id}/download`}
+                    href={`/api/teacher-materials/${m.id}/download?disposition=attachment`}
                     className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
                   >
                     Download
