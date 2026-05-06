@@ -183,6 +183,11 @@ export async function confirmStudentDocumentUpload(
     .single();
 
   if (error || !data) {
+    console.error("[student-doc-confirm]", {
+      documentId,
+      err: error,
+      data,
+    });
     return {
       ok: false,
       error: error?.message ?? "Document not found or already confirmed",
