@@ -94,6 +94,19 @@ export async function requestStudentDocumentUpload(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Auth required" };
 
+  // TEMP DEBUG: probe whether RLS sees the same user as supabase.auth.
+  // If parent_students returns rows, auth.uid() is propagating; if not,
+  // the JWT isn't reaching the DB session.
+  const { data: psRows, error: psErr } = await supabase
+    .from("parent_students")
+    .select("parent_id, student_id");
+  console.log("[upload-debug]", {
+    userId: user.id,
+    expectedParentId: "d4e2ed91-4e4a-4226-bf17-d1d271a40838",
+    parentStudentsVisible: psRows,
+    psErr: psErr?.message,
+  });
+
   const ext = pickExtension(parsed.data.originalFilename, parsed.data.mimeType);
   const kindSlug = safeKindSlug(parsed.data.kind);
   const storageKey = `${studentDocumentPolicy.prefix}/${parsed.data.studentId}/${kindSlug}-${randomSuffix()}.${ext}`;
