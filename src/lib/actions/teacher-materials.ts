@@ -171,6 +171,12 @@ export async function requestTeacherMaterialUpload(
     .single();
 
   if (insertErr || !inserted) {
+    console.error("[teacher-material-insert]", {
+      userId: ctx.userId,
+      role: ctx.role,
+      studentId: parsed.data.studentId,
+      err: insertErr,
+    });
     return {
       ok: false,
       error: insertErr?.message ?? "Failed to record material",
