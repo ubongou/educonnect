@@ -149,6 +149,13 @@ export async function requestTeacherMaterialUpload(
     ctx.role,
     parsed.data.studentId,
   );
+  console.log("[teacher-upload-debug]", {
+    userId: ctx.userId,
+    role: ctx.role,
+    studentId: parsed.data.studentId,
+    authOk: auth.ok,
+    authErr: auth.ok ? undefined : auth.error,
+  });
   if (!auth.ok) return auth;
 
   const ext = pickExtension(parsed.data.originalFilename, parsed.data.mimeType);
