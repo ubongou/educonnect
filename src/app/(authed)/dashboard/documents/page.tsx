@@ -8,6 +8,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/format";
 import { getParentChildren, pickChild, childTabColor } from "@/lib/dashboard/children";
+import { isViewableMime } from "@/lib/uploads/viewable";
 
 type TutorMaterialRow = {
   id: string;
@@ -15,6 +16,7 @@ type TutorMaterialRow = {
   original_filename: string;
   size_bytes: number | null;
   uploaded_at: string;
+  mime_type: string | null;
 };
 
 const tutorMaterialKindLabels: Record<string, string> = {
@@ -53,12 +55,12 @@ export default async function DashboardDocumentsPage({
   const [{ data }, { data: materialsData }] = await Promise.all([
     supabase
       .from("student_documents")
-      .select("id, kind, original_filename, size_bytes, uploaded_at")
+      .select("id, kind, original_filename, size_bytes, uploaded_at, mime_type")
       .eq("student_id", selected.id)
       .order("uploaded_at", { ascending: false }),
     supabase
       .from("teacher_materials")
-      .select("id, kind, original_filename, size_bytes, uploaded_at")
+      .select("id, kind, original_filename, size_bytes, uploaded_at, mime_type")
       .eq("student_id", selected.id)
       .order("uploaded_at", { ascending: false }),
   ]);
@@ -123,12 +125,24 @@ export default async function DashboardDocumentsPage({
                     </p>
                   </div>
                 </div>
-                <a
-                  href={`/api/teacher-materials/${m.id}/download`}
-                  className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
-                >
-                  Download
-                </a>
+                <div className="flex items-center gap-3">
+                  {isViewableMime(m.mime_type) && (
+                    <a
+                      href={`/api/teacher-materials/${m.id}/download`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
+                    >
+                      View
+                    </a>
+                  )}
+                  <a
+                    href={`/api/teacher-materials/${m.id}/download?disposition=attachment`}
+                    className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
+                  >
+                    Download
+                  </a>
+                </div>
               </li>
             ))}
           </ul>

@@ -15,6 +15,7 @@ import {
   MaterialsUpload,
   type TeacherMaterial,
 } from "@/components/teacher/MaterialsUpload";
+import { isViewableMime } from "@/lib/uploads/viewable";
 
 type ReportRow = {
   id: string;
@@ -30,6 +31,7 @@ type DocumentRow = {
   original_filename: string;
   size_bytes: number | null;
   uploaded_at: string;
+  mime_type: string | null;
 };
 
 function humanSize(bytes: number | null): string {
@@ -96,12 +98,12 @@ export default async function TeacherStudentDetail({
         .limit(20),
       supabase
         .from("student_documents")
-        .select("id, kind, original_filename, size_bytes, uploaded_at")
+        .select("id, kind, original_filename, size_bytes, uploaded_at, mime_type")
         .eq("student_id", id)
         .order("uploaded_at", { ascending: false }),
       supabase
         .from("teacher_materials")
-        .select("id, kind, original_filename, size_bytes, uploaded_at")
+        .select("id, kind, original_filename, size_bytes, uploaded_at, mime_type")
         .eq("student_id", id)
         .eq("status", "ready")
         .order("uploaded_at", { ascending: false }),
@@ -177,12 +179,24 @@ export default async function TeacherStudentDetail({
                     </p>
                   </div>
                 </div>
-                <a
-                  href={`/api/student-documents/${d.id}/download`}
-                  className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
-                >
-                  Download
-                </a>
+                <div className="flex items-center gap-3">
+                  {isViewableMime(d.mime_type) && (
+                    <a
+                      href={`/api/student-documents/${d.id}/download`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
+                    >
+                      View
+                    </a>
+                  )}
+                  <a
+                    href={`/api/student-documents/${d.id}/download?disposition=attachment`}
+                    className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
+                  >
+                    Download
+                  </a>
+                </div>
               </li>
             ))}
           </ul>

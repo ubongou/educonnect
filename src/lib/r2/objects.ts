@@ -36,22 +36,37 @@ export async function presignPut(input: PresignPutInput): Promise<string> {
   return getSignedUrl(client, cmd, { expiresIn: input.ttlSeconds ?? 600 });
 }
 
+export type PresignGetOptions = {
+  ttlSeconds?: number;
+  /** Override the Content-Disposition header on the response. */
+  contentDisposition?: string;
+  /** Override the Content-Type header on the response (for inline rendering). */
+  contentType?: string;
+};
+
 /**
  * Presigned GET URL with short TTL (default 60s). Caller resolves the
  * RLS-gated metadata first; this just turns the storage_key into a
- * temporary download URL the browser can redirect to.
+ * temporary download URL the browser can redirect to. Pass
+ * `contentDisposition` to force a particular display behaviour
+ * (e.g. `attachment; filename="..."` to force download).
  */
 export async function presignGet(
   key: string,
-  ttlSeconds = 60,
+  options: PresignGetOptions = {},
 ): Promise<string> {
   const client = getR2Client();
   const bucket = getR2Bucket();
   if (!client || !bucket) {
     throw new Error("R2 is not configured (missing R2_* env vars)");
   }
-  const cmd = new GetObjectCommand({ Bucket: bucket, Key: key });
-  return getSignedUrl(client, cmd, { expiresIn: ttlSeconds });
+  const cmd = new GetObjectCommand({
+    Bucket: bucket,
+    Key: key,
+    ResponseContentDisposition: options.contentDisposition,
+    ResponseContentType: options.contentType,
+  });
+  return getSignedUrl(client, cmd, { expiresIn: options.ttlSeconds ?? 60 });
 }
 
 /**
