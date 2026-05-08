@@ -28,6 +28,7 @@ export default async function AdminEnrollmentsQueue() {
       .from("profiles")
       .select("id, full_name")
       .eq("role", "teacher")
+      .is("deactivated_at", null)
       .order("full_name"),
   ]);
 

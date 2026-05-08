@@ -37,7 +37,7 @@ export function EnrollForm({
         setError(res.error);
         return;
       }
-      router.push(`/dashboard/children/${studentId}?tab=subjects`);
+      router.push(`/dashboard?child=${studentId}&requested=1`);
     });
   };
 

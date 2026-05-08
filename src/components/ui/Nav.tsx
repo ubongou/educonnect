@@ -25,6 +25,7 @@ const parentLinks: NavLink[] = [
 const adminLinks: NavLink[] = [
   { href: "/admin", label: "Overview" },
   { href: "/admin/students", label: "Students" },
+  { href: "/admin/parents", label: "Parents" },
   { href: "/admin/teachers", label: "Teachers" },
   { href: "/admin/enrollments", label: "Enrollments" },
   { href: "/admin/schedule", label: "Schedule" },

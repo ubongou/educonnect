@@ -36,9 +36,17 @@ export async function login(
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, deactivated_at")
     .eq("id", user.id)
     .single();
+
+  if (profile?.deactivated_at) {
+    await supabase.auth.signOut();
+    return {
+      ok: false,
+      error: "This account has been deactivated. Contact your admin.",
+    };
+  }
 
   const role = profile?.role as Role | undefined;
   redirect(
