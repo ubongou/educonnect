@@ -52,11 +52,16 @@ function averageSkill(ratings: Array<{ rating: number }>): number | null {
 export default async function DashboardOverview({
   searchParams,
 }: {
-  searchParams: Promise<{ child?: string; subject?: string }>;
+  searchParams: Promise<{ child?: string; subject?: string; requested?: string }>;
 }) {
-  const { child: childIdRaw, subject: subjectRaw } = await searchParams;
+  const {
+    child: childIdRaw,
+    subject: subjectRaw,
+    requested,
+  } = await searchParams;
   const { children } = await getParentChildren("/dashboard");
   const selected = pickChild(children, childIdRaw);
+  const showRequestedBanner = requested === "1";
 
   if (!selected) {
     // Middleware should have bounced empty-children parents to /onboarding,
@@ -155,6 +160,17 @@ export default async function DashboardOverview({
 
   return (
     <Container>
+      {showRequestedBanner && (
+        <div
+          role="status"
+          className="mb-6 rounded-md border-[1.5px] border-blue/30 bg-blue/10 px-4 py-3 text-[13px] text-navy"
+        >
+          <strong className="font-heading font-bold">Request sent.</strong>{" "}
+          Admin will assign a teacher and you&apos;ll see new sessions appear
+          under &ldquo;Upcoming.&rdquo;
+        </div>
+      )}
+
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-blue">

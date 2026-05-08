@@ -3,6 +3,10 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate, formatRegistrationNumber } from "@/lib/format";
+import {
+  DeactivateToggle,
+  StatusPill,
+} from "@/components/admin/DeactivateToggle";
 
 type EnrollmentRow = {
   id: string;
@@ -34,7 +38,7 @@ export default async function AdminTeacherDetail({
 
   const { data: teacher } = await supabase
     .from("profiles")
-    .select("id, full_name, email, phone, created_at, role")
+    .select("id, full_name, email, phone, created_at, role, deactivated_at")
     .eq("id", id)
     .eq("role", "teacher")
     .maybeSingle();
@@ -85,15 +89,22 @@ export default async function AdminTeacherDetail({
 
       <div className="flex flex-wrap items-end justify-between gap-6 border-b border-g100 pb-8">
         <div>
-          <h1 className="font-heading text-[clamp(28px,3.4vw,40px)] font-extrabold leading-tight text-navy">
-            {teacher.full_name ?? "Unnamed teacher"}
-          </h1>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="font-heading text-[clamp(28px,3.4vw,40px)] font-extrabold leading-tight text-navy">
+              {teacher.full_name ?? "Unnamed teacher"}
+            </h1>
+            <StatusPill active={teacher.deactivated_at == null} />
+          </div>
           <p className="mt-2 text-[14px] text-g600">
             {teacher.email ?? "no email"}
             {teacher.phone && ` · ${teacher.phone}`}
             {` · created ${formatDate(teacher.created_at)}`}
           </p>
         </div>
+        <DeactivateToggle
+          profileId={teacher.id}
+          active={teacher.deactivated_at == null}
+        />
       </div>
 
       <section className="mt-10">

@@ -2,6 +2,10 @@ import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { createClient } from "@/lib/supabase/server";
+import {
+  DeactivateToggle,
+  StatusPill,
+} from "@/components/admin/DeactivateToggle";
 
 type TeacherRow = {
   id: string;
@@ -9,6 +13,7 @@ type TeacherRow = {
   email: string | null;
   phone: string | null;
   created_at: string;
+  deactivated_at: string | null;
   // Aggregated in-memory below.
   students: number;
   upcoming: number;
@@ -19,8 +24,9 @@ export default async function AdminTeachersPage() {
 
   const { data: profiles } = await supabase
     .from("profiles")
-    .select("id, full_name, email, phone, created_at")
+    .select("id, full_name, email, phone, created_at, deactivated_at")
     .eq("role", "teacher")
+    .order("deactivated_at", { ascending: true, nullsFirst: true })
     .order("created_at", { ascending: false });
 
   const teacherIds = (profiles ?? []).map((p) => p.id);
@@ -64,6 +70,7 @@ export default async function AdminTeachersPage() {
     email: p.email,
     phone: p.phone,
     created_at: p.created_at,
+    deactivated_at: p.deactivated_at,
     students: studentsByTeacher.get(p.id)?.size ?? 0,
     upcoming: upcomingByTeacher.get(p.id) ?? 0,
   }));
@@ -99,32 +106,46 @@ export default async function AdminTeachersPage() {
                 <th className="px-5 py-3">Email</th>
                 <th className="px-5 py-3 text-right">Students</th>
                 <th className="px-5 py-3 text-right">Upcoming</th>
-                <th className="px-5 py-3 text-right">Added</th>
+                <th className="px-5 py-3">Status</th>
+                <th className="px-5 py-3 text-right">Action</th>
               </tr>
             </thead>
             <tbody>
-              {rows.map((r) => (
-                <tr key={r.id} className="border-t border-g100 transition-colors hover:bg-g50">
-                  <td className="px-5 py-3 font-heading font-bold text-navy">
-                    <Link
-                      href={`/admin/teachers/${r.id}`}
-                      className="underline-offset-4 hover:underline"
-                    >
-                      {r.full_name ?? "Unnamed teacher"}
-                    </Link>
-                  </td>
-                  <td className="px-5 py-3 text-g600">{r.email ?? "—"}</td>
-                  <td className="px-5 py-3 text-right tabular-nums text-navy">{r.students}</td>
-                  <td className="px-5 py-3 text-right tabular-nums text-navy">{r.upcoming}</td>
-                  <td className="px-5 py-3 text-right text-g600">
-                    {new Date(r.created_at).toLocaleDateString("en-GB", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </td>
-                </tr>
-              ))}
+              {rows.map((r) => {
+                const active = r.deactivated_at == null;
+                return (
+                  <tr
+                    key={r.id}
+                    className={`border-t border-g100 transition-colors hover:bg-g50 ${
+                      active ? "" : "bg-g50/50"
+                    }`}
+                  >
+                    <td className="px-5 py-3 font-heading font-bold">
+                      <Link
+                        href={`/admin/teachers/${r.id}`}
+                        className={`underline-offset-4 hover:underline ${
+                          active ? "text-navy" : "text-g600"
+                        }`}
+                      >
+                        {r.full_name ?? "Unnamed teacher"}
+                      </Link>
+                    </td>
+                    <td className="px-5 py-3 text-g600">{r.email ?? "—"}</td>
+                    <td className="px-5 py-3 text-right tabular-nums text-navy">
+                      {r.students}
+                    </td>
+                    <td className="px-5 py-3 text-right tabular-nums text-navy">
+                      {r.upcoming}
+                    </td>
+                    <td className="px-5 py-3">
+                      <StatusPill active={active} />
+                    </td>
+                    <td className="px-5 py-3 text-right">
+                      <DeactivateToggle profileId={r.id} active={active} />
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
