@@ -38,13 +38,7 @@ export default async function EnrollPage({
   return (
     <Container>
       <div className="mb-6 text-[13px] text-g600">
-        <Link href="/dashboard" className="hover:text-navy">
-          My children
-        </Link>
-        <span aria-hidden="true" className="mx-2">
-          ›
-        </span>
-        <Link href={`/dashboard/children/${id}`} className="hover:text-navy">
+        <Link href={`/dashboard?child=${id}`} className="hover:text-navy">
           {displayName}
         </Link>
         <span aria-hidden="true" className="mx-2">
