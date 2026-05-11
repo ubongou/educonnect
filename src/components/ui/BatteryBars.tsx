@@ -12,6 +12,16 @@ type Props = {
   className?: string;
 };
 
+// Color-code filled segments by the rating itself, not the segment index.
+// <3 = struggling (coral), 3..7 = building (yellow), >=8 = strong (green).
+// On the 0..5 scale used by intake, the same buckets still apply.
+function fillClass(value: number): string {
+  if (value <= 0) return "bg-white";
+  if (value < 3) return "bg-coral";
+  if (value < 8) return "bg-yellow";
+  return "bg-green";
+}
+
 export function BatteryBars({
   value,
   max = 5,
@@ -23,6 +33,7 @@ export function BatteryBars({
 }: Props) {
   const bars = Array.from({ length: max }, (_, i) => i + 1);
   const interactive = !readOnly && !!onChange;
+  const filledColor = fillClass(value);
 
   return (
     <div className={clsx("flex flex-col gap-2", className)}>
@@ -53,7 +64,7 @@ export function BatteryBars({
                   // each segment. Keeps the overall strip similar in size to
                   // the 5-bar form used on intake's verbal-expression scale.
                   max > 5 ? "h-5 w-4" : "h-6 w-10",
-                  filled ? "bg-yellow" : "bg-white",
+                  filled ? filledColor : "bg-white",
                   interactive && "cursor-pointer hover:brightness-95",
                   !interactive && "cursor-default",
                 )}

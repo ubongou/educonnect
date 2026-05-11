@@ -3,10 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { sendLessonReportEmail } from "@/lib/email/sendLessonReport";
-import { lessonReportSchema } from "@/lib/validation";
+import { lessonReportSchema, lessonReportEditSchema } from "@/lib/validation";
 
 export type SubmitReportResult =
   | { ok: true; reportId: string }
+  | { ok: false; error: string };
+
+export type UpdateReportResult =
+  | { ok: true }
   | { ok: false; error: string };
 
 /**
@@ -90,4 +94,60 @@ export async function submitLessonReport(input: unknown): Promise<SubmitReportRe
   revalidatePath(`/admin/students/${parsed.data.student_id}`);
 
   return { ok: true, reportId };
+}
+
+/**
+ * Admin-only edit of an existing report. Calls update_lesson_report
+ * (SECURITY DEFINER) which verifies admin, swaps the row in place, and
+ * replaces the skill ratings transactionally. Silent edit — no email
+ * re-send.
+ */
+export async function updateLessonReport(
+  reportId: string,
+  input: unknown,
+): Promise<UpdateReportResult> {
+  const parsed = lessonReportEditSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: parsed.error.issues[0]?.message ?? "Invalid report payload",
+    };
+  }
+
+  const supabase = await createClient();
+  // RPC isn't in the generated db.ts yet (run `supabase gen types` post-
+  // migration to regenerate). Until then call it via an untyped client.
+  const { error } = await (
+    supabase as unknown as {
+      rpc: (
+        name: string,
+        args: Record<string, unknown>,
+      ) => Promise<{ error: { message: string } | null }>;
+    }
+  ).rpc("update_lesson_report", {
+    p_report_id: reportId,
+    p_lesson_date: parsed.data.lesson_date,
+    p_duration_minutes: parsed.data.duration_minutes,
+    p_lesson_focus: parsed.data.lesson_focus,
+    p_understanding_check: parsed.data.understanding_check,
+    p_confidence_level: parsed.data.confidence_level,
+    p_lesson_highlights: parsed.data.lesson_highlights ?? "",
+    p_participation: parsed.data.participation,
+    p_focus_rating: parsed.data.focus_rating,
+    p_homework: parsed.data.homework,
+    p_next_focus: parsed.data.next_focus ?? "",
+    p_how_to_help_at_home: parsed.data.how_to_help_at_home ?? "",
+    p_skill_ratings: parsed.data.skill_ratings,
+  });
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/reports");
+  revalidatePath(`/admin/reports/${reportId}`);
+  revalidatePath("/dashboard");
+  revalidatePath(`/dashboard/reports/${reportId}`);
+  revalidatePath("/teacher");
+  revalidatePath(`/teacher/reports/${reportId}`);
+
+  return { ok: true };
 }

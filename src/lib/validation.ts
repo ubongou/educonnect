@@ -245,3 +245,29 @@ export const lessonReportSchema = z.object({
 });
 
 export type LessonReportInput = z.infer<typeof lessonReportSchema>;
+
+// Edit payload — same shape minus student/subject (those are immutable for
+// an existing report; the update RPC patches the row in place by id).
+export const lessonReportEditSchema = z.object({
+  lesson_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Expected YYYY-MM-DD"),
+  duration_minutes: z.number().int().min(1).max(600),
+  lesson_focus: z.string().min(1),
+  understanding_check: rating1to10,
+  confidence_level: rating1to10,
+  lesson_highlights: z.string().optional(),
+  participation: rating0to10,
+  focus_rating: rating0to10,
+  homework: rating0to10,
+  next_focus: z.string().optional(),
+  how_to_help_at_home: z.string().optional(),
+  skill_ratings: z
+    .array(
+      z.object({
+        skill_id: z.string().uuid(),
+        rating: rating0to10,
+      }),
+    )
+    .default([]),
+});
+
+export type LessonReportEditInput = z.infer<typeof lessonReportEditSchema>;

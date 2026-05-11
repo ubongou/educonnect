@@ -1,15 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/Container";
-import { StatusBadge } from "@/components/ui/StatusBadge";
-import { ResendReportButton } from "@/components/admin/ResendReportButton";
 import {
   LessonReportView,
   type LessonReportViewData,
 } from "@/components/dashboard/LessonReportView";
-import { requireAdmin } from "@/lib/auth";
+import { requireParent } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { formatDate } from "@/lib/format";
 
 type FullReport = {
   id: string;
@@ -24,7 +21,6 @@ type FullReport = {
   homework: number;
   next_focus: string | null;
   how_to_help_at_home: string | null;
-  emailed_at: string | null;
   students: {
     id: string;
     full_name: string;
@@ -38,18 +34,17 @@ type FullReport = {
   }>;
 };
 
-export default async function AdminReportDetailPage({
+export default async function ParentReportDetailPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ saved?: string }>;
 }) {
-  await requireAdmin();
+  await requireParent("/dashboard");
   const { id } = await params;
-  const { saved } = await searchParams;
   const supabase = await createClient();
 
+  // RLS restricts SELECT on lesson_reports to admins, the uploader, and
+  // parents linked to the student. A non-matching id returns no row → 404.
   const { data } = await supabase
     .from("lesson_reports")
     .select(
@@ -57,7 +52,7 @@ export default async function AdminReportDetailPage({
       id, lesson_date, duration_minutes, lesson_focus,
       understanding_check, confidence_level, lesson_highlights,
       participation, focus_rating, homework,
-      next_focus, how_to_help_at_home, emailed_at,
+      next_focus, how_to_help_at_home,
       students ( id, full_name, preferred_name ),
       subjects ( name ),
       uploader:profiles!lesson_reports_uploaded_by_fkey ( full_name ),
@@ -98,64 +93,30 @@ export default async function AdminReportDetailPage({
 
   return (
     <Container>
-      <div className="mb-6">
-        <Link
-          href="/admin/reports"
-          className="inline-flex items-center gap-1 font-heading text-[12px] font-bold uppercase tracking-[0.08em] text-blue underline-offset-4 hover:underline"
-        >
-          ← Back to reports
+      <div className="mb-6 text-[13px] text-g600">
+        <Link href="/dashboard" className="hover:text-navy">
+          Dashboard
         </Link>
+        <span aria-hidden="true" className="mx-2">
+          ›
+        </span>
+        <span className="font-semibold text-navy">Lesson report</span>
       </div>
 
-      <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-blue">
-            Lesson report
-          </p>
-          <h1 className="mt-1 font-heading text-[28px] font-extrabold text-navy">
-            {studentName} ·{" "}
-            <span className="text-g600">{report.subjects?.name ?? "Subject"}</span>
-          </h1>
+      <div className="mb-8">
+        <p className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-blue">
+          Lesson report
+        </p>
+        <h1 className="mt-1 font-heading text-[28px] font-extrabold text-navy">
+          {studentName} ·{" "}
+          <span className="text-g600">{report.subjects?.name ?? "Subject"}</span>
+        </h1>
+        {report.uploader?.full_name && (
           <p className="mt-2 text-[13px] text-g600">
-            Uploaded by {report.uploader?.full_name ?? "—"} ·{" "}
-            {report.students?.id && (
-              <Link
-                href={`/admin/students/${report.students.id}`}
-                className="underline-offset-4 hover:underline"
-              >
-                Open student profile
-              </Link>
-            )}
+            Taught by {report.uploader.full_name}
           </p>
-        </div>
-
-        <div className="flex flex-col items-end gap-2">
-          <StatusBadge tone={report.emailed_at ? "green" : "gray"}>
-            {report.emailed_at
-              ? `Email sent ${formatDate(report.emailed_at)}`
-              : "Email not sent"}
-          </StatusBadge>
-          <div className="flex items-center gap-2">
-            <Link
-              href={`/admin/reports/${id}/edit`}
-              className="inline-flex items-center rounded-pill border-[1.5px] border-navy bg-white px-4 py-1.5 font-heading text-[12px] font-bold text-navy hover:bg-g50"
-            >
-              Edit report
-            </Link>
-            <ResendReportButton reportId={report.id} />
-          </div>
-        </div>
+        )}
       </div>
-
-      {saved === "1" && (
-        <div
-          role="status"
-          className="mb-6 rounded-md border-[1.5px] border-blue/30 bg-blue/10 px-4 py-3 text-[13px] text-navy"
-        >
-          <strong className="font-heading font-bold">Saved.</strong>{" "}
-          Changes are live. The parent email was not re-sent.
-        </div>
-      )}
 
       <LessonReportView report={view} />
     </Container>

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
-import { StatusBadge } from "@/components/ui/StatusBadge";
 import { ProfileForm } from "@/components/dashboard/ProfileForm";
 import { PasswordForm } from "@/components/dashboard/PasswordForm";
 import { getProfile, requireParent } from "@/lib/auth";
@@ -21,15 +20,6 @@ export default async function DashboardAccountPage() {
   if (!profile) return null;
 
   const supabase = await createClient();
-
-  // profiles.renewal_at is only readable by self (RLS on profiles), so this
-  // comes from getProfile's own row. We read it separately because the
-  // CurrentProfile shape doesn't include it.
-  const { data: me } = await supabase
-    .from("profiles")
-    .select("renewal_at")
-    .eq("id", profile.id)
-    .maybeSingle();
 
   const { data: childrenData } = await supabase
     .from("students")
@@ -68,8 +58,6 @@ export default async function DashboardAccountPage() {
     };
   });
 
-  const renewalAt = me?.renewal_at ?? null;
-
   return (
     <Container>
       <div className="mb-8">
@@ -80,40 +68,12 @@ export default async function DashboardAccountPage() {
           Account
         </h1>
         <p className="mt-2 text-[14px] text-g600">
-          Subscription status, session progress, and your contact details.
+          Session progress and your contact details.
         </p>
       </div>
 
-      {/* Subscription + Contact (side by side on desktop) */}
-      <div className="grid gap-6 md:grid-cols-2">
-        <section className="rounded-lg border-[1.5px] border-navy/10 bg-white p-6">
-          <h2 className="mb-4 font-heading text-[14px] font-extrabold text-navy">
-            Subscription
-          </h2>
-          <div className="flex items-center gap-3 rounded-md border-[1.5px] border-blue/40 bg-blue/10 px-4 py-3">
-            <span className="h-2 w-2 rounded-pill bg-blue" />
-            <div>
-              <p className="font-heading text-[13px] font-extrabold text-navy">
-                {renewalAt ? "Active" : "Not on a plan yet"}
-              </p>
-              <p className="mt-0.5 text-[12px] text-g600">
-                {renewalAt
-                  ? `Renews ${new Date(renewalAt).toLocaleDateString("en-GB", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}`
-                  : "Speak to admin to set a renewal date."}
-              </p>
-            </div>
-          </div>
-          <p className="mt-4 text-[12px] text-g400">
-            Billing integration is rolling out soon. Subscription changes happen over
-            your usual channel for now.
-          </p>
-        </section>
-
-        <section className="rounded-lg border-[1.5px] border-navy/10 bg-white p-6">
+      <div className="grid gap-6">
+        <section className="rounded-lg border-[1.5px] border-navy/10 bg-white p-6 md:max-w-[540px]">
           <h2 className="mb-6 font-heading text-[14px] font-extrabold text-navy">
             Contact details
           </h2>
@@ -171,19 +131,13 @@ export default async function DashboardAccountPage() {
         <PasswordForm />
       </section>
 
-      <section className="mt-12 flex items-center justify-between rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-6">
-        <div>
-          <p className="font-heading text-[13px] font-extrabold text-navy">
-            Active plan status
-          </p>
-          <p className="mt-1 text-[12px] text-g600">
-            Need to pause lessons or change the schedule? Reach out to admin —
-            all schedule edits happen there.
-          </p>
-        </div>
-        <StatusBadge tone={renewalAt ? "blue" : "gray"}>
-          {renewalAt ? "Active" : "No plan"}
-        </StatusBadge>
+      <section className="mt-8 rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-6">
+        <p className="font-heading text-[13px] font-extrabold text-navy">
+          Need to change the schedule?
+        </p>
+        <p className="mt-1 text-[12px] text-g600">
+          Reach out to admin — all schedule edits happen there.
+        </p>
       </section>
     </Container>
   );
