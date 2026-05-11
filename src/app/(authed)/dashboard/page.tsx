@@ -200,7 +200,7 @@ export default async function DashboardOverview({
       <section className="mb-6 rounded-lg border-[1.5px] border-navy/10 bg-white p-6">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-heading text-[15px] font-extrabold text-navy">
-            Confidence over time
+            Confidence progression
           </h2>
           {latest && (
             <StatusBadge tone={confidenceBadge(latest.confidence_level).tone}>
@@ -234,7 +234,7 @@ export default async function DashboardOverview({
       <section className="mb-10 rounded-lg border-[1.5px] border-navy/10 bg-white p-6">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-heading text-[15px] font-extrabold text-navy">
-            Skill level over time
+            Average skill level progression
           </h2>
           <div className="flex items-center gap-2">
             {SUBJECT_SLUGS.map((slug) => {
@@ -297,6 +297,7 @@ export default async function DashboardOverview({
           lesson={
             latest
               ? {
+                  id: latest.id,
                   lesson_date: latest.lesson_date,
                   lesson_focus: latest.lesson_focus,
                   understanding_check: latest.understanding_check,

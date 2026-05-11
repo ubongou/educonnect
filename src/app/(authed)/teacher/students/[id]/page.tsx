@@ -220,6 +220,7 @@ export default async function TeacherStudentDetail({
                   <th className="px-5 py-3">Subject</th>
                   <th className="px-5 py-3">Understanding</th>
                   <th className="px-5 py-3">Confidence</th>
+                  <th className="px-5 py-3 text-right">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -227,9 +228,17 @@ export default async function TeacherStudentDetail({
                   const u = understandingBadge(r.understanding_check);
                   const c = confidenceBadge(r.confidence_level);
                   return (
-                    <tr key={r.id} className="border-t border-g100">
+                    <tr
+                      key={r.id}
+                      className="border-t border-g100 transition-colors hover:bg-g50"
+                    >
                       <td className="px-5 py-3 font-heading font-bold text-navy">
-                        {formatDate(r.lesson_date)}
+                        <Link
+                          href={`/teacher/reports/${r.id}`}
+                          className="block underline-offset-4 hover:underline"
+                        >
+                          {formatDate(r.lesson_date)}
+                        </Link>
                       </td>
                       <td className="px-5 py-3 text-navy">
                         {r.subjects?.name ?? "—"}
@@ -239,6 +248,14 @@ export default async function TeacherStudentDetail({
                       </td>
                       <td className="px-5 py-3">
                         <StatusBadge tone={c.tone}>{c.label}</StatusBadge>
+                      </td>
+                      <td className="px-5 py-3 text-right">
+                        <Link
+                          href={`/teacher/reports/${r.id}`}
+                          className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
+                        >
+                          View
+                        </Link>
                       </td>
                     </tr>
                   );
