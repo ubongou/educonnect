@@ -31,7 +31,7 @@ const allowedKinds = [
   "other",
 ] as const satisfies readonly StudentDocumentKind[];
 
-const requestSchema = z.object({
+export const requestSchema = z.object({
   studentId: z.string().uuid("Invalid student id"),
   enrollmentId: z.string().uuid("Pick a subject"),
   kind: z.enum(allowedKinds, { message: "Pick a valid kind" }),
