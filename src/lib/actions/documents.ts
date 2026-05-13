@@ -33,6 +33,7 @@ const allowedKinds = [
 
 const requestSchema = z.object({
   studentId: z.string().uuid("Invalid student id"),
+  enrollmentId: z.string().uuid("Pick a subject"),
   kind: z.enum(allowedKinds, { message: "Pick a valid kind" }),
   mimeType: z.string().min(1, "Missing MIME type"),
   sizeBytes: z.number().int().positive(),
@@ -94,6 +95,22 @@ export async function requestStudentDocumentUpload(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Auth required" };
 
+  const { data: enrollment, error: enrollErr } = await supabase
+    .from("enrollments")
+    .select("id, student_id, status")
+    .eq("id", parsed.data.enrollmentId)
+    .maybeSingle();
+
+  if (enrollErr || !enrollment) {
+    return { ok: false, error: "Enrollment not found" };
+  }
+  if (enrollment.student_id !== parsed.data.studentId) {
+    return { ok: false, error: "Enrollment does not match the selected child" };
+  }
+  if (enrollment.status !== "approved") {
+    return { ok: false, error: "Pick an approved enrollment" };
+  }
+
   const ext = pickExtension(parsed.data.originalFilename, parsed.data.mimeType);
   const kindSlug = safeKindSlug(parsed.data.kind);
   const storageKey = `${studentDocumentPolicy.prefix}/${parsed.data.studentId}/${kindSlug}-${randomSuffix()}.${ext}`;
@@ -102,6 +119,7 @@ export async function requestStudentDocumentUpload(
     .from("student_documents")
     .insert({
       student_id: parsed.data.studentId,
+      enrollment_id: parsed.data.enrollmentId,
       uploaded_by: user.id,
       kind: parsed.data.kind,
       original_filename: parsed.data.originalFilename.slice(0, 255),
