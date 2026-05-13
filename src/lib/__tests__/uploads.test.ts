@@ -5,7 +5,7 @@ import {
   teacherMaterialPolicy,
   validateUpload,
 } from "@/lib/uploads/policies";
-import { requestSchema } from "@/lib/actions/documents";
+import { studentDocumentUploadSchema } from "@/lib/validation";
 
 const MB = 1024 * 1024;
 
@@ -253,7 +253,7 @@ describe("policy prefixes", () => {
 
 describe("requestStudentDocumentUpload schema", () => {
   it("rejects payloads without enrollmentId", () => {
-    const result = requestSchema.safeParse({
+    const result = studentDocumentUploadSchema.safeParse({
       studentId: "11111111-1111-4111-8111-111111111111",
       kind: "test_paper",
       mimeType: "application/pdf",
@@ -264,7 +264,7 @@ describe("requestStudentDocumentUpload schema", () => {
   });
 
   it("rejects a non-UUID enrollmentId", () => {
-    const result = requestSchema.safeParse({
+    const result = studentDocumentUploadSchema.safeParse({
       studentId: "11111111-1111-4111-8111-111111111111",
       enrollmentId: "not-a-uuid",
       kind: "test_paper",
@@ -276,7 +276,7 @@ describe("requestStudentDocumentUpload schema", () => {
   });
 
   it("accepts a complete payload", () => {
-    const result = requestSchema.safeParse({
+    const result = studentDocumentUploadSchema.safeParse({
       studentId: "11111111-1111-4111-8111-111111111111",
       enrollmentId: "22222222-2222-4222-8222-222222222222",
       kind: "test_paper",

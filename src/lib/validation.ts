@@ -211,6 +211,33 @@ export const enrollmentRequestSchema = z.object({
 export type EnrollmentRequestInput = z.infer<typeof enrollmentRequestSchema>;
 
 // -----------------------------------------------------------------------------
+// Parent document upload — input to requestStudentDocumentUpload action.
+// Lives here (not in actions/documents.ts) because "use server" modules can
+// only export async functions; a Zod schema is an object and would break at
+// runtime.
+// -----------------------------------------------------------------------------
+
+const studentDocumentKinds = [
+  "test_paper",
+  "school_report",
+  "exam_result",
+  "other",
+] as const;
+
+export const studentDocumentUploadSchema = z.object({
+  studentId: z.string().uuid("Invalid student id"),
+  enrollmentId: z.string().uuid("Pick a subject"),
+  kind: z.enum(studentDocumentKinds, { message: "Pick a valid kind" }),
+  mimeType: z.string().min(1, "Missing MIME type"),
+  sizeBytes: z.number().int().positive(),
+  originalFilename: z.string().min(1).max(255),
+});
+
+export type StudentDocumentUploadInput = z.infer<
+  typeof studentDocumentUploadSchema
+>;
+
+// -----------------------------------------------------------------------------
 // Lesson report — mirrors public.lesson_reports CHECK constraints
 // -----------------------------------------------------------------------------
 

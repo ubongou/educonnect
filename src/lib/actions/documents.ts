@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import {
   deleteR2Object,
@@ -11,7 +10,7 @@ import {
   studentDocumentPolicy,
   validateUpload,
 } from "@/lib/uploads/policies";
-import type { StudentDocumentKind } from "@/types/domain";
+import { studentDocumentUploadSchema } from "@/lib/validation";
 
 // -----------------------------------------------------------------------------
 // Types
@@ -23,23 +22,6 @@ export type RequestUploadResult =
 
 export type ConfirmResult = { ok: true } | { ok: false; error: string };
 export type DeleteResult = { ok: true } | { ok: false; error: string };
-
-const allowedKinds = [
-  "test_paper",
-  "school_report",
-  "exam_result",
-  "other",
-] as const satisfies readonly StudentDocumentKind[];
-
-export const requestSchema = z.object({
-  studentId: z.string().uuid("Invalid student id"),
-  enrollmentId: z.string().uuid("Pick a subject"),
-  kind: z.enum(allowedKinds, { message: "Pick a valid kind" }),
-  mimeType: z.string().min(1, "Missing MIME type"),
-  sizeBytes: z.number().int().positive(),
-  originalFilename: z.string().min(1).max(255),
-});
-export type RequestUploadInput = z.infer<typeof requestSchema>;
 
 // -----------------------------------------------------------------------------
 // Helpers
@@ -81,7 +63,7 @@ function safeKindSlug(kind: string): string {
 export async function requestStudentDocumentUpload(
   raw: unknown,
 ): Promise<RequestUploadResult> {
-  const parsed = requestSchema.safeParse(raw);
+  const parsed = studentDocumentUploadSchema.safeParse(raw);
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
