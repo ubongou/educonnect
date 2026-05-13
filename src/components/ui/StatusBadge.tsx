@@ -11,6 +11,17 @@ const toneClasses: Record<BadgeTone, string> = {
   coral: "border-coral/40 bg-coral/10 text-coral",
 };
 
+// On a dark navy surface the translucent-fill variants above wash out — the
+// text loses contrast and "Developing" becomes near-invisible. These solid
+// variants restore legibility while keeping the tones distinguishable.
+const toneClassesOnDark: Record<BadgeTone, string> = {
+  gray: "border-white/20 bg-white/10 text-white/80",
+  amber: "border-yellow bg-yellow text-navy",
+  green: "border-green bg-green text-white",
+  blue: "border-blue bg-blue text-navy",
+  coral: "border-coral bg-coral text-white",
+};
+
 /**
  * Small, reusable labelled badge. Tones match the inspiration's bg-green /
  * bg-amber / bg-gray / bg-blue palette but rethemed onto EduConnect tokens:
@@ -27,10 +38,12 @@ const toneClasses: Record<BadgeTone, string> = {
  */
 export function StatusBadge({
   tone,
+  onDark = false,
   children,
   className,
 }: {
   tone: BadgeTone;
+  onDark?: boolean;
   children: ReactNode;
   className?: string;
 }) {
@@ -38,7 +51,7 @@ export function StatusBadge({
     <span
       className={clsx(
         "inline-flex items-center rounded-pill border-[1.5px] px-3 py-1 font-heading text-[11px] font-bold uppercase tracking-[0.1em]",
-        toneClasses[tone],
+        (onDark ? toneClassesOnDark : toneClasses)[tone],
         className,
       )}
     >
