@@ -46,7 +46,9 @@ export function LatestLessonCard({
           Last lesson highlights · {formatDate(lesson.lesson_date)}
         </span>
         {lesson.subjects?.name && (
-          <StatusBadge tone={readingTone}>{lesson.subjects.name}</StatusBadge>
+          <StatusBadge tone={readingTone} onDark>
+            {lesson.subjects.name}
+          </StatusBadge>
         )}
       </div>
 
@@ -66,7 +68,9 @@ export function LatestLessonCard({
             Understanding
           </dt>
           <dd className="mt-2">
-            <StatusBadge tone={u.tone}>{u.label}</StatusBadge>
+            <StatusBadge tone={u.tone} onDark>
+              {u.label}
+            </StatusBadge>
           </dd>
         </div>
         <div>
@@ -74,7 +78,9 @@ export function LatestLessonCard({
             Confidence
           </dt>
           <dd className="mt-2">
-            <StatusBadge tone={c.tone}>{c.label}</StatusBadge>
+            <StatusBadge tone={c.tone} onDark>
+              {c.label}
+            </StatusBadge>
           </dd>
         </div>
         {nextSessionLabel && (

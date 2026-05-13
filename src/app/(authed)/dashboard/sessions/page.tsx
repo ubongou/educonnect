@@ -186,7 +186,9 @@ export default async function DashboardSessionsPage({
                         {r.subjects?.name ?? "Subject"} · {r.lesson_focus}
                       </p>
                       <div className="mt-2">
-                        <StatusBadge tone={conf.tone}>{conf.label}</StatusBadge>
+                        <StatusBadge tone={conf.tone} onDark={active}>
+                          {conf.label}
+                        </StatusBadge>
                       </div>
                     </Link>
                   </li>
