@@ -52,20 +52,65 @@ export default async function DashboardDocumentsPage({
   }
 
   const supabase = await createClient();
-  const [{ data }, { data: materialsData }] = await Promise.all([
-    supabase
-      .from("student_documents")
-      .select("id, kind, original_filename, size_bytes, uploaded_at, mime_type")
-      .eq("student_id", selected.id)
-      .order("uploaded_at", { ascending: false }),
-    supabase
-      .from("teacher_materials")
-      .select("id, kind, original_filename, size_bytes, uploaded_at, mime_type")
-      .eq("student_id", selected.id)
-      .order("uploaded_at", { ascending: false }),
-  ]);
+  const [{ data }, { data: materialsData }, { data: enrollmentRows }] =
+    await Promise.all([
+      supabase
+        .from("student_documents")
+        .select(
+          "id, kind, original_filename, size_bytes, uploaded_at, mime_type, enrollment_id, enrollments ( subjects ( name ) )",
+        )
+        .eq("student_id", selected.id)
+        .order("uploaded_at", { ascending: false }),
+      supabase
+        .from("teacher_materials")
+        .select("id, kind, original_filename, size_bytes, uploaded_at, mime_type")
+        .eq("student_id", selected.id)
+        .order("uploaded_at", { ascending: false }),
+      supabase
+        .from("enrollments")
+        .select(
+          "id, subjects ( name ), teacher:profiles!enrollments_teacher_id_fkey ( full_name )",
+        )
+        .eq("student_id", selected.id)
+        .eq("status", "approved")
+        .order("created_at", { ascending: true }),
+    ]);
 
-  const documents = (data ?? []) as UploadedDocument[];
+  type EnrollmentRow = {
+    id: string;
+    subjects: { name: string } | null;
+    teacher: { full_name: string | null } | null;
+  };
+
+  const enrollmentOptions = ((enrollmentRows ?? []) as unknown as EnrollmentRow[])
+    .map((e) => ({
+      id: e.id,
+      subjectName: e.subjects?.name ?? "Subject",
+      teacherName: e.teacher?.full_name ?? null,
+    }));
+
+  type DocRow = {
+    id: string;
+    kind: string;
+    original_filename: string;
+    size_bytes: number | null;
+    uploaded_at: string;
+    mime_type: string | null;
+    enrollment_id: string | null;
+    enrollments: { subjects: { name: string } | null } | null;
+  };
+
+  const documents: UploadedDocument[] = ((data ?? []) as unknown as DocRow[]).map(
+    (d) => ({
+      id: d.id,
+      kind: d.kind,
+      original_filename: d.original_filename,
+      size_bytes: d.size_bytes,
+      uploaded_at: d.uploaded_at,
+      mime_type: d.mime_type,
+      subjectName: d.enrollments?.subjects?.name ?? null,
+    }),
+  );
   const tutorMaterials = (materialsData ?? []) as TutorMaterialRow[];
   const childOptions: ChildTabOption[] = children.map((c, i) => ({
     id: c.id,
@@ -94,7 +139,11 @@ export default async function DashboardDocumentsPage({
         activeId={selected.id}
       />
 
-      <DocumentUpload studentId={selected.id} documents={documents} />
+      <DocumentUpload
+        studentId={selected.id}
+        documents={documents}
+        enrollments={enrollmentOptions}
+      />
 
       <section className="mt-10">
         <h2 className="mb-4 font-heading text-[11px] font-bold uppercase tracking-[0.12em] text-g400">
