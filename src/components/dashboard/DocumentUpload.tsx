@@ -210,10 +210,10 @@ export function DocumentUpload({
   const progressPct = state.kind === "uploading" ? state.progress : 0;
 
   let statusLine: string | null = null;
-  if (state.kind === "requesting") statusLine = "Requesting upload URL…";
+  if (state.kind === "requesting") statusLine = "Uploading…";
   else if (state.kind === "uploading")
     statusLine = `Uploading… ${progressPct}%`;
-  else if (state.kind === "confirming") statusLine = "Finalizing…";
+  else if (state.kind === "confirming") statusLine = "Uploading…";
 
   return (
     <div className="flex flex-col gap-6">
