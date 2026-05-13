@@ -5,6 +5,7 @@ import {
   teacherMaterialPolicy,
   validateUpload,
 } from "@/lib/uploads/policies";
+import { requestSchema } from "@/lib/actions/documents";
 
 const MB = 1024 * 1024;
 
@@ -247,5 +248,42 @@ describe("policy prefixes", () => {
     ]) {
       expect(policy.prefix.endsWith("/")).toBe(false);
     }
+  });
+});
+
+describe("requestStudentDocumentUpload schema", () => {
+  it("rejects payloads without enrollmentId", () => {
+    const result = requestSchema.safeParse({
+      studentId: "11111111-1111-4111-8111-111111111111",
+      kind: "test_paper",
+      mimeType: "application/pdf",
+      sizeBytes: 1024,
+      originalFilename: "x.pdf",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a non-UUID enrollmentId", () => {
+    const result = requestSchema.safeParse({
+      studentId: "11111111-1111-4111-8111-111111111111",
+      enrollmentId: "not-a-uuid",
+      kind: "test_paper",
+      mimeType: "application/pdf",
+      sizeBytes: 1024,
+      originalFilename: "x.pdf",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts a complete payload", () => {
+    const result = requestSchema.safeParse({
+      studentId: "11111111-1111-4111-8111-111111111111",
+      enrollmentId: "22222222-2222-4222-8222-222222222222",
+      kind: "test_paper",
+      mimeType: "application/pdf",
+      sizeBytes: 1024,
+      originalFilename: "x.pdf",
+    });
+    expect(result.success).toBe(true);
   });
 });
