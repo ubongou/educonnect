@@ -242,6 +242,8 @@ export type Database = {
           confidence_level: number
           created_at: string
           duration_minutes: number
+          edited_at: string | null
+          edited_by: string | null
           emailed_at: string | null
           focus_rating: number
           homework: number
@@ -262,6 +264,8 @@ export type Database = {
           confidence_level: number
           created_at?: string
           duration_minutes: number
+          edited_at?: string | null
+          edited_by?: string | null
           emailed_at?: string | null
           focus_rating: number
           homework: number
@@ -282,6 +286,8 @@ export type Database = {
           confidence_level?: number
           created_at?: string
           duration_minutes?: number
+          edited_at?: string | null
+          edited_by?: string | null
           emailed_at?: string | null
           focus_rating?: number
           homework?: number
@@ -299,6 +305,13 @@ export type Database = {
           uploaded_by?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "lesson_reports_edited_by_fkey"
+            columns: ["edited_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "lesson_reports_session_id_fkey"
             columns: ["session_id"]
@@ -504,6 +517,7 @@ export type Database = {
       }
       student_documents: {
         Row: {
+          enrollment_id: string | null
           id: string
           kind: string
           mime_type: string | null
@@ -516,6 +530,7 @@ export type Database = {
           uploaded_by: string
         }
         Insert: {
+          enrollment_id?: string | null
           id?: string
           kind: string
           mime_type?: string | null
@@ -528,6 +543,7 @@ export type Database = {
           uploaded_by: string
         }
         Update: {
+          enrollment_id?: string | null
           id?: string
           kind?: string
           mime_type?: string | null
@@ -540,6 +556,13 @@ export type Database = {
           uploaded_by?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "student_documents_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "enrollments"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "student_documents_student_id_fkey"
             columns: ["student_id"]
@@ -749,6 +772,8 @@ export type Database = {
           confidence_level: number
           created_at: string
           duration_minutes: number
+          edited_at: string | null
+          edited_by: string | null
           emailed_at: string | null
           focus_rating: number
           homework: number
@@ -808,6 +833,51 @@ export type Database = {
       is_admin: { Args: { uid: string }; Returns: boolean }
       is_teacher: { Args: { uid: string }; Returns: boolean }
       next_registration_number: { Args: never; Returns: string }
+      update_lesson_report: {
+        Args: {
+          p_confidence_level: number
+          p_duration_minutes: number
+          p_focus_rating: number
+          p_homework: number
+          p_how_to_help_at_home: string
+          p_lesson_date: string
+          p_lesson_focus: string
+          p_lesson_highlights: string
+          p_next_focus: string
+          p_participation: number
+          p_report_id: string
+          p_skill_ratings: Json
+          p_understanding_check: number
+        }
+        Returns: {
+          confidence_level: number
+          created_at: string
+          duration_minutes: number
+          edited_at: string | null
+          edited_by: string | null
+          emailed_at: string | null
+          focus_rating: number
+          homework: number
+          how_to_help_at_home: string | null
+          id: string
+          lesson_date: string
+          lesson_focus: string
+          lesson_highlights: string | null
+          next_focus: string | null
+          participation: number
+          session_id: string | null
+          student_id: string
+          subject_id: string
+          understanding_check: number
+          uploaded_by: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "lesson_reports"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       [_ in never]: never
