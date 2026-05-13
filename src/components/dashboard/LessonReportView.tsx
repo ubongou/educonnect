@@ -56,6 +56,30 @@ export function LessonReportView({ report }: { report: LessonReportViewData }) {
         </div>
       )}
 
+      {/* Next focus + help at home — surfaced above metrics per client feedback */}
+      {(report.next_focus || report.how_to_help_at_home) && (
+        <div className="grid gap-5 rounded-lg border-[1.5px] border-navy/10 bg-white p-6 md:grid-cols-2">
+          {report.next_focus && (
+            <div>
+              <p className="font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
+                Next focus
+              </p>
+              <p className="mt-2 text-[14px] text-navy">{report.next_focus}</p>
+            </div>
+          )}
+          {report.how_to_help_at_home && (
+            <div>
+              <p className="font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
+                Help at home
+              </p>
+              <p className="mt-2 text-[14px] text-navy">
+                {report.how_to_help_at_home}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Key metrics */}
       <div className="grid gap-5 rounded-lg border-[1.5px] border-navy/10 bg-white p-6 md:grid-cols-2">
         <div>
@@ -128,30 +152,6 @@ export function LessonReportView({ report }: { report: LessonReportViewData }) {
               />
             ))}
           </div>
-        </div>
-      )}
-
-      {/* Narrative — next focus + help at home (highlights now shown above) */}
-      {(report.next_focus || report.how_to_help_at_home) && (
-        <div className="grid gap-5 rounded-lg border-[1.5px] border-navy/10 bg-white p-6 md:grid-cols-2">
-          {report.next_focus && (
-            <div>
-              <p className="font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
-                Next focus
-              </p>
-              <p className="mt-2 text-[14px] text-navy">{report.next_focus}</p>
-            </div>
-          )}
-          {report.how_to_help_at_home && (
-            <div>
-              <p className="font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
-                Help at home
-              </p>
-              <p className="mt-2 text-[14px] text-navy">
-                {report.how_to_help_at_home}
-              </p>
-            </div>
-          )}
         </div>
       )}
     </article>
