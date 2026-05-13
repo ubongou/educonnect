@@ -32,6 +32,18 @@ type DocumentRow = {
   size_bytes: number | null;
   uploaded_at: string;
   mime_type: string | null;
+  subjectName: string | null;
+};
+
+type DocRow = {
+  id: string;
+  kind: string;
+  original_filename: string;
+  size_bytes: number | null;
+  uploaded_at: string;
+  mime_type: string | null;
+  enrollment_id: string | null;
+  enrollments: { subjects: { name: string } | null } | null;
 };
 
 function humanSize(bytes: number | null): string {
@@ -98,7 +110,9 @@ export default async function TeacherStudentDetail({
         .limit(20),
       supabase
         .from("student_documents")
-        .select("id, kind, original_filename, size_bytes, uploaded_at, mime_type")
+        .select(
+          "id, kind, original_filename, size_bytes, uploaded_at, mime_type, enrollment_id, enrollments ( subjects ( name ) )",
+        )
         .eq("student_id", id)
         .order("uploaded_at", { ascending: false }),
       supabase
@@ -110,7 +124,17 @@ export default async function TeacherStudentDetail({
     ]);
 
   const reportRows = (reports ?? []) as unknown as ReportRow[];
-  const docs = (documents ?? []) as DocumentRow[];
+  const docs: DocumentRow[] = ((documents ?? []) as unknown as DocRow[]).map(
+    (d) => ({
+      id: d.id,
+      kind: d.kind,
+      original_filename: d.original_filename,
+      size_bytes: d.size_bytes,
+      uploaded_at: d.uploaded_at,
+      mime_type: d.mime_type,
+      subjectName: d.enrollments?.subjects?.name ?? null,
+    }),
+  );
   const teacherMaterials = (materials ?? []) as TeacherMaterial[];
   const intake = (student.intake ?? null) as IntakeJson | null;
   const displayName = student.preferred_name ?? student.full_name;
@@ -170,6 +194,9 @@ export default async function TeacherStudentDetail({
                   <StatusBadge tone="gray">
                     {kindLabels[d.kind] ?? d.kind}
                   </StatusBadge>
+                  {d.subjectName && (
+                    <StatusBadge tone="blue">{d.subjectName}</StatusBadge>
+                  )}
                   <div>
                     <p className="font-heading text-[14px] font-extrabold text-navy">
                       {d.original_filename}
