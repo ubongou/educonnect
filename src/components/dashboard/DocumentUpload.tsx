@@ -23,6 +23,13 @@ export type UploadedDocument = {
   size_bytes: number | null;
   uploaded_at: string;
   mime_type: string | null;
+  subjectName: string | null;
+};
+
+export type EnrollmentOption = {
+  id: string;
+  subjectName: string;
+  teacherName: string | null;
 };
 
 const kindLabels: Record<string, string> = {
@@ -90,13 +97,18 @@ async function putWithProgress(
 export function DocumentUpload({
   studentId,
   documents,
+  enrollments,
 }: {
   studentId: string;
   documents: UploadedDocument[];
+  enrollments: EnrollmentOption[];
 }) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [kind, setKind] = useState<keyof typeof kindLabels>("test_paper");
+  const [enrollmentId, setEnrollmentId] = useState<string>(
+    enrollments[0]?.id ?? "",
+  );
   const [state, setState] = useState<UploadState>({ kind: "idle" });
   const [success, setSuccess] = useState<string | null>(null);
   const [deletePending, startDeleteTransition] = useTransition();
@@ -109,6 +121,14 @@ export function DocumentUpload({
   const doUpload = async (file: File) => {
     setSuccess(null);
     setState({ kind: "idle" });
+
+    if (!enrollmentId) {
+      setState({
+        kind: "error",
+        message: "Approve a subject enrollment for this child before uploading.",
+      });
+      return;
+    }
 
     // Pre-flight check — server is still authoritative, but reject
     // obviously-bad files in the browser to skip a round-trip.
@@ -124,6 +144,7 @@ export function DocumentUpload({
     setState({ kind: "requesting" });
     const req = await requestStudentDocumentUpload({
       studentId,
+      enrollmentId,
       kind,
       mimeType: file.type,
       sizeBytes: file.size,
@@ -206,30 +227,61 @@ export function DocumentUpload({
               PDFs, images, scans, or short videos. The assigned teacher will see it immediately.
             </p>
           </div>
-          <label className="flex flex-col gap-[6px]">
-            <span className="font-heading text-[11px] font-bold uppercase tracking-[0.08em] text-g400">
-              Kind
-            </span>
-            <select
-              value={kind}
-              onChange={(e) => setKind(e.target.value as keyof typeof kindLabels)}
-              className={`${inputBase} py-2 text-[13px]`}
-              disabled={isBusy}
-            >
-              {Object.entries(kindLabels).map(([v, l]) => (
-                <option key={v} value={v}>
-                  {l}
-                </option>
-              ))}
-            </select>
-          </label>
+          <div className="flex flex-wrap items-end gap-3">
+            <label className="flex flex-col gap-[6px]">
+              <span className="font-heading text-[11px] font-bold uppercase tracking-[0.08em] text-g400">
+                Subject
+              </span>
+              <select
+                value={enrollmentId}
+                onChange={(e) => setEnrollmentId(e.target.value)}
+                className={`${inputBase} py-2 text-[13px]`}
+                disabled={isBusy || enrollments.length === 0}
+              >
+                {enrollments.length === 0 ? (
+                  <option value="">No approved subjects yet</option>
+                ) : (
+                  enrollments.map((e) => (
+                    <option key={e.id} value={e.id}>
+                      {e.subjectName}
+                      {e.teacherName ? ` · ${e.teacherName}` : ""}
+                    </option>
+                  ))
+                )}
+              </select>
+            </label>
+            <label className="flex flex-col gap-[6px]">
+              <span className="font-heading text-[11px] font-bold uppercase tracking-[0.08em] text-g400">
+                Kind
+              </span>
+              <select
+                value={kind}
+                onChange={(e) => setKind(e.target.value as keyof typeof kindLabels)}
+                className={`${inputBase} py-2 text-[13px]`}
+                disabled={isBusy}
+              >
+                {Object.entries(kindLabels).map(([v, l]) => (
+                  <option key={v} value={v}>
+                    {l}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
         </div>
+
+        {enrollments.length === 0 && (
+          <p className="mb-3 rounded-md border-[1.5px] border-yellow/40 bg-yellow/10 px-3 py-2 text-[13px] font-semibold text-navy">
+            Once your child has an approved subject enrollment, you can upload
+            documents here.
+          </p>
+        )}
 
         <label
           onDragOver={(e) => e.preventDefault()}
           onDrop={onDrop}
           className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-[1.5px] border-dashed border-navy/30 bg-g50 px-6 py-10 text-center transition-colors hover:border-navy ${
-            isBusy ? "pointer-events-none opacity-60" : ""
+            isBusy || enrollments.length === 0 ? "pointer-events-none opacity-60" : ""
           }`}
         >
           <svg
@@ -254,7 +306,7 @@ export function DocumentUpload({
             ref={fileInputRef}
             type="file"
             onChange={onFilePicked}
-            disabled={isBusy}
+            disabled={isBusy || enrollments.length === 0}
             className="sr-only"
             accept={ACCEPT}
           />
@@ -318,6 +370,9 @@ export function DocumentUpload({
                   <StatusBadge tone="gray">
                     {kindLabels[d.kind] ?? d.kind}
                   </StatusBadge>
+                  {d.subjectName && (
+                    <StatusBadge tone="blue">{d.subjectName}</StatusBadge>
+                  )}
                   <div>
                     <p className="font-heading text-[14px] font-extrabold text-navy">
                       {d.original_filename}
