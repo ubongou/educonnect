@@ -26,7 +26,7 @@ export async function sendLessonReportEmail(
     .from("lesson_reports")
     .select(
       `
-      id, lesson_date, lesson_focus,
+      id, lesson_date, lesson_focus, lesson_highlights,
       understanding_check, confidence_level,
       participation, focus_rating, homework,
       next_focus, how_to_help_at_home,
@@ -109,6 +109,7 @@ export async function sendLessonReportEmail(
       teacherName,
       lessonDate: report.lesson_date,
       lessonFocus: report.lesson_focus,
+      lessonHighlights: report.lesson_highlights,
       understanding: report.understanding_check,
       confidence: report.confidence_level,
       participation: report.participation,

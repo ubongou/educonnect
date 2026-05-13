@@ -7,6 +7,7 @@ export type LessonReportEmailData = {
   teacherName: string | null;
   lessonDate: string; // ISO date
   lessonFocus: string;
+  lessonHighlights: string | null;
   understanding: number; // 1..10
   confidence: number; // 1..10
   participation: number; // 0..10
@@ -79,6 +80,23 @@ export function renderLessonReportEmail(data: LessonReportEmailData): {
     ? `Hi ${escapeHtml(data.parentFirstName)},`
     : "Hi,";
 
+  const keyTakeaways = [
+    data.lessonHighlights
+      ? `<p style="margin:24px 0 6px;font:800 11px Arial,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#7A8690;">Lesson highlights</p>
+       <p style="margin:0;font:400 14px Arial,sans-serif;line-height:1.55;color:${BRAND_NAVY};font-style:italic;">${escapeHtml(data.lessonHighlights)}</p>`
+      : "",
+    data.nextFocus
+      ? `<p style="margin:20px 0 6px;font:800 11px Arial,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#7A8690;">Next focus</p>
+       <p style="margin:0;font:400 14px Arial,sans-serif;line-height:1.55;color:${BRAND_NAVY};">${escapeHtml(data.nextFocus)}</p>`
+      : "",
+    data.howToHelpAtHome
+      ? `<p style="margin:20px 0 6px;font:800 11px Arial,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#7A8690;">Help at home</p>
+       <p style="margin:0;font:400 14px Arial,sans-serif;line-height:1.55;color:${BRAND_NAVY};">${escapeHtml(data.howToHelpAtHome)}</p>`
+      : "",
+  ]
+    .filter(Boolean)
+    .join("");
+
   const html = `<!doctype html>
 <html>
   <head>
@@ -117,6 +135,8 @@ export function renderLessonReportEmail(data: LessonReportEmailData): {
                   </tr>
                 </table>
 
+                ${keyTakeaways}
+
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:20px;">
                   <tr>
                     <td width="50%" valign="top" style="padding-right:8px;">
@@ -138,16 +158,6 @@ export function renderLessonReportEmail(data: LessonReportEmailData): {
                   ${behaviourRow("Focus and attention", data.focus)}
                   ${behaviourRow("Homework completion", data.homework)}
                 </table>
-
-                ${data.nextFocus ? `
-                <p style="margin:24px 0 6px;font:800 11px Arial,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#7A8690;">Next focus</p>
-                <p style="margin:0;font:400 14px Arial,sans-serif;line-height:1.55;color:${BRAND_NAVY};">${escapeHtml(data.nextFocus)}</p>
-                ` : ""}
-
-                ${data.howToHelpAtHome ? `
-                <p style="margin:20px 0 6px;font:800 11px Arial,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#7A8690;">Help at home</p>
-                <p style="margin:0;font:400 14px Arial,sans-serif;line-height:1.55;color:${BRAND_NAVY};">${escapeHtml(data.howToHelpAtHome)}</p>
-                ` : ""}
 
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:28px;">
                   <tr>
@@ -174,13 +184,16 @@ export function renderLessonReportEmail(data: LessonReportEmailData): {
 </html>`;
 
   const text = [
-    `${greeting.replace(/<[^>]+>/g, "")}`,
+    greeting.replace(/<[^>]+>/g, ""),
     "",
     `${data.teacherName ?? "Your child's teacher"} has just shared a new lesson report for ${data.studentName}.`,
     "",
     `${fmtDate(data.lessonDate)} — ${data.lessonFocus}`,
     `${data.subjectName}${data.teacherName ? ` · ${data.teacherName}` : ""}`,
     "",
+    data.lessonHighlights ? `Lesson highlights:\n${data.lessonHighlights}\n` : "",
+    data.nextFocus ? `Next focus:\n${data.nextFocus}\n` : "",
+    data.howToHelpAtHome ? `Help at home:\n${data.howToHelpAtHome}\n` : "",
     `Understanding: ${data.understanding}/10 (${u.label})`,
     `Confidence:    ${data.confidence}/10 (${c.label})`,
     "",
@@ -188,8 +201,6 @@ export function renderLessonReportEmail(data: LessonReportEmailData): {
     `Focus:         ${data.focus}/10`,
     `Homework:      ${data.homework}/10`,
     "",
-    data.nextFocus ? `Next focus:\n${data.nextFocus}\n` : "",
-    data.howToHelpAtHome ? `Help at home:\n${data.howToHelpAtHome}\n` : "",
     `View the full report: ${data.reportUrl}`,
     "",
     "— EduConnect",
