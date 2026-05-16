@@ -62,3 +62,5 @@ yarn-error.log*
 next-env.d.ts
 bun.lock
 design_handoff_educonnect_website 2/
+.imp
+educlone/
