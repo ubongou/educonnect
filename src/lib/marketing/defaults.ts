@@ -82,7 +82,7 @@ export const defaultMarquee: MarqueeContent = {
 
 export const defaultWhyGrid: WhyGridContent = {
   eyebrow: "Why EduConnect",
-  title: "What sets our teachers apart",
+  title: "What sets us apart",
   subtitle:
     "We do not list tutors for parents to browse. We select, vet, and place the right teacher for each child.",
   cards: [
@@ -142,7 +142,7 @@ export const defaultTestimonials: TestimonialsContent = {
 export const defaultFounders: FoundersContent = {
   eyebrow: "About",
   headingLead: "Built on one belief: ",
-  headingHighlight: "teaching quality determines everything.",
+  headingHighlight: " Teaching quality determines everything.",
   intro:
     "EduConnect was built on a simple belief: the quality of teaching determines everything. We recruit and vet Nigeria's most capable teachers, then work with families around the world to give every child access to genuinely excellent instruction.",
   intro2:
