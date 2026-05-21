@@ -18,7 +18,7 @@ export function FoundersAbout({
               {content.eyebrow}
             </span>
             <h2 id="about-heading" style={{ marginTop: 14 }}>
-              {content.headingLead}
+              {content.headingLead}{" "}
               <em>{content.headingHighlight}</em>
             </h2>
             <p>{content.intro}</p>
