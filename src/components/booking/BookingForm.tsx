@@ -54,14 +54,13 @@ export function BookingForm() {
     <section className="contact" aria-labelledby="booking-heading">
       <div className="container">
         <span className="eyebrow" style={{ marginBottom: 18 }}>
-          Book a free trial
+          Book a free consultation
         </span>
         <h1 id="booking-heading" style={{ marginTop: 14 }}>
           Tell us about your child
         </h1>
         <p className="lead">
-          We&apos;ll match you with a tutor and confirm your trial session on
-          WhatsApp.
+          This takes less than 2 minutes. We&apos;ll reach out within 24 hours to confirm your session.
         </p>
 
         <form
@@ -204,7 +203,7 @@ export function BookingForm() {
               name="parent_phone"
               type="tel"
               autoComplete="tel"
-              hint="Include country code, e.g. +234 801 234 5678"
+              hint="Include country code, e.g. +44 801 234 5678"
               defaultValue={values.parent_phone}
               error={errs.parent_phone}
               required
