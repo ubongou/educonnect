@@ -12,6 +12,8 @@ export const metadata: Metadata = {
     "Flexible, transparent pricing for EduConnect tutoring. Choose the package that works for your family — 8, 24, or 48 sessions with no hidden fees.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function PricingPage() {
   const pricing = await getPricingContent();
 

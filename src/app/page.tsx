@@ -10,6 +10,8 @@ import { Contact } from "@/components/marketing/Contact";
 import { MarketingScrollReveal } from "@/components/marketing/MarketingScrollReveal";
 import { getHomeContent } from "@/lib/marketing/content";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const home = await getHomeContent();
 

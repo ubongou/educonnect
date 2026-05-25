@@ -10,6 +10,8 @@ export const metadata: Metadata = {
     "Pick a session time on the calendar to confirm your free trial booking.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function BookThanksPage() {
   const globals = await getGlobals();
   const calendarUrl = globals.content.bookingUrl;
