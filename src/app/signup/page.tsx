@@ -10,7 +10,7 @@ export default function SignupPage() {
           Create your parent account.
         </>
       }
-      subtitle="The next step after signing up is a short intake about your child."
+      subtitle="The next step after signing up is a short intake form."
       footer={
         <>
           Already have an account?{" "}
