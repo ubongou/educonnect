@@ -36,9 +36,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "EduConnect | Personal Tutoring from Nigeria's Best Teachers",
+  title: "EduConnect | Personal Tutoring from World Class Teachers",
   description:
-    "EduConnect — Personal Tutoring from Nigeria's Best Teachers. One-on-one sessions in Maths, English, and Science. Backed by MIT.",
+    "EduConnect — Personal Tutoring from World Class Teachers. One-on-one sessions in Maths, English, and Science. Backed by MIT.",
 };
 
 export default function RootLayout({
