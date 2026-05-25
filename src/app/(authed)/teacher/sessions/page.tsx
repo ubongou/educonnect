@@ -75,14 +75,14 @@ export default async function TeacherComposerPage({
           <p className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-blue">
             Teacher
           </p>
-          <h1 className="mt-1 font-heading text-[32px] font-extrabold text-navy">
+          <h1 className="mt-1 font-heading text-[clamp(28px,3vw,40px)] font-semibold tracking-[-0.02em] text-navy">
             Lesson report
           </h1>
           <p className="mt-2 text-[14px] text-g600">
             Every scheduled session that&apos;s still awaiting a report shows up here.
           </p>
         </div>
-        <div className="rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-10 text-center">
+        <div className="rounded-[28px] border border-dashed border-line bg-white p-10 text-center">
           <p className="text-[14px] text-g600">
             No sessions waiting for a report. Once admins schedule your next session
             you&apos;ll see it here.
@@ -119,7 +119,7 @@ export default async function TeacherComposerPage({
         <p className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-blue">
           Teacher
         </p>
-        <h1 className="mt-1 font-heading text-[32px] font-extrabold text-navy">
+        <h1 className="mt-1 font-heading text-[clamp(28px,3vw,40px)] font-semibold tracking-[-0.02em] text-navy">
           Lesson report
         </h1>
         <p className="mt-2 text-[14px] text-g600">
@@ -140,10 +140,10 @@ export default async function TeacherComposerPage({
               <Link
                 key={s.id}
                 href={`/teacher/sessions?session=${s.id}`}
-                className={`inline-flex items-center gap-2 rounded-pill border-[1.5px] px-4 py-[6px] font-heading text-[12px] font-semibold transition-colors ${
+                className={`inline-flex items-center gap-2 rounded-pill border px-4 py-[6px] font-heading text-[12px] font-semibold transition-colors ${
                   active
                     ? "border-navy bg-navy text-yellow"
-                    : "border-navy/20 bg-white text-navy hover:bg-g50"
+                    : "border-navy/20 bg-white text-navy hover:bg-paper"
                 }`}
               >
                 {name} · {s.subjects?.name ?? "Subject"} ·{" "}

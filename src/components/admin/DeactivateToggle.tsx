@@ -54,7 +54,7 @@ export function DeactivateToggle({
 export function StatusPill({ active }: { active: boolean }) {
   return (
     <span
-      className={`inline-flex items-center rounded-pill border-[1.5px] px-2 py-[2px] font-heading text-[10px] font-bold uppercase tracking-[0.1em] ${
+      className={`inline-flex items-center rounded-pill border px-2 py-[2px] font-heading text-[10px] font-bold uppercase tracking-[0.1em] ${
         active
           ? "border-blue/30 bg-blue/10 text-navy"
           : "border-g400/40 bg-white text-g600"

@@ -112,7 +112,7 @@ export default async function AdminReportDetailPage({
           <p className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-blue">
             Lesson report
           </p>
-          <h1 className="mt-1 font-heading text-[28px] font-extrabold text-navy">
+          <h1 className="mt-1 font-heading text-[28px] font-semibold text-navy">
             {studentName} ·{" "}
             <span className="text-g600">{report.subjects?.name ?? "Subject"}</span>
           </h1>
@@ -138,7 +138,7 @@ export default async function AdminReportDetailPage({
           <div className="flex items-center gap-2">
             <Link
               href={`/admin/reports/${id}/edit`}
-              className="inline-flex items-center rounded-pill border-[1.5px] border-navy bg-white px-4 py-1.5 font-heading text-[12px] font-bold text-navy hover:bg-g50"
+              className="inline-flex items-center rounded-pill border border-navy bg-white px-4 py-1.5 font-heading text-[12px] font-bold text-navy hover:bg-paper"
             >
               Edit report
             </Link>
@@ -150,7 +150,7 @@ export default async function AdminReportDetailPage({
       {saved === "1" && (
         <div
           role="status"
-          className="mb-6 rounded-md border-[1.5px] border-blue/30 bg-blue/10 px-4 py-3 text-[13px] text-navy"
+          className="mb-6 rounded-md border border-blue/30 bg-blue/10 px-4 py-3 text-[13px] text-navy"
         >
           <strong className="font-heading font-bold">Saved.</strong>{" "}
           Changes are live. The parent email was not re-sent.

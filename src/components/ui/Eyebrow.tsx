@@ -11,7 +11,7 @@ export function Eyebrow({
   return (
     <span
       className={clsx(
-        "mb-3 block text-[11px] font-bold uppercase tracking-[0.12em] text-blue",
+        "mb-3 inline-flex items-center gap-[10px] text-[13px] font-medium uppercase tracking-[0.14em] text-g600 before:block before:h-px before:w-6 before:bg-current before:opacity-50",
         className,
       )}
     >

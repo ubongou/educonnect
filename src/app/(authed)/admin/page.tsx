@@ -53,7 +53,7 @@ export default async function AdminOverview() {
         <p className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-blue">
           Admin
         </p>
-        <h1 className="mt-1 font-heading text-[32px] font-extrabold text-navy">Overview</h1>
+        <h1 className="mt-1 font-heading text-[clamp(28px,3vw,40px)] font-semibold tracking-[-0.02em] text-navy">Overview</h1>
         <p className="mt-2 text-[14px] text-g600">
           At-a-glance activity across students, enrollment requests, and recent reports.
         </p>
@@ -64,12 +64,12 @@ export default async function AdminOverview() {
           <Link
             key={c.href}
             href={c.href}
-            className="group flex flex-col rounded-lg border-[1.5px] border-g100 bg-white p-7 transition-colors hover:border-navy"
+            className="group flex flex-col rounded-[28px] border border-line bg-white p-7 transition-colors hover:border-navy"
           >
             <p className="font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
               {c.label}
             </p>
-            <p className="mt-2 font-heading text-[48px] font-extrabold leading-none tabular-nums text-navy">
+            <p className="mt-2 font-heading text-[48px] font-semibold leading-none tabular-nums text-navy">
               {c.value}
             </p>
             <p className="mt-4 text-[13px] leading-[1.5] text-g600">{c.hint}</p>

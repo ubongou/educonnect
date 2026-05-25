@@ -58,7 +58,7 @@ export function TeacherAssign({
             type="button"
             disabled={pending}
             onClick={save}
-            className="inline-flex items-center rounded-pill border-[1.5px] border-navy bg-navy px-3 py-1 font-heading text-[11px] font-bold uppercase tracking-[0.08em] text-white disabled:opacity-50"
+            className="inline-flex items-center rounded-pill border border-navy bg-navy px-3 py-1 font-heading text-[11px] font-bold uppercase tracking-[0.08em] text-white disabled:opacity-50"
           >
             {pending ? "Saving…" : "Save"}
           </button>

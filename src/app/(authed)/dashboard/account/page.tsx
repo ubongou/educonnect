@@ -64,7 +64,7 @@ export default async function DashboardAccountPage() {
         <p className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-blue">
           Parent dashboard
         </p>
-        <h1 className="mt-1 font-heading text-[32px] font-extrabold text-navy">
+        <h1 className="mt-1 font-heading text-[clamp(28px,3vw,40px)] font-semibold tracking-[-0.02em] text-navy">
           Account
         </h1>
         <p className="mt-2 text-[14px] text-g600">
@@ -73,8 +73,8 @@ export default async function DashboardAccountPage() {
       </div>
 
       <div className="grid gap-6">
-        <section className="rounded-lg border-[1.5px] border-navy/10 bg-white p-6 md:max-w-[540px]">
-          <h2 className="mb-6 font-heading text-[14px] font-extrabold text-navy">
+        <section className="rounded-[28px] border border-line bg-white p-6 md:max-w-[540px]">
+          <h2 className="mb-6 font-heading text-[14px] font-semibold text-navy">
             Contact details
           </h2>
           <ProfileForm
@@ -86,8 +86,8 @@ export default async function DashboardAccountPage() {
       </div>
 
       {/* Session summary per child */}
-      <section className="mt-8 rounded-lg border-[1.5px] border-navy/10 bg-white p-6">
-        <h2 className="mb-4 font-heading text-[14px] font-extrabold text-navy">
+      <section className="mt-8 rounded-[28px] border border-line bg-white p-6">
+        <h2 className="mb-4 font-heading text-[14px] font-semibold text-navy">
           Session summary
         </h2>
         {summaries.length === 0 ? (
@@ -99,11 +99,11 @@ export default async function DashboardAccountPage() {
             {summaries.map((s) => {
               const total = s.completed + s.scheduled;
               return (
-                <div key={s.id} className="rounded-md bg-g50 p-4">
+                <div key={s.id} className="rounded-md bg-paper p-4">
                   <p className="font-heading text-[11px] font-bold uppercase tracking-[0.08em] text-g400">
                     {s.preferred_name ?? s.full_name}
                   </p>
-                  <p className="mt-1 font-heading text-[24px] font-extrabold leading-none text-navy">
+                  <p className="mt-1 font-heading text-[24px] font-semibold leading-none text-navy">
                     {s.completed}
                   </p>
                   <p className="mt-1 text-[11px] text-g600">
@@ -124,15 +124,15 @@ export default async function DashboardAccountPage() {
       </section>
 
       {/* Password — full width so the two form columns don't get squeezed */}
-      <section className="mt-8 rounded-lg border-[1.5px] border-navy/10 bg-white p-6 md:max-w-[540px]">
-        <h2 className="mb-6 font-heading text-[14px] font-extrabold text-navy">
+      <section className="mt-8 rounded-[28px] border border-line bg-white p-6 md:max-w-[540px]">
+        <h2 className="mb-6 font-heading text-[14px] font-semibold text-navy">
           Password
         </h2>
         <PasswordForm />
       </section>
 
-      <section className="mt-8 rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-6">
-        <p className="font-heading text-[13px] font-extrabold text-navy">
+      <section className="mt-8 rounded-[28px] border border-dashed border-line bg-white p-6">
+        <p className="font-heading text-[13px] font-semibold text-navy">
           Need to change the schedule?
         </p>
         <p className="mt-1 text-[12px] text-g600">

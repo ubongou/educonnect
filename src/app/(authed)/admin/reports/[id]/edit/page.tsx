@@ -108,7 +108,7 @@ export default async function AdminReportEditPage({
         <p className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-blue">
           Edit lesson report
         </p>
-        <h1 className="mt-1 font-heading text-[28px] font-extrabold text-navy">
+        <h1 className="mt-1 font-heading text-[28px] font-semibold text-navy">
           {studentName} ·{" "}
           <span className="text-g600">{subjectName}</span>
         </h1>

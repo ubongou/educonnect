@@ -30,7 +30,7 @@ export function LessonReportView({ report }: { report: LessonReportViewData }) {
       {/* Session summary header */}
       <div className="rounded-lg bg-navy p-5 text-white">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <span className="font-heading text-[14px] font-extrabold text-yellow">
+          <span className="font-heading text-[14px] font-semibold text-yellow">
             {formatDate(report.lesson_date)}
           </span>
           <span className="text-[12px] text-white/60">
@@ -39,14 +39,14 @@ export function LessonReportView({ report }: { report: LessonReportViewData }) {
             {` · ${formatDuration(report.duration_minutes)}`}
           </span>
         </div>
-        <h2 className="mt-2 font-heading text-[22px] font-extrabold">
+        <h2 className="mt-2 font-heading text-[22px] font-semibold">
           {report.lesson_focus}
         </h2>
       </div>
 
       {/* Lesson highlights — surfaced above metrics per client feedback */}
       {report.lesson_highlights && (
-        <div className="rounded-lg border-[1.5px] border-navy/10 bg-white p-6">
+        <div className="rounded-[28px] border border-line bg-white p-6">
           <p className="font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
             Lesson highlights
           </p>
@@ -58,7 +58,7 @@ export function LessonReportView({ report }: { report: LessonReportViewData }) {
 
       {/* Next focus + help at home — surfaced above metrics per client feedback */}
       {(report.next_focus || report.how_to_help_at_home) && (
-        <div className="grid gap-5 rounded-lg border-[1.5px] border-navy/10 bg-white p-6 md:grid-cols-2">
+        <div className="grid gap-5 rounded-[28px] border border-line bg-white p-6 md:grid-cols-2">
           {report.next_focus && (
             <div>
               <p className="font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
@@ -81,13 +81,13 @@ export function LessonReportView({ report }: { report: LessonReportViewData }) {
       )}
 
       {/* Key metrics */}
-      <div className="grid gap-5 rounded-lg border-[1.5px] border-navy/10 bg-white p-6 md:grid-cols-2">
+      <div className="grid gap-5 rounded-[28px] border border-line bg-white p-6 md:grid-cols-2">
         <div>
           <p className="font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
             Understanding
           </p>
           <div className="mt-2 flex items-center gap-3">
-            <span className="font-heading text-[22px] font-extrabold tabular-nums text-navy">
+            <span className="font-heading text-[22px] font-semibold tabular-nums text-navy">
               {report.understanding_check}
               <span className="text-[14px] text-g400"> / 10</span>
             </span>
@@ -99,7 +99,7 @@ export function LessonReportView({ report }: { report: LessonReportViewData }) {
             Confidence
           </p>
           <div className="mt-2 flex items-center gap-3">
-            <span className="font-heading text-[22px] font-extrabold tabular-nums text-navy">
+            <span className="font-heading text-[22px] font-semibold tabular-nums text-navy">
               {report.confidence_level}
               <span className="text-[14px] text-g400"> / 10</span>
             </span>
@@ -109,8 +109,8 @@ export function LessonReportView({ report }: { report: LessonReportViewData }) {
       </div>
 
       {/* Behaviours */}
-      <div className="rounded-lg border-[1.5px] border-navy/10 bg-white p-6">
-        <h3 className="mb-4 font-heading text-[14px] font-extrabold text-navy">
+      <div className="rounded-[28px] border border-line bg-white p-6">
+        <h3 className="mb-4 font-heading text-[14px] font-semibold text-navy">
           Learning behaviours
         </h3>
         <div className="flex flex-col gap-3">
@@ -137,8 +137,8 @@ export function LessonReportView({ report }: { report: LessonReportViewData }) {
 
       {/* Skill tracker (optional) */}
       {report.skill_ratings.length > 0 && (
-        <div className="rounded-lg border-[1.5px] border-navy/10 bg-white p-6">
-          <h3 className="mb-4 font-heading text-[14px] font-extrabold text-navy">
+        <div className="rounded-[28px] border border-line bg-white p-6">
+          <h3 className="mb-4 font-heading text-[14px] font-semibold text-navy">
             Skill tracker — {report.subject_name}
           </h3>
           <div className="flex flex-col gap-3">

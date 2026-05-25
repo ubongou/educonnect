@@ -22,7 +22,7 @@ export function ProfileForm({
   return (
     <form action={formAction} className="flex flex-col gap-5">
       <FormField label="Email" hint="To change your email, contact support.">
-        <input type="email" value={email} disabled readOnly className={`${inputBase} bg-g50`} />
+        <input type="email" value={email} disabled readOnly className={`${inputBase} bg-paper`} />
       </FormField>
       <FormField label="Full name" required>
         <input
@@ -47,7 +47,7 @@ export function ProfileForm({
       {state?.ok && (
         <p
           role="status"
-          className="rounded-md border-[1.5px] border-blue/40 bg-blue/10 px-3 py-2 text-[13px] font-semibold text-blue"
+          className="rounded-md border border-blue/40 bg-blue/10 px-3 py-2 text-[13px] font-semibold text-blue"
         >
           Profile updated.
         </p>
@@ -55,7 +55,7 @@ export function ProfileForm({
       {state?.error && (
         <p
           role="alert"
-          className="rounded-md border-[1.5px] border-coral/40 bg-coral/10 px-3 py-2 text-[13px] font-semibold text-coral"
+          className="rounded-md border border-coral/40 bg-coral/10 px-3 py-2 text-[13px] font-semibold text-coral"
         >
           {state.error}
         </p>

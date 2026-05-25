@@ -82,7 +82,7 @@ export default async function AdminTeachersPage() {
           <p className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-blue">
             Admin
           </p>
-          <h1 className="mt-1 font-heading text-[32px] font-extrabold text-navy">Teachers</h1>
+          <h1 className="mt-1 font-heading text-[clamp(28px,3vw,40px)] font-semibold tracking-[-0.02em] text-navy">Teachers</h1>
           <p className="mt-2 text-[14px] text-g600">
             Create and manage teacher accounts. Teachers can compose lesson reports for the
             enrollments you assign to them.
@@ -92,15 +92,15 @@ export default async function AdminTeachersPage() {
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-12 text-center">
+        <div className="rounded-[28px] border border-dashed border-line bg-white p-12 text-center">
           <p className="text-[14px] text-g600">
             No teachers yet. Create the first one to start assigning enrollments.
           </p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-lg border-[1.5px] border-navy/10 bg-white">
+        <div className="overflow-hidden rounded-2xl border border-line bg-white">
           <table className="w-full text-[14px]">
-            <thead className="bg-g50 text-left font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
+            <thead className="bg-paper text-left font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
               <tr>
                 <th className="px-5 py-3">Name</th>
                 <th className="px-5 py-3">Email</th>
@@ -116,8 +116,8 @@ export default async function AdminTeachersPage() {
                 return (
                   <tr
                     key={r.id}
-                    className={`border-t border-g100 transition-colors hover:bg-g50 ${
-                      active ? "" : "bg-g50/50"
+                    className={`border-t border-line transition-colors hover:bg-paper ${
+                      active ? "" : "bg-paper/50"
                     }`}
                   >
                     <td className="px-5 py-3 font-heading font-bold">

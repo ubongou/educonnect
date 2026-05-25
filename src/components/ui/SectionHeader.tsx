@@ -23,7 +23,7 @@ export function SectionHeader({
       {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
       <h2
         className={clsx(
-          "font-heading text-[clamp(26px,3.5vw,40px)] font-extrabold leading-[1.15] mb-3",
+          "font-heading text-[clamp(34px,4vw,52px)] font-semibold leading-[1.05] tracking-[-0.03em] mb-3",
           light ? "text-white" : "text-navy",
         )}
       >

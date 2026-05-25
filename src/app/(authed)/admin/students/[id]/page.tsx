@@ -48,7 +48,7 @@ function StatusPill({ status }: { status: string }) {
   const tone = statusTone[status] ?? statusTone.pending;
   return (
     <span
-      className={`inline-flex items-center rounded-pill border-[1.5px] px-3 py-1 font-heading text-[11px] font-bold uppercase tracking-[0.1em] ${tone}`}
+      className={`inline-flex items-center rounded-pill border px-3 py-1 font-heading text-[11px] font-bold uppercase tracking-[0.1em] ${tone}`}
     >
       {status}
     </span>
@@ -119,12 +119,12 @@ export default async function AdminStudentDetail({
         <span className="font-semibold text-navy">{displayName}</span>
       </div>
 
-      <div className="flex flex-wrap items-end justify-between gap-6 border-b border-g100 pb-8">
+      <div className="flex flex-wrap items-end justify-between gap-6 border-b border-line pb-8">
         <div>
-          <span className="inline-flex items-center gap-2 rounded-pill border-[1.5px] border-navy bg-yellow px-3 py-1 font-heading text-[11px] font-extrabold uppercase tracking-[0.1em] text-navy">
+          <span className="inline-flex items-center gap-2 rounded-pill border border-navy bg-yellow px-3 py-1 font-heading text-[11px] font-semibold uppercase tracking-[0.1em] text-navy">
             {formatRegistrationNumber(student.registration_number)}
           </span>
-          <h1 className="mt-3 font-heading text-[clamp(28px,3.4vw,40px)] font-extrabold leading-tight text-navy">
+          <h1 className="mt-3 font-heading text-[clamp(28px,3.4vw,40px)] font-semibold leading-tight text-navy">
             {displayName}
           </h1>
           <p className="mt-2 text-[14px] text-g600">
@@ -140,7 +140,7 @@ export default async function AdminStudentDetail({
           Linked parents
         </h2>
         {parents.length === 0 ? (
-          <div className="rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-6 text-[14px] text-g600">
+          <div className="rounded-[28px] border border-dashed border-line bg-white p-6 text-[14px] text-g600">
             No parent accounts linked to this student.
           </div>
         ) : (
@@ -148,10 +148,10 @@ export default async function AdminStudentDetail({
             {parents.map((p) => (
               <li
                 key={p.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-lg border-[1.5px] border-navy/10 bg-white px-5 py-4"
+                className="flex flex-wrap items-center justify-between gap-3 rounded-[28px] border border-line bg-white px-5 py-4"
               >
                 <div>
-                  <p className="font-heading text-[15px] font-extrabold text-navy">
+                  <p className="font-heading text-[15px] font-semibold text-navy">
                     {p.full_name ?? "Unnamed parent"}
                   </p>
                   <p className="mt-1 text-[13px] text-g600">
@@ -178,7 +178,7 @@ export default async function AdminStudentDetail({
           Enrollments
         </h2>
         {enrollments.length === 0 ? (
-          <div className="rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-6 text-[14px] text-g600">
+          <div className="rounded-[28px] border border-dashed border-line bg-white p-6 text-[14px] text-g600">
             No enrollment requests.
           </div>
         ) : (
@@ -186,10 +186,10 @@ export default async function AdminStudentDetail({
             {enrollments.map((e) => (
               <li
                 key={e.id}
-                className="flex flex-wrap items-center justify-between gap-4 rounded-lg border-[1.5px] border-navy/10 bg-white px-5 py-4"
+                className="flex flex-wrap items-center justify-between gap-4 rounded-[28px] border border-line bg-white px-5 py-4"
               >
                 <div>
-                  <p className="font-heading text-[15px] font-extrabold text-navy">
+                  <p className="font-heading text-[15px] font-semibold text-navy">
                     {e.subjects?.name ?? "Subject"}
                   </p>
                   <p className="mt-1 text-[12px] text-g400">
@@ -218,13 +218,13 @@ export default async function AdminStudentDetail({
           Lesson reports
         </h2>
         {reports.length === 0 ? (
-          <div className="rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-6 text-[14px] text-g600">
+          <div className="rounded-[28px] border border-dashed border-line bg-white p-6 text-[14px] text-g600">
             No lesson reports submitted yet.
           </div>
         ) : (
-          <div className="overflow-hidden rounded-lg border-[1.5px] border-navy/10 bg-white">
+          <div className="overflow-hidden rounded-2xl border border-line bg-white">
             <table className="w-full text-[14px]">
-              <thead className="bg-g50 text-left font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
+              <thead className="bg-paper text-left font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
                 <tr>
                   <th className="px-5 py-3">Date</th>
                   <th className="px-5 py-3">Subject</th>
@@ -235,7 +235,7 @@ export default async function AdminStudentDetail({
               </thead>
               <tbody>
                 {reports.map((r) => (
-                  <tr key={r.id} className="border-t border-g100 hover:bg-g50">
+                  <tr key={r.id} className="border-t border-line hover:bg-paper">
                     <td className="px-5 py-3 font-heading font-bold text-navy">
                       {formatDate(r.lesson_date)}
                     </td>

@@ -72,7 +72,7 @@ export default async function TeacherOverview({
         <p className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-blue">
           Teacher
         </p>
-        <h1 className="mt-1 font-heading text-[32px] font-extrabold text-navy">
+        <h1 className="mt-1 font-heading text-[clamp(28px,3vw,40px)] font-semibold tracking-[-0.02em] text-navy">
           Welcome back{profile.full_name ? `, ${profile.full_name.split(" ")[0]}` : ""}.
         </h1>
         <p className="mt-2 text-[14px] text-g600">
@@ -83,18 +83,18 @@ export default async function TeacherOverview({
       {submitted === "1" && (
         <div
           role="status"
-          className="mb-8 rounded-md border-[1.5px] border-blue/40 bg-blue/10 px-4 py-3 text-[14px] font-semibold text-blue"
+          className="mb-8 rounded-md border border-blue/40 bg-blue/10 px-4 py-3 text-[14px] font-semibold text-blue"
         >
           Lesson report submitted. The parent can see it now.
         </div>
       )}
 
       <div className="mb-10 grid gap-4 md:grid-cols-3">
-        <div className="rounded-lg border-[1.5px] border-g100 bg-white p-7">
+        <div className="rounded-[28px] border border-line bg-white p-7">
           <p className="font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
             Students
           </p>
-          <p className="mt-2 font-heading text-[40px] font-extrabold leading-none tabular-nums text-navy">
+          <p className="mt-2 font-heading text-[40px] font-semibold leading-none tabular-nums text-navy">
             {studentSet.size}
           </p>
           <p className="mt-3 text-[13px] text-g600">
@@ -107,11 +107,11 @@ export default async function TeacherOverview({
             View students →
           </Link>
         </div>
-        <div className="rounded-lg border-[1.5px] border-g100 bg-white p-7">
+        <div className="rounded-[28px] border border-line bg-white p-7">
           <p className="font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
             Reports · last 7 days
           </p>
-          <p className="mt-2 font-heading text-[40px] font-extrabold leading-none tabular-nums text-navy">
+          <p className="mt-2 font-heading text-[40px] font-semibold leading-none tabular-nums text-navy">
             {reports7d}
           </p>
           <p className="mt-3 text-[13px] text-g600">
@@ -124,11 +124,11 @@ export default async function TeacherOverview({
             New report →
           </Link>
         </div>
-        <div className="rounded-lg border-[1.5px] border-g100 bg-white p-7">
+        <div className="rounded-[28px] border border-line bg-white p-7">
           <p className="font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
             Upcoming sessions
           </p>
-          <p className="mt-2 font-heading text-[40px] font-extrabold leading-none tabular-nums text-navy">
+          <p className="mt-2 font-heading text-[40px] font-semibold leading-none tabular-nums text-navy">
             {upcomingRows.length}
           </p>
           <p className="mt-3 text-[13px] text-g600">
@@ -148,7 +148,7 @@ export default async function TeacherOverview({
           Next sessions
         </h2>
         {upcomingRows.length === 0 ? (
-          <div className="rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-10 text-center">
+          <div className="rounded-[28px] border border-dashed border-line bg-white p-10 text-center">
             <p className="text-[14px] text-g600">
               Nothing scheduled yet. Admins will set your sessions here.
             </p>
@@ -158,10 +158,10 @@ export default async function TeacherOverview({
             {upcomingRows.map((s) => (
               <li
                 key={s.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-lg border-[1.5px] border-navy/10 bg-white px-5 py-4"
+                className="flex flex-wrap items-center justify-between gap-3 rounded-[28px] border border-line bg-white px-5 py-4"
               >
                 <div>
-                  <p className="font-heading text-[15px] font-extrabold text-navy">
+                  <p className="font-heading text-[15px] font-semibold text-navy">
                     {s.students?.preferred_name ?? s.students?.full_name ?? "Unknown"}
                   </p>
                   <p className="mt-1 text-[12px] text-g400">

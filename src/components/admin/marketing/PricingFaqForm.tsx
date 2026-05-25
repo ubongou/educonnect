@@ -76,7 +76,7 @@ export function PricingFaqForm({ initial }: { initial: PricingFaqContent }) {
             <button
               type="button"
               onClick={() => removeItem(i)}
-              className="self-start rounded-pill border-[1.5px] border-coral/40 px-4 py-1 font-heading text-[11px] font-bold uppercase tracking-[0.08em] text-coral transition-colors hover:bg-coral hover:text-white"
+              className="self-start rounded-pill border border-coral/40 px-4 py-1 font-heading text-[11px] font-bold uppercase tracking-[0.08em] text-coral transition-colors hover:bg-coral hover:text-white"
             >
               Remove item
             </button>
@@ -88,7 +88,7 @@ export function PricingFaqForm({ initial }: { initial: PricingFaqContent }) {
         <button
           type="button"
           onClick={addItem}
-          className="self-start rounded-pill border-[1.5px] border-navy/30 px-5 py-2 font-heading text-[12px] font-bold uppercase tracking-[0.08em] text-navy transition-colors hover:bg-navy hover:text-white"
+          className="self-start rounded-pill border border-navy/30 px-5 py-2 font-heading text-[12px] font-bold uppercase tracking-[0.08em] text-navy transition-colors hover:bg-navy hover:text-white"
         >
           + Add FAQ item
         </button>

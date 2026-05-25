@@ -44,7 +44,7 @@ export function PasswordForm() {
       {state?.ok && (
         <p
           role="status"
-          className="rounded-md border-[1.5px] border-blue/40 bg-blue/10 px-3 py-2 text-[13px] font-semibold text-blue"
+          className="rounded-md border border-blue/40 bg-blue/10 px-3 py-2 text-[13px] font-semibold text-blue"
         >
           Password updated.
         </p>
@@ -52,7 +52,7 @@ export function PasswordForm() {
       {state?.error && (
         <p
           role="alert"
-          className="rounded-md border-[1.5px] border-coral/40 bg-coral/10 px-3 py-2 text-[13px] font-semibold text-coral"
+          className="rounded-md border border-coral/40 bg-coral/10 px-3 py-2 text-[13px] font-semibold text-coral"
         >
           {state.error}
         </p>

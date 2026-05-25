@@ -52,7 +52,7 @@ export function SectionFormShell({
         <p className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-blue">
           Site content
         </p>
-        <h1 className="mt-1 font-heading text-[32px] font-extrabold text-navy">
+        <h1 className="mt-1 font-heading text-[32px] font-semibold text-navy">
           {title}
         </h1>
         <p className="mt-2 text-[14px] text-g600">{description}</p>

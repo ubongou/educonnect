@@ -198,7 +198,7 @@ export function MaterialsUpload({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="rounded-lg border-[1.5px] border-navy/10 bg-white p-6">
+      <div className="rounded-lg border border-line bg-white p-6">
         <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
@@ -231,7 +231,7 @@ export function MaterialsUpload({
         <label
           onDragOver={(e) => e.preventDefault()}
           onDrop={onDrop}
-          className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-[1.5px] border-dashed border-navy/30 bg-g50 px-6 py-10 text-center transition-colors hover:border-navy ${
+          className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-md border border-dashed border-navy/30 bg-paper px-6 py-10 text-center transition-colors hover:border-navy ${
             isBusy ? "pointer-events-none opacity-60" : ""
           }`}
         >
@@ -287,7 +287,7 @@ export function MaterialsUpload({
         {errorMessage && (
           <p
             role="alert"
-            className="mt-3 rounded-md border-[1.5px] border-coral/40 bg-coral/10 px-3 py-2 text-[13px] font-semibold text-coral"
+            className="mt-3 rounded-md border border-coral/40 bg-coral/10 px-3 py-2 text-[13px] font-semibold text-coral"
           >
             {errorMessage}
           </p>
@@ -295,7 +295,7 @@ export function MaterialsUpload({
         {success && (
           <p
             role="status"
-            className="mt-3 rounded-md border-[1.5px] border-blue/40 bg-blue/10 px-3 py-2 text-[13px] font-semibold text-blue"
+            className="mt-3 rounded-md border border-blue/40 bg-blue/10 px-3 py-2 text-[13px] font-semibold text-blue"
           >
             {success}
           </p>
@@ -307,7 +307,7 @@ export function MaterialsUpload({
           Your shared materials
         </h2>
         {materials.length === 0 ? (
-          <div className="rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-6 text-[14px] text-g600">
+          <div className="rounded-lg border border-dashed border-line bg-white p-6 text-[14px] text-g600">
             Nothing shared yet for this student.
           </div>
         ) : (
@@ -315,14 +315,14 @@ export function MaterialsUpload({
             {materials.map((m) => (
               <li
                 key={m.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-lg border-[1.5px] border-navy/10 bg-white px-5 py-3"
+                className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-white px-5 py-3"
               >
                 <div className="flex items-center gap-3">
                   <StatusBadge tone="gray">
                     {kindLabels[m.kind as TeacherMaterialKind] ?? m.kind}
                   </StatusBadge>
                   <div>
-                    <p className="font-heading text-[14px] font-extrabold text-navy">
+                    <p className="font-heading text-[14px] font-semibold text-navy">
                       {m.original_filename}
                     </p>
                     <p className="mt-1 text-[12px] text-g400">

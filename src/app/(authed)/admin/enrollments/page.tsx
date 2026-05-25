@@ -42,7 +42,7 @@ export default async function AdminEnrollmentsQueue() {
           <p className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-blue">
             Admin
           </p>
-          <h1 className="mt-1 font-heading text-[32px] font-extrabold text-navy">
+          <h1 className="mt-1 font-heading text-[clamp(28px,3vw,40px)] font-semibold tracking-[-0.02em] text-navy">
             Enrollments queue
           </h1>
           <p className="mt-2 text-[14px] text-g600">
@@ -54,13 +54,13 @@ export default async function AdminEnrollmentsQueue() {
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-12 text-center">
+        <div className="rounded-[28px] border border-dashed border-line bg-white p-12 text-center">
           <p className="text-[14px] text-g600">You&apos;re all caught up.</p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-lg border-[1.5px] border-navy/10 bg-white">
+        <div className="overflow-hidden rounded-2xl border border-line bg-white">
           <table className="w-full text-[14px]">
-            <thead className="bg-g50 text-left font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
+            <thead className="bg-paper text-left font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
               <tr>
                 <th className="px-5 py-3">Student</th>
                 <th className="px-5 py-3">Subject</th>
@@ -74,7 +74,7 @@ export default async function AdminEnrollmentsQueue() {
                 const studentName =
                   r.students?.preferred_name ?? r.students?.full_name ?? "Unknown";
                 return (
-                  <tr key={r.id} className="border-t border-g100">
+                  <tr key={r.id} className="border-t border-line">
                     <td className="px-5 py-3">
                       {r.students ? (
                         <Link

@@ -51,17 +51,17 @@ export function StudentsTable({ rows }: { rows: StudentRow[] }) {
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-10 text-center">
+        <div className="rounded-lg border border-dashed border-line bg-white p-10 text-center">
           <p className="text-[14px] text-g600">No students yet.</p>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-10 text-center">
+        <div className="rounded-lg border border-dashed border-line bg-white p-10 text-center">
           <p className="text-[14px] text-g600">No students match “{q}”.</p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-lg border-[1.5px] border-navy/10 bg-white">
+        <div className="overflow-hidden rounded-lg border border-line bg-white">
           <table className="w-full text-[14px]">
-            <thead className="bg-g50 text-left font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
+            <thead className="bg-paper text-left font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
               <tr>
                 <th className="px-5 py-3">Reg no.</th>
                 <th className="px-5 py-3">Full name</th>
@@ -75,7 +75,7 @@ export function StudentsTable({ rows }: { rows: StudentRow[] }) {
               {filtered.map((s) => (
                 <tr
                   key={s.id}
-                  className="border-t border-g100 transition-colors hover:bg-g50"
+                  className="border-t border-line transition-colors hover:bg-paper"
                 >
                   <td className="px-5 py-3 font-heading font-bold tabular-nums text-navy">
                     <Link

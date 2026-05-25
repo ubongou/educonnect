@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Nav } from "@/components/ui/Nav";
+import { DashboardShell } from "@/components/ui/DashboardShell";
 import { requireParent, requireOnboardingComplete } from "@/lib/auth";
 import { logout } from "@/lib/actions/profile";
 
@@ -8,14 +8,12 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   await requireOnboardingComplete();
 
   return (
-    <>
-      <Nav
-        mode="authed"
-        role="parent"
-        displayName={profile.full_name || "Parent"}
-        onLogout={logout}
-      />
-      <main className="min-h-screen bg-g50 pb-24 pt-24">{children}</main>
-    </>
+    <DashboardShell
+      role="parent"
+      displayName={profile.full_name || "Parent"}
+      onLogout={logout}
+    >
+      {children}
+    </DashboardShell>
   );
 }

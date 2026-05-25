@@ -28,7 +28,7 @@ export function LatestLessonCard({
 }) {
   if (!lesson) {
     return (
-      <div className="rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-6 text-[14px] text-g600">
+      <div className="rounded-[28px] border border-dashed border-line bg-white p-6 text-[14px] text-g600">
         No lesson reports yet. You&apos;ll see the latest one here after the first
         session.
       </div>
@@ -52,7 +52,7 @@ export function LatestLessonCard({
         )}
       </div>
 
-      <h3 className="mt-3 font-heading text-[22px] font-extrabold text-white">
+      <h3 className="mt-3 font-heading text-[22px] font-semibold text-white">
         {lesson.lesson_focus}
       </h3>
 
@@ -106,7 +106,7 @@ export function LatestLessonCard({
       <div className="mt-6 flex justify-end">
         <Link
           href={`/dashboard/reports/${lesson.id}`}
-          className="inline-flex items-center gap-1 rounded-pill border-[1.5px] border-yellow bg-yellow px-4 py-1.5 font-heading text-[12px] font-extrabold text-navy transition-colors hover:bg-yellow/90"
+          className="inline-flex items-center gap-1 rounded-pill border border-yellow bg-yellow px-4 py-1.5 font-heading text-[12px] font-semibold text-navy transition-colors hover:bg-yellow/90"
         >
           See more
           <span aria-hidden="true">→</span>

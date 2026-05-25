@@ -18,7 +18,7 @@ export function FormField({
 }) {
   return (
     <label className={clsx("flex flex-col gap-[7px]", className)}>
-      <span className="font-heading text-[13px] font-semibold text-navy">
+      <span className="font-heading text-[13px] font-medium tracking-[0.02em] text-navy">
         {label}
         {required && <span className="ml-1 text-coral">*</span>}
       </span>
@@ -30,4 +30,4 @@ export function FormField({
 }
 
 export const inputBase =
-  "rounded-md border-[1.5px] border-g100 bg-white px-4 py-3 font-sans text-[14px] text-navy outline-none transition-colors placeholder:text-g400 focus:border-navy disabled:opacity-50";
+  "rounded-xl border border-line bg-paper px-4 py-3 font-sans text-[14px] text-navy outline-none transition-[border-color,background,box-shadow] placeholder:text-g400 focus:border-blue focus:bg-white focus:shadow-[0_0_0_4px_rgba(62,190,255,0.15)] disabled:opacity-50";

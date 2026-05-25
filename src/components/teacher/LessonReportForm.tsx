@@ -112,7 +112,7 @@ export function LessonReportForm({ session, skills }: Props) {
           "Apr 17, 2025 · Ms. Ayobola · Session 14" summary banner. */}
       <div className="rounded-lg bg-navy px-5 py-4 text-white">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <span className="font-heading text-[14px] font-extrabold text-yellow">
+          <span className="font-heading text-[14px] font-semibold text-yellow">
             {session.student_name}
           </span>
           <span className="text-[12px] text-white/60">
@@ -131,8 +131,8 @@ export function LessonReportForm({ session, skills }: Props) {
       </div>
 
       {/* Lesson metadata */}
-      <section className="rounded-lg border-[1.5px] border-navy/10 bg-white p-6">
-        <h2 className="mb-4 font-heading text-[15px] font-extrabold text-navy">
+      <section className="rounded-lg border border-line bg-white p-6">
+        <h2 className="mb-4 font-heading text-[15px] font-semibold text-navy">
           Lesson details
         </h2>
         <div className="grid gap-5 md:grid-cols-2">
@@ -205,8 +205,8 @@ export function LessonReportForm({ session, skills }: Props) {
       </section>
 
       {/* Understanding + Confidence — 1..10 with named levels */}
-      <section className="rounded-lg border-[1.5px] border-navy/10 bg-white p-6">
-        <h2 className="mb-4 font-heading text-[15px] font-extrabold text-navy">
+      <section className="rounded-lg border border-line bg-white p-6">
+        <h2 className="mb-4 font-heading text-[15px] font-semibold text-navy">
           Understanding &amp; confidence
         </h2>
         <div className="flex flex-col gap-6">
@@ -226,8 +226,8 @@ export function LessonReportForm({ session, skills }: Props) {
       </section>
 
       {/* Learning behaviours — 0..10 battery bars */}
-      <section className="rounded-lg border-[1.5px] border-navy/10 bg-white p-6">
-        <h2 className="mb-4 font-heading text-[15px] font-extrabold text-navy">
+      <section className="rounded-lg border border-line bg-white p-6">
+        <h2 className="mb-4 font-heading text-[15px] font-semibold text-navy">
           Learning behaviours
         </h2>
         <div className="flex flex-col gap-4">
@@ -254,8 +254,8 @@ export function LessonReportForm({ session, skills }: Props) {
 
       {/* Skill tracker — per-subject, 0..10 */}
       {skills.length > 0 && (
-        <section className="rounded-lg border-[1.5px] border-navy/10 bg-white p-6">
-          <h2 className="mb-1 font-heading text-[15px] font-extrabold text-navy">
+        <section className="rounded-lg border border-line bg-white p-6">
+          <h2 className="mb-1 font-heading text-[15px] font-semibold text-navy">
             Skill tracker — {session.subject_name}
           </h2>
           <p className="mb-4 text-[12px] text-g400">
@@ -280,7 +280,7 @@ export function LessonReportForm({ session, skills }: Props) {
       {error && (
         <div
           role="alert"
-          className="rounded-md border-[1.5px] border-coral/40 bg-coral/10 px-4 py-3 text-[14px] font-semibold text-coral"
+          className="rounded-md border border-coral/40 bg-coral/10 px-4 py-3 text-[14px] font-semibold text-coral"
         >
           {error}
         </div>

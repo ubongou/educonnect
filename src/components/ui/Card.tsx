@@ -4,7 +4,7 @@ import clsx from "clsx";
 type Variant = "light" | "dark" | "dark-yellow-border";
 
 const variants: Record<Variant, string> = {
-  light: "bg-white border-[1.5px] border-g100",
+  light: "bg-white border border-line",
   dark: "bg-navy border border-white/10",
   "dark-yellow-border": "bg-navy border-[1.5px] border-yellow",
 };
@@ -21,7 +21,7 @@ export function Card({
   return (
     <div
       className={clsx(
-        "rounded-lg p-7 transition-[transform,box-shadow] duration-200",
+        "rounded-[28px] p-7 transition-[transform,box-shadow] duration-200",
         variants[variant],
         className,
       )}

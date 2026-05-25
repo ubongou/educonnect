@@ -124,7 +124,7 @@ export default async function DashboardDocumentsPage({
         <p className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-blue">
           Parent dashboard
         </p>
-        <h1 className="mt-1 font-heading text-[32px] font-extrabold text-navy">
+        <h1 className="mt-1 font-heading text-[clamp(28px,3vw,40px)] font-semibold tracking-[-0.02em] text-navy">
           Documents
         </h1>
         <p className="mt-2 text-[14px] text-g600">
@@ -150,7 +150,7 @@ export default async function DashboardDocumentsPage({
           Materials shared by your tutor
         </h2>
         {tutorMaterials.length === 0 ? (
-          <div className="rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-6 text-[14px] text-g600">
+          <div className="rounded-[28px] border border-dashed border-line bg-white p-6 text-[14px] text-g600">
             Your tutor hasn&apos;t shared any materials for this child yet.
           </div>
         ) : (
@@ -158,14 +158,14 @@ export default async function DashboardDocumentsPage({
             {tutorMaterials.map((m) => (
               <li
                 key={m.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-lg border-[1.5px] border-navy/10 bg-white px-5 py-3"
+                className="flex flex-wrap items-center justify-between gap-3 rounded-[28px] border border-line bg-white px-5 py-3"
               >
                 <div className="flex items-center gap-3">
                   <StatusBadge tone="gray">
                     {tutorMaterialKindLabels[m.kind] ?? m.kind}
                   </StatusBadge>
                   <div>
-                    <p className="font-heading text-[14px] font-extrabold text-navy">
+                    <p className="font-heading text-[14px] font-semibold text-navy">
                       {m.original_filename}
                     </p>
                     <p className="mt-1 text-[12px] text-g400">

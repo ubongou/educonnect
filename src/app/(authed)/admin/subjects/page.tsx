@@ -21,12 +21,12 @@ export default async function AdminSubjectsPage() {
         <p className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-blue">
           Admin
         </p>
-        <h1 className="mt-1 font-heading text-[32px] font-extrabold text-navy">Subjects</h1>
+        <h1 className="mt-1 font-heading text-[clamp(28px,3vw,40px)] font-semibold tracking-[-0.02em] text-navy">Subjects</h1>
         <p className="mt-2 text-[14px] text-g600">
           Parents can only request subjects listed here. Archived subjects stay on past reports
           and enrollments but hide from the request form.
         </p>
-        <p className="mt-3 rounded-md border-[1.5px] border-blue/30 bg-blue/10 px-4 py-3 text-[13px] text-navy">
+        <p className="mt-3 rounded-md border border-blue/30 bg-blue/10 px-4 py-3 text-[13px] text-navy">
           Skill trackers are seeded only for Mathematics, English, and Science. New subjects will
           render lesson reports without the skill-tracker block until skills are added.
         </p>

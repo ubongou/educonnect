@@ -151,12 +151,12 @@ export default async function TeacherStudentDetail({
         <span className="font-semibold text-navy">{displayName}</span>
       </div>
 
-      <div className="flex flex-wrap items-end justify-between gap-6 border-b border-g100 pb-8">
+      <div className="flex flex-wrap items-end justify-between gap-6 border-b border-line pb-8">
         <div>
-          <span className="inline-flex items-center gap-2 rounded-pill border-[1.5px] border-navy bg-yellow px-3 py-1 font-heading text-[11px] font-extrabold uppercase tracking-[0.1em] text-navy">
+          <span className="inline-flex items-center gap-2 rounded-pill border border-navy bg-yellow px-3 py-1 font-heading text-[11px] font-semibold uppercase tracking-[0.1em] text-navy">
             {formatRegistrationNumber(student.registration_number)}
           </span>
-          <h1 className="mt-3 font-heading text-[clamp(28px,3.4vw,40px)] font-extrabold leading-tight text-navy">
+          <h1 className="mt-3 font-heading text-[clamp(28px,3.4vw,40px)] font-semibold leading-tight text-navy">
             {displayName}
           </h1>
           <p className="mt-2 text-[14px] text-g600">
@@ -179,7 +179,7 @@ export default async function TeacherStudentDetail({
           Documents shared by the parent
         </h2>
         {docs.length === 0 ? (
-          <div className="rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-6 text-[14px] text-g600">
+          <div className="rounded-[28px] border border-dashed border-line bg-white p-6 text-[14px] text-g600">
             No documents uploaded yet. Parents can share test papers or reports from
             their dashboard.
           </div>
@@ -188,7 +188,7 @@ export default async function TeacherStudentDetail({
             {docs.map((d) => (
               <li
                 key={d.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-lg border-[1.5px] border-navy/10 bg-white px-5 py-3"
+                className="flex flex-wrap items-center justify-between gap-3 rounded-[28px] border border-line bg-white px-5 py-3"
               >
                 <div className="flex items-center gap-3">
                   <StatusBadge tone="gray">
@@ -198,7 +198,7 @@ export default async function TeacherStudentDetail({
                     <StatusBadge tone="blue">{d.subjectName}</StatusBadge>
                   )}
                   <div>
-                    <p className="font-heading text-[14px] font-extrabold text-navy">
+                    <p className="font-heading text-[14px] font-semibold text-navy">
                       {d.original_filename}
                     </p>
                     <p className="mt-1 text-[12px] text-g400">
@@ -235,13 +235,13 @@ export default async function TeacherStudentDetail({
           Past lesson reports
         </h2>
         {reportRows.length === 0 ? (
-          <div className="rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-6 text-[14px] text-g600">
+          <div className="rounded-[28px] border border-dashed border-line bg-white p-6 text-[14px] text-g600">
             No reports for this student yet.
           </div>
         ) : (
-          <div className="overflow-hidden rounded-lg border-[1.5px] border-navy/10 bg-white">
+          <div className="overflow-hidden rounded-2xl border border-line bg-white">
             <table className="w-full text-[14px]">
-              <thead className="bg-g50 text-left font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
+              <thead className="bg-paper text-left font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
                 <tr>
                   <th className="px-5 py-3">Date</th>
                   <th className="px-5 py-3">Subject</th>
@@ -257,7 +257,7 @@ export default async function TeacherStudentDetail({
                   return (
                     <tr
                       key={r.id}
-                      className="border-t border-g100 transition-colors hover:bg-g50"
+                      className="border-t border-line transition-colors hover:bg-paper"
                     >
                       <td className="px-5 py-3 font-heading font-bold text-navy">
                         <Link

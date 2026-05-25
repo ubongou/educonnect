@@ -72,7 +72,7 @@ export default async function DashboardOverview({
           <p className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-blue">
             Parent dashboard
           </p>
-          <h1 className="mt-1 font-heading text-[32px] font-extrabold text-navy">
+          <h1 className="mt-1 font-heading text-[clamp(28px,3vw,40px)] font-semibold tracking-[-0.02em] text-navy">
             Welcome to EduConnect
           </h1>
           <p className="mt-2 text-[14px] text-g600">
@@ -163,7 +163,7 @@ export default async function DashboardOverview({
       {showRequestedBanner && (
         <div
           role="status"
-          className="mb-6 rounded-md border-[1.5px] border-blue/30 bg-blue/10 px-4 py-3 text-[13px] text-navy"
+          className="mb-6 rounded-md border border-blue/30 bg-blue/10 px-4 py-3 text-[13px] text-navy"
         >
           <strong className="font-heading font-bold">Request sent.</strong>{" "}
           Admin will assign a teacher and you&apos;ll see new sessions appear
@@ -176,7 +176,7 @@ export default async function DashboardOverview({
           <p className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-blue">
             Parent dashboard
           </p>
-          <h1 className="mt-1 font-heading text-[32px] font-extrabold text-navy">
+          <h1 className="mt-1 font-heading text-[clamp(28px,3vw,40px)] font-semibold tracking-[-0.02em] text-navy">
             Overview
           </h1>
           <p className="mt-2 text-[14px] text-g600">
@@ -197,9 +197,9 @@ export default async function DashboardOverview({
       />
 
       {/* Confidence over time */}
-      <section className="mb-6 rounded-lg border-[1.5px] border-navy/10 bg-white p-6">
+      <section className="mb-6 rounded-[28px] border border-line bg-white p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-heading text-[15px] font-extrabold text-navy">
+          <h2 className="font-heading text-[15px] font-semibold text-navy">
             Confidence progression
           </h2>
           {latest && (
@@ -231,9 +231,9 @@ export default async function DashboardOverview({
       </section>
 
       {/* Skill chart with subject subtabs */}
-      <section className="mb-10 rounded-lg border-[1.5px] border-navy/10 bg-white p-6">
+      <section className="mb-10 rounded-[28px] border border-line bg-white p-6">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-heading text-[15px] font-extrabold text-navy">
+          <h2 className="font-heading text-[15px] font-semibold text-navy">
             Average skill level progression
           </h2>
           <div className="flex items-center gap-2">
@@ -249,10 +249,10 @@ export default async function DashboardOverview({
                 <Link
                   key={slug}
                   href={`/dashboard?child=${selected.id}&subject=${slug}`}
-                  className={`inline-flex items-center rounded-pill border-[1.5px] px-4 py-[4px] font-heading text-[12px] font-semibold transition-colors ${
+                  className={`inline-flex items-center rounded-pill border px-4 py-[4px] font-heading text-[12px] font-semibold transition-colors ${
                     active
                       ? "border-navy bg-navy text-yellow"
-                      : "border-navy/20 bg-white text-navy hover:bg-g50"
+                      : "border-navy/20 bg-white text-navy hover:bg-paper"
                   }`}
                 >
                   {label}
@@ -329,10 +329,10 @@ export default async function DashboardOverview({
       </section>
 
       {/* Shortcut: request additional subjects */}
-      <section className="mt-10 rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-6">
+      <section className="mt-10 rounded-[28px] border border-dashed border-line bg-white p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 className="font-heading text-[15px] font-extrabold text-navy">
+            <h3 className="font-heading text-[15px] font-semibold text-navy">
               Want {displayName} to study another subject?
             </h3>
             <p className="mt-1 text-[13px] text-g600">

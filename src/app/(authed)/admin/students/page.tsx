@@ -19,7 +19,7 @@ export default async function AdminStudentsPage() {
         <p className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-blue">
           Admin
         </p>
-        <h1 className="mt-1 font-heading text-[32px] font-extrabold text-navy">Students</h1>
+        <h1 className="mt-1 font-heading text-[clamp(28px,3vw,40px)] font-semibold tracking-[-0.02em] text-navy">Students</h1>
         <p className="mt-2 text-[14px] text-g600">
           Every student on the platform. Search by name, reg number, or school.
         </p>

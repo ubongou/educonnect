@@ -84,7 +84,7 @@ export default async function TeacherStudentsPage() {
         <p className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-blue">
           Teacher
         </p>
-        <h1 className="mt-1 font-heading text-[32px] font-extrabold text-navy">
+        <h1 className="mt-1 font-heading text-[clamp(28px,3vw,40px)] font-semibold tracking-[-0.02em] text-navy">
           My students
         </h1>
         <p className="mt-2 text-[14px] text-g600">
@@ -94,7 +94,7 @@ export default async function TeacherStudentsPage() {
       </div>
 
       {students.length === 0 ? (
-        <div className="rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-12 text-center">
+        <div className="rounded-[28px] border border-dashed border-line bg-white p-12 text-center">
           <p className="text-[14px] text-g600">
             No students assigned yet. Admins will assign them on enrollment approval.
           </p>
@@ -107,14 +107,14 @@ export default async function TeacherStudentsPage() {
               <li key={s.id}>
                 <Link
                   href={`/teacher/students/${s.id}`}
-                  className="group flex items-start gap-4 rounded-lg border-[1.5px] border-navy/10 bg-white p-5 transition-colors hover:border-navy/30"
+                  className="group flex items-start gap-4 rounded-[28px] border border-line bg-white p-5 transition-colors hover:border-navy/30"
                 >
-                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-pill bg-yellow font-heading text-[13px] font-extrabold text-navy">
+                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-pill bg-yellow font-heading text-[13px] font-semibold text-navy">
                     {initials(s.full_name)}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="font-heading text-[16px] font-extrabold text-navy">
+                      <p className="font-heading text-[16px] font-semibold text-navy">
                         {display}
                       </p>
                       <StatusBadge tone="blue">Active</StatusBadge>

@@ -62,7 +62,7 @@ export function SessionScheduler({
 
   if (enrollments.length === 0) {
     return (
-      <div className="rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-6 text-[14px] text-g600">
+      <div className="rounded-lg border border-dashed border-line bg-white p-6 text-[14px] text-g600">
         No approved enrollments with a teacher assigned yet. Approve an enrollment and pick a
         teacher on the{" "}
         <a
@@ -79,7 +79,7 @@ export function SessionScheduler({
   return (
     <form
       onSubmit={onSubmit}
-      className="flex flex-col gap-5 rounded-lg border-[1.5px] border-navy/10 bg-white p-6"
+      className="flex flex-col gap-5 rounded-lg border border-line bg-white p-6"
     >
       <label className="flex flex-col gap-[7px]">
         <span className="font-heading text-[13px] font-semibold text-navy">Enrollment</span>
@@ -128,7 +128,7 @@ export function SessionScheduler({
       {error && (
         <p
           role="alert"
-          className="rounded-md border-[1.5px] border-coral/40 bg-coral/10 px-3 py-2 text-[13px] font-semibold text-coral"
+          className="rounded-md border border-coral/40 bg-coral/10 px-3 py-2 text-[13px] font-semibold text-coral"
         >
           {error}
         </p>
@@ -136,7 +136,7 @@ export function SessionScheduler({
       {success && (
         <p
           role="status"
-          className="rounded-md border-[1.5px] border-blue/40 bg-blue/10 px-3 py-2 text-[13px] font-semibold text-blue"
+          className="rounded-md border border-blue/40 bg-blue/10 px-3 py-2 text-[13px] font-semibold text-blue"
         >
           {success}
         </p>

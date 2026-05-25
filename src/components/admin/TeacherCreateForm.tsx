@@ -13,7 +13,7 @@ function CopyField({ label, value }: { label: string; value: string }) {
         {label}
       </span>
       <div className="flex items-center gap-2">
-        <code className="flex-1 rounded-md border-[1.5px] border-navy/15 bg-g50 px-3 py-2 font-sans text-[14px] text-navy">
+        <code className="flex-1 rounded-md border border-navy/15 bg-paper px-3 py-2 font-sans text-[14px] text-navy">
           {value}
         </code>
         <button
@@ -21,7 +21,7 @@ function CopyField({ label, value }: { label: string; value: string }) {
           onClick={() => {
             void navigator.clipboard.writeText(value);
           }}
-          className="inline-flex items-center rounded-pill border-[1.5px] border-navy/30 bg-white px-4 py-[6px] font-heading text-[12px] font-bold uppercase tracking-[0.08em] text-navy transition-colors hover:bg-g50"
+          className="inline-flex items-center rounded-pill border border-navy/30 bg-white px-4 py-[6px] font-heading text-[12px] font-bold uppercase tracking-[0.08em] text-navy transition-colors hover:bg-paper"
         >
           Copy
         </button>
@@ -40,8 +40,8 @@ export function TeacherCreateForm() {
     const c = state.credentials;
     return (
       <div className="flex flex-col gap-6">
-        <div className="rounded-md border-[1.5px] border-blue/40 bg-blue/10 px-5 py-6">
-          <h2 className="font-heading text-[16px] font-extrabold text-navy">
+        <div className="rounded-md border border-blue/40 bg-blue/10 px-5 py-6">
+          <h2 className="font-heading text-[16px] font-semibold text-navy">
             Teacher account created for {c.full_name}
           </h2>
           <p className="mt-2 text-[14px] leading-[1.6] text-navy">
@@ -51,7 +51,7 @@ export function TeacherCreateForm() {
           </p>
         </div>
 
-        <div className="flex flex-col gap-4 rounded-lg border-[1.5px] border-navy/10 bg-white p-6">
+        <div className="flex flex-col gap-4 rounded-lg border border-line bg-white p-6">
           <CopyField label="Email" value={c.email} />
           <CopyField label="Temporary password" value={c.password} />
         </div>
@@ -72,7 +72,7 @@ export function TeacherCreateForm() {
   const values = state?.status === "error" ? state.values : null;
 
   return (
-    <form action={formAction} className="flex flex-col gap-5 rounded-lg border-[1.5px] border-navy/10 bg-white p-6">
+    <form action={formAction} className="flex flex-col gap-5 rounded-lg border border-line bg-white p-6">
       <FormField label="Full name" required>
         <input
           type="text"
@@ -123,7 +123,7 @@ export function TeacherCreateForm() {
       {state?.status === "error" && (
         <p
           role="alert"
-          className="rounded-md border-[1.5px] border-coral/40 bg-coral/10 px-3 py-2 text-[13px] font-semibold text-coral"
+          className="rounded-md border border-coral/40 bg-coral/10 px-3 py-2 text-[13px] font-semibold text-coral"
         >
           {state.error}
         </p>

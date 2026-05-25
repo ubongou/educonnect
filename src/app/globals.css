@@ -20,9 +20,14 @@
   --radius-lg:   16px;
   --radius-md:   10px;
 
+  /* Warm surface tokens (matching marketing design language) */
+  --color-paper:  #fbf9f4;
+  --color-paper-2: #f4f1e8;
+  --color-line:   #e8e3d6;
+
   /* Fonts — exposed as utility classes (font-heading, font-sans) */
-  --font-heading: var(--font-nunito), sans-serif;
-  --font-sans:    var(--font-nunito-sans), sans-serif;
+  --font-heading: var(--font-outfit), sans-serif;
+  --font-sans:    var(--font-inter), sans-serif;
 
   /* Animations */
   --animate-float:   float 4s ease-in-out infinite;
@@ -42,7 +47,7 @@
 /* Base resets + typography */
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { font-size: 16px; }
+body { font-size: 17px; }
 img { display: block; max-width: 100%; }
 h1, h2, h3, h4 { font-family: var(--font-heading); }
 

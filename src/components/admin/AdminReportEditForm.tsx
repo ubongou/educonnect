@@ -106,7 +106,7 @@ export function AdminReportEditForm({
     <form onSubmit={onSubmit} className="flex flex-col gap-8">
       <div className="rounded-lg bg-navy px-5 py-4 text-white">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <span className="font-heading text-[14px] font-extrabold text-yellow">
+          <span className="font-heading text-[14px] font-semibold text-yellow">
             {studentName}
           </span>
           <span className="text-[12px] text-white/80">{subjectName}</span>
@@ -116,8 +116,8 @@ export function AdminReportEditForm({
         </p>
       </div>
 
-      <section className="rounded-lg border-[1.5px] border-navy/10 bg-white p-6">
-        <h2 className="mb-4 font-heading text-[15px] font-extrabold text-navy">
+      <section className="rounded-lg border border-line bg-white p-6">
+        <h2 className="mb-4 font-heading text-[15px] font-semibold text-navy">
           Lesson details
         </h2>
         <div className="grid gap-5 md:grid-cols-2">
@@ -183,8 +183,8 @@ export function AdminReportEditForm({
         </div>
       </section>
 
-      <section className="rounded-lg border-[1.5px] border-navy/10 bg-white p-6">
-        <h2 className="mb-4 font-heading text-[15px] font-extrabold text-navy">
+      <section className="rounded-lg border border-line bg-white p-6">
+        <h2 className="mb-4 font-heading text-[15px] font-semibold text-navy">
           Understanding &amp; confidence
         </h2>
         <div className="flex flex-col gap-6">
@@ -203,8 +203,8 @@ export function AdminReportEditForm({
         </div>
       </section>
 
-      <section className="rounded-lg border-[1.5px] border-navy/10 bg-white p-6">
-        <h2 className="mb-4 font-heading text-[15px] font-extrabold text-navy">
+      <section className="rounded-lg border border-line bg-white p-6">
+        <h2 className="mb-4 font-heading text-[15px] font-semibold text-navy">
           Learning behaviours
         </h2>
         <div className="flex flex-col gap-4">
@@ -230,8 +230,8 @@ export function AdminReportEditForm({
       </section>
 
       {skills.length > 0 && (
-        <section className="rounded-lg border-[1.5px] border-navy/10 bg-white p-6">
-          <h2 className="mb-1 font-heading text-[15px] font-extrabold text-navy">
+        <section className="rounded-lg border border-line bg-white p-6">
+          <h2 className="mb-1 font-heading text-[15px] font-semibold text-navy">
             Skill tracker — {subjectName}
           </h2>
           <p className="mb-4 text-[12px] text-g400">
@@ -256,7 +256,7 @@ export function AdminReportEditForm({
       {error && (
         <div
           role="alert"
-          className="rounded-md border-[1.5px] border-coral/40 bg-coral/10 px-4 py-3 text-[14px] font-semibold text-coral"
+          className="rounded-md border border-coral/40 bg-coral/10 px-4 py-3 text-[14px] font-semibold text-coral"
         >
           {error}
         </div>
@@ -266,7 +266,7 @@ export function AdminReportEditForm({
         <button
           type="button"
           onClick={() => router.push(`/admin/reports/${reportId}`)}
-          className="rounded-pill border-[1.5px] border-navy bg-white px-6 py-[12px] font-heading text-[14px] font-bold text-navy hover:bg-g50"
+          className="rounded-pill border border-navy bg-white px-6 py-[12px] font-heading text-[14px] font-bold text-navy hover:bg-paper"
         >
           Cancel
         </button>

@@ -30,7 +30,7 @@ type ButtonProps = CommonProps & {
 type Props = AnchorProps | ButtonProps;
 
 const base =
-  "inline-flex items-center gap-2 rounded-pill border-2 border-navy font-heading font-bold leading-none transition-[transform,box-shadow,background] duration-200 hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(0,0,0,0.18)] active:translate-y-0 active:shadow-none disabled:opacity-50 disabled:pointer-events-none";
+  "inline-flex items-center gap-2 rounded-pill border border-transparent font-heading font-medium leading-none transition-[transform,box-shadow,background,border-color] duration-200 hover:-translate-y-0.5 active:translate-y-0 active:shadow-none disabled:opacity-50 disabled:pointer-events-none";
 
 const sizes = {
   md: "text-[13px] px-6 py-[11px]",
@@ -38,8 +38,8 @@ const sizes = {
 };
 
 const variants = {
-  primary: "bg-coral text-white",
-  outline: "bg-transparent text-navy hover:bg-navy/5",
+  primary: "bg-coral text-white shadow-[0_8px_18px_-8px_rgba(255,105,63,0.55)] hover:bg-[#e85429]",
+  outline: "border-[rgba(4,19,28,0.18)] bg-transparent text-navy hover:border-navy hover:bg-navy hover:text-white",
 };
 
 export function Button(props: Props) {

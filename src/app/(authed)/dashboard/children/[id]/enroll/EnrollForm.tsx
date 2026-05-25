@@ -43,7 +43,7 @@ export function EnrollForm({
 
   if (subjects.length === 0) {
     return (
-      <div className="rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-10 text-center">
+      <div className="rounded-[28px] border border-dashed border-line bg-white p-10 text-center">
         <p className="text-[14px] text-g600">
           Your child is already enrolled or requested for every subject we offer.
         </p>
@@ -59,7 +59,7 @@ export function EnrollForm({
           return (
             <li key={s.id}>
               <label
-                className={`flex cursor-pointer items-center gap-4 rounded-lg border-[1.5px] bg-white px-5 py-4 transition-colors ${
+                className={`flex cursor-pointer items-center gap-4 rounded-[28px] border bg-white px-5 py-4 transition-colors ${
                   checked ? "border-navy" : "border-navy/10 hover:border-navy/30"
                 }`}
               >
@@ -71,7 +71,7 @@ export function EnrollForm({
                   onChange={() => toggle(s.id)}
                   className="h-5 w-5 accent-navy"
                 />
-                <span className="font-heading text-[16px] font-extrabold text-navy">
+                <span className="font-heading text-[16px] font-semibold text-navy">
                   {s.name}
                 </span>
               </label>
@@ -83,13 +83,13 @@ export function EnrollForm({
       {error && (
         <p
           role="alert"
-          className="rounded-md border-[1.5px] border-coral/40 bg-coral/10 px-3 py-2 text-[13px] font-semibold text-coral"
+          className="rounded-md border border-coral/40 bg-coral/10 px-3 py-2 text-[13px] font-semibold text-coral"
         >
           {error}
         </p>
       )}
 
-      <div className="flex items-center justify-between gap-4 rounded-lg border-[1.5px] border-navy/10 bg-white p-5">
+      <div className="flex items-center justify-between gap-4 rounded-[28px] border border-line bg-white p-5">
         <p className="text-[13px] text-g600">
           Admin reviews each request and matches a teacher.
         </p>

@@ -98,7 +98,7 @@ export default async function AdminContentPage() {
         <p className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-blue">
           Admin
         </p>
-        <h1 className="mt-1 font-heading text-[32px] font-extrabold text-navy">
+        <h1 className="mt-1 font-heading text-[clamp(28px,3vw,40px)] font-semibold tracking-[-0.02em] text-navy">
           Site content
         </h1>
         <p className="mt-2 max-w-[720px] text-[14px] text-g600">
@@ -117,9 +117,9 @@ export default async function AdminContentPage() {
               <Link
                 key={t.id}
                 href={`/admin/content/${t.id}`}
-                className="group flex flex-col rounded-lg border-[1.5px] border-g100 bg-white p-6 transition-colors hover:border-navy"
+                className="group flex flex-col rounded-[28px] border border-line bg-white p-6 transition-colors hover:border-navy"
               >
-                <p className="font-heading text-[15px] font-extrabold text-navy">
+                <p className="font-heading text-[15px] font-semibold text-navy">
                   {t.title}
                 </p>
                 <p className="mt-2 text-[13px] leading-[1.55] text-g600">

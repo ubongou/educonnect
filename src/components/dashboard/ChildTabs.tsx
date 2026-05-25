@@ -38,10 +38,10 @@ export function ChildTabs({
             href={href}
             aria-current={active ? "page" : undefined}
             className={clsx(
-              "inline-flex items-center gap-2 rounded-pill border-[1.5px] px-4 py-[7px] font-heading text-[13px] font-semibold transition-colors",
+              "inline-flex items-center gap-2 rounded-pill border px-4 py-[7px] font-heading text-[13px] font-semibold transition-colors",
               active
                 ? "border-navy bg-navy text-yellow"
-                : "border-navy/20 bg-white text-navy hover:bg-g50",
+                : "border-navy/20 bg-white text-navy hover:bg-paper",
             )}
           >
             {c.dotColor && (

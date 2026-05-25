@@ -112,7 +112,7 @@ export function Checkbox({
   hint?: string;
 }) {
   return (
-    <label className="flex items-start gap-3 rounded-md border-[1.5px] border-g100 bg-white px-4 py-3">
+    <label className="flex items-start gap-3 rounded-md border border-line bg-white px-4 py-3">
       <input
         type="checkbox"
         checked={checked}
@@ -137,7 +137,7 @@ export function FieldGroup({
   children: React.ReactNode;
 }) {
   return (
-    <fieldset className="rounded-md border-[1.5px] border-navy/10 bg-white p-5">
+    <fieldset className="rounded-md border border-line bg-white p-5">
       <legend className="px-2 font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
         {title}
       </legend>

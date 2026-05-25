@@ -67,7 +67,7 @@ export default async function TeacherSchedulePage() {
         <p className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-blue">
           Teacher
         </p>
-        <h1 className="mt-1 font-heading text-[32px] font-extrabold text-navy">
+        <h1 className="mt-1 font-heading text-[clamp(28px,3vw,40px)] font-semibold tracking-[-0.02em] text-navy">
           My schedule
         </h1>
         <p className="mt-2 text-[14px] text-g600">
@@ -77,7 +77,7 @@ export default async function TeacherSchedulePage() {
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-10 text-center">
+        <div className="rounded-[28px] border border-dashed border-line bg-white p-10 text-center">
           <p className="text-[14px] text-g600">
             No upcoming sessions on your calendar.
           </p>
@@ -106,14 +106,14 @@ export default async function TeacherSchedulePage() {
                   return (
                     <li
                       key={s.id}
-                      className="flex flex-wrap items-center justify-between gap-3 rounded-lg border-[1.5px] border-navy/10 bg-white px-5 py-4"
+                      className="flex flex-wrap items-center justify-between gap-3 rounded-[28px] border border-line bg-white px-5 py-4"
                     >
                       <div className="flex items-center gap-4">
-                        <span className="font-heading text-[20px] font-extrabold tabular-nums text-navy">
+                        <span className="font-heading text-[20px] font-semibold tabular-nums text-navy">
                           {time}
                         </span>
                         <div>
-                          <p className="font-heading text-[15px] font-extrabold text-navy">
+                          <p className="font-heading text-[15px] font-semibold text-navy">
                             {displayName} · {s.subjects?.name ?? "Subject"}
                           </p>
                           <p className="mt-1 text-[12px] text-g400">

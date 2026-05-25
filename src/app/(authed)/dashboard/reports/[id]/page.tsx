@@ -107,7 +107,7 @@ export default async function ParentReportDetailPage({
         <p className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-blue">
           Lesson report
         </p>
-        <h1 className="mt-1 font-heading text-[28px] font-extrabold text-navy">
+        <h1 className="mt-1 font-heading text-[28px] font-semibold text-navy">
           {studentName} ·{" "}
           <span className="text-g600">{report.subjects?.name ?? "Subject"}</span>
         </h1>

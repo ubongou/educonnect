@@ -38,7 +38,7 @@ export function ResendReportButton({ reportId }: { reportId: string }) {
         type="button"
         onClick={onClick}
         disabled={pending}
-        className="inline-flex items-center rounded-pill border-[1.5px] border-navy/30 bg-white px-3 py-1 font-heading text-[11px] font-bold uppercase tracking-[0.08em] text-navy transition-colors hover:bg-g50 disabled:opacity-50"
+        className="inline-flex items-center rounded-pill border border-navy/30 bg-white px-3 py-1 font-heading text-[11px] font-bold uppercase tracking-[0.08em] text-navy transition-colors hover:bg-paper disabled:opacity-50"
       >
         {pending ? "Sending…" : "Resend"}
       </button>

@@ -87,10 +87,10 @@ export default async function AdminTeacherDetail({
         <span className="font-semibold text-navy">{teacher.full_name ?? "Unnamed"}</span>
       </div>
 
-      <div className="flex flex-wrap items-end justify-between gap-6 border-b border-g100 pb-8">
+      <div className="flex flex-wrap items-end justify-between gap-6 border-b border-line pb-8">
         <div>
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="font-heading text-[clamp(28px,3.4vw,40px)] font-extrabold leading-tight text-navy">
+            <h1 className="font-heading text-[clamp(28px,3.4vw,40px)] font-semibold leading-tight text-navy">
               {teacher.full_name ?? "Unnamed teacher"}
             </h1>
             <StatusPill active={teacher.deactivated_at == null} />
@@ -112,7 +112,7 @@ export default async function AdminTeacherDetail({
           Assigned enrollments
         </h2>
         {enr.length === 0 ? (
-          <div className="rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-6 text-[14px] text-g600">
+          <div className="rounded-[28px] border border-dashed border-line bg-white p-6 text-[14px] text-g600">
             This teacher isn&apos;t assigned to any enrollments yet. Head to{" "}
             <Link
               href="/admin/enrollments"
@@ -127,10 +127,10 @@ export default async function AdminTeacherDetail({
             {enr.map((e) => (
               <li
                 key={e.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-lg border-[1.5px] border-navy/10 bg-white px-5 py-4"
+                className="flex flex-wrap items-center justify-between gap-3 rounded-[28px] border border-line bg-white px-5 py-4"
               >
                 <div>
-                  <p className="font-heading text-[15px] font-extrabold text-navy">
+                  <p className="font-heading text-[15px] font-semibold text-navy">
                     {e.students?.preferred_name ?? e.students?.full_name ?? "Unknown"}
                     {" · "}
                     {e.subjects?.name ?? "Subject"}
@@ -161,7 +161,7 @@ export default async function AdminTeacherDetail({
           Upcoming sessions
         </h2>
         {sess.length === 0 ? (
-          <div className="rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-6 text-[14px] text-g600">
+          <div className="rounded-[28px] border border-dashed border-line bg-white p-6 text-[14px] text-g600">
             No upcoming sessions scheduled for this teacher. Visit{" "}
             <Link
               href="/admin/schedule"
@@ -172,9 +172,9 @@ export default async function AdminTeacherDetail({
             to create one.
           </div>
         ) : (
-          <div className="overflow-hidden rounded-lg border-[1.5px] border-navy/10 bg-white">
+          <div className="overflow-hidden rounded-2xl border border-line bg-white">
             <table className="w-full text-[14px]">
-              <thead className="bg-g50 text-left font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
+              <thead className="bg-paper text-left font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
                 <tr>
                   <th className="px-5 py-3">When</th>
                   <th className="px-5 py-3">Student</th>
@@ -184,7 +184,7 @@ export default async function AdminTeacherDetail({
               </thead>
               <tbody>
                 {sess.map((s) => (
-                  <tr key={s.id} className="border-t border-g100">
+                  <tr key={s.id} className="border-t border-line">
                     <td className="px-5 py-3 font-heading font-bold text-navy">
                       {new Date(s.scheduled_at).toLocaleString("en-GB", {
                         weekday: "short",

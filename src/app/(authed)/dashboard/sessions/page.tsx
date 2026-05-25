@@ -130,7 +130,7 @@ export default async function DashboardSessionsPage({
         <p className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-blue">
           Parent dashboard
         </p>
-        <h1 className="mt-1 font-heading text-[32px] font-extrabold text-navy">
+        <h1 className="mt-1 font-heading text-[clamp(28px,3vw,40px)] font-semibold tracking-[-0.02em] text-navy">
           Sessions
         </h1>
         <p className="mt-2 text-[14px] text-g600">
@@ -145,7 +145,7 @@ export default async function DashboardSessionsPage({
       />
 
       {reports.length === 0 ? (
-        <div className="rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-10 text-center">
+        <div className="rounded-[28px] border border-dashed border-line bg-white p-10 text-center">
           <p className="text-[14px] text-g600">
             No lesson reports submitted for this child yet.
           </p>
@@ -165,14 +165,14 @@ export default async function DashboardSessionsPage({
                     <Link
                       href={`/dashboard/sessions?child=${selected.id}&report=${r.id}`}
                       aria-current={active ? "page" : undefined}
-                      className={`block rounded-lg border-[1.5px] px-4 py-3 transition-colors ${
+                      className={`block rounded-[28px] border px-4 py-3 transition-colors ${
                         active
                           ? "border-navy bg-navy text-white"
                           : "border-navy/10 bg-white hover:border-navy/30"
                       }`}
                     >
                       <p
-                        className={`font-heading text-[13px] font-extrabold ${
+                        className={`font-heading text-[13px] font-semibold ${
                           active ? "text-yellow" : "text-navy"
                         }`}
                       >

@@ -78,7 +78,7 @@ export function PricingTiersForm({ initial }: { initial: PricingTiersContent }) 
             return (
               <div
                 key={code}
-                className="rounded-md border border-g100 bg-g50 p-4"
+                className="rounded-md border border-line bg-paper p-4"
               >
                 <p className="mb-3 font-heading text-[12px] font-bold uppercase tracking-[0.1em] text-navy">
                   {code}

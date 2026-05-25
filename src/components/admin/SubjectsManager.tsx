@@ -34,7 +34,7 @@ function AddSubjectForm() {
   return (
     <form
       onSubmit={onSubmit}
-      className="flex flex-wrap items-end gap-3 rounded-lg border-[1.5px] border-navy/10 bg-white p-5"
+      className="flex flex-wrap items-end gap-3 rounded-lg border border-line bg-white p-5"
     >
       <label className="flex flex-1 min-w-[220px] flex-col gap-[6px]">
         <span className="font-heading text-[12px] font-bold uppercase tracking-[0.1em] text-g400">
@@ -92,8 +92,8 @@ function SubjectListItem({ row }: { row: SubjectRow }) {
 
   return (
     <li
-      className={`flex flex-wrap items-center justify-between gap-3 rounded-lg border-[1.5px] px-5 py-4 ${
-        row.is_archived ? "border-g100 bg-g50" : "border-navy/10 bg-white"
+      className={`flex flex-wrap items-center justify-between gap-3 rounded-lg border px-5 py-4 ${
+        row.is_archived ? "border-line bg-paper" : "border-navy/10 bg-white"
       }`}
     >
       <div className="flex-1 min-w-[220px]">
@@ -136,13 +136,13 @@ function SubjectListItem({ row }: { row: SubjectRow }) {
         ) : (
           <div>
             <h3
-              className={`font-heading text-[16px] font-extrabold ${
+              className={`font-heading text-[16px] font-semibold ${
                 row.is_archived ? "text-g600" : "text-navy"
               }`}
             >
               {row.name}
               {row.is_archived && (
-                <span className="ml-3 inline-flex items-center rounded-pill border-[1.5px] border-g400/40 bg-white px-2 py-[2px] font-heading text-[10px] font-bold uppercase tracking-[0.1em] text-g600">
+                <span className="ml-3 inline-flex items-center rounded-pill border border-g400/40 bg-white px-2 py-[2px] font-heading text-[10px] font-bold uppercase tracking-[0.1em] text-g600">
                   Archived
                 </span>
               )}
@@ -181,7 +181,7 @@ export function SubjectsManager({ rows }: { rows: SubjectRow[] }) {
     <div className="flex flex-col gap-6">
       <AddSubjectForm />
       {rows.length === 0 ? (
-        <div className="rounded-lg border-[1.5px] border-dashed border-g100 bg-white p-10 text-center">
+        <div className="rounded-lg border border-dashed border-line bg-white p-10 text-center">
           <p className="text-[14px] text-g600">No subjects yet. Add your first above.</p>
         </div>
       ) : (

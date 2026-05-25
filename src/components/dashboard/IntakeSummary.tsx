@@ -90,10 +90,10 @@ function Section({
   return (
     <details
       open={defaultOpen}
-      className="group rounded-lg border-[1.5px] border-navy/10 bg-white [&[open]>summary>svg]:rotate-180"
+      className="group rounded-[28px] border border-line bg-white [&[open]>summary>svg]:rotate-180"
     >
       <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4">
-        <span className="font-heading text-[15px] font-extrabold text-navy">{title}</span>
+        <span className="font-heading text-[15px] font-semibold text-navy">{title}</span>
         <svg
           viewBox="0 0 16 16"
           className="h-4 w-4 shrink-0 text-navy transition-transform"
@@ -102,7 +102,7 @@ function Section({
           <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.75" fill="none" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </summary>
-      <div className="border-t border-g100 px-5 py-5">{children}</div>
+      <div className="border-t border-line px-5 py-5">{children}</div>
     </details>
   );
 }
@@ -114,7 +114,7 @@ function Chips({ values }: { values: readonly string[] }) {
       {values.map((v) => (
         <span
           key={v}
-          className="rounded-pill border-[1.5px] border-navy/15 bg-g50 px-3 py-1 text-[12px] font-semibold text-navy"
+          className="rounded-pill border border-navy/15 bg-paper px-3 py-1 text-[12px] font-semibold text-navy"
         >
           {humanize(v)}
         </span>
@@ -172,7 +172,7 @@ export function IntakeSummary({ child, intake, files }: IntakeSummaryProps) {
         </dl>
 
         {files.length > 0 && (
-          <div className="mt-6 border-t border-g100 pt-5">
+          <div className="mt-6 border-t border-line pt-5">
             <p className="mb-3 font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
               Uploaded files
             </p>
@@ -181,7 +181,7 @@ export function IntakeSummary({ child, intake, files }: IntakeSummaryProps) {
                 <li key={f.id}>
                   <a
                     href={`/api/intake-files/${f.id}/download`}
-                    className="inline-flex items-center gap-3 rounded-md border-[1.5px] border-navy/10 bg-g50 px-3 py-2 text-[13px] text-navy transition-colors hover:border-navy/30"
+                    className="inline-flex items-center gap-3 rounded-md border border-line bg-paper px-3 py-2 text-[13px] text-navy transition-colors hover:border-navy/30"
                   >
                     <span className="font-heading font-bold">{humanize(f.kind)}</span>
                     <span className="text-g600">{f.original_filename}</span>

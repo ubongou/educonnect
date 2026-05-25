@@ -47,7 +47,7 @@ export function DecisionButtons({
   };
 
   const btnBase =
-    "inline-flex items-center rounded-pill border-[1.5px] px-4 py-[6px] font-heading text-[12px] font-bold uppercase tracking-[0.08em] transition-colors disabled:opacity-50 disabled:pointer-events-none";
+    "inline-flex items-center rounded-pill border px-4 py-[6px] font-heading text-[12px] font-bold uppercase tracking-[0.08em] transition-colors disabled:opacity-50 disabled:pointer-events-none";
 
   return (
     <div className="flex flex-col items-end gap-2">
@@ -77,7 +77,7 @@ export function DecisionButtons({
           type="button"
           disabled={pending}
           onClick={() => decide("rejected")}
-          className={`${btnBase} border-navy/30 bg-white text-navy hover:bg-g50`}
+          className={`${btnBase} border-navy/30 bg-white text-navy hover:bg-paper`}
         >
           Reject
         </button>

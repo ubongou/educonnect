@@ -48,7 +48,7 @@ export default async function EnrollPage({
       </div>
 
       <Eyebrow>New enrollment</Eyebrow>
-      <h1 className="mt-2 font-heading text-[clamp(26px,3.4vw,38px)] font-extrabold leading-[1.1] text-navy">
+      <h1 className="mt-2 font-heading text-[clamp(26px,3.4vw,38px)] font-semibold leading-[1.1] text-navy">
         Request subjects for {displayName}.
       </h1>
       <p className="mt-3 max-w-[580px] text-[15px] leading-[1.7] text-g600">
