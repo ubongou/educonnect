@@ -1,7 +1,10 @@
+"use client";
+
 import { resolveAssetUrl } from "@/lib/marketing/assetUrl";
 import { bundledAssets } from "@/lib/marketing/defaults";
 import type { HeroContent } from "@/lib/marketing/schemas";
 import Link from "next/link";
+import { trackEvent } from "@/lib/analytics";
 
 export function Hero({
   content,
@@ -37,7 +40,11 @@ export function Hero({
           </h1>
           <p className="lead reveal delay-2">{content.subheading}</p>
           <div className="hero-ctas reveal delay-3">
-            <Link href="/book?source=hero" className="btn btn-coral">
+            <Link
+              href="/book?source=hero"
+              className="btn btn-coral"
+              onClick={() => trackEvent("click_book_session", { source: "hero" })}
+            >
               {content.primaryCtaLabel}{" "}
               <span className="arrow" aria-hidden="true">
                 →

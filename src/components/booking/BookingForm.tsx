@@ -16,6 +16,7 @@ import {
   submitBookingRequest,
   type SubmitBookingRequestState,
 } from "@/lib/actions/booking";
+import { trackEvent } from "@/lib/analytics";
 
 export function BookingForm() {
   const params = useSearchParams();
@@ -70,6 +71,7 @@ export function BookingForm() {
           aria-label="Booking request form"
           noValidate
           style={{ display: "block", marginTop: 32 }}
+          onSubmit={() => trackEvent("booking_form_submit", { source })}
         >
           <input type="hidden" name="source" value={source} />
           <input

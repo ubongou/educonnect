@@ -8,6 +8,7 @@ import type {
   PricingIntroContent,
   PricingTiersContent,
 } from "@/lib/marketing/schemas";
+import { trackEvent } from "@/lib/analytics";
 
 function fmt(value: number, currency: Currency): string {
   const symbol = currencySymbols[currency];
@@ -107,6 +108,12 @@ export function PricingTable({
                   <Link
                     href={`/book?source=pricing-${tier.sessions}`}
                     className="btn btn-coral"
+                    onClick={() =>
+                      trackEvent("click_book_session", {
+                        source: "pricing",
+                        tier: `${tier.sessions} sessions`,
+                      })
+                    }
                   >
                     Book a session{" "}
                     <span className="arrow" aria-hidden="true">

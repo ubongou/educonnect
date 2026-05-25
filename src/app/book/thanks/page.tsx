@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Nav } from "@/components/ui/Nav";
 import { Footer } from "@/components/ui/Footer";
 import { getGlobals } from "@/lib/marketing/content";
+import { PickSessionButton } from "@/components/booking/PickSessionButton";
 
 export const metadata: Metadata = {
   title: "One more step — EduConnect",
@@ -38,14 +39,7 @@ export default async function BookThanksPage() {
             </p>
 
             <div style={{ marginTop: 32 }}>
-              <a
-                href={calendarUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-coral"
-              >
-                Pick your session time
-              </a>
+              <PickSessionButton href={calendarUrl} />
               <p
                 style={{
                   marginTop: 12,

@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import { Button } from "./Button";
 import { BrandLogo } from "./BrandLogo";
+import { trackEvent } from "@/lib/analytics";
 
 type NavLink = { href: string; label: string };
 
@@ -164,7 +165,11 @@ function MarketingNav({ activeHref }: { activeHref?: string }) {
             <Link href="/login" className="login">
               Log in
             </Link>
-            <Link href="/book?source=nav" className="btn btn-coral">
+            <Link
+              href="/book?source=nav"
+              className="btn btn-coral"
+              onClick={() => trackEvent("click_book_session", { source: "nav" })}
+            >
               Book a Free Session
             </Link>
           </div>
@@ -196,7 +201,10 @@ function MarketingNav({ activeHref }: { activeHref?: string }) {
           <Link
             href="/book?source=nav"
             className="btn btn-coral"
-            onClick={closeMenu}
+            onClick={() => {
+              closeMenu();
+              trackEvent("click_book_session", { source: "nav" });
+            }}
           >
             Book a Free Session
           </Link>
