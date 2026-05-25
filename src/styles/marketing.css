@@ -645,7 +645,7 @@
 }
 .mkt-root .section-head {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 40px;
   align-items: end;
   margin-bottom: 56px;
