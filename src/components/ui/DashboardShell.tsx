@@ -75,7 +75,7 @@ export function DashboardShell({
         <Sidebar role={role} open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
         {/* Main content */}
-        <main className="flex-1 px-0 pb-0 pt-8">
+        <main className="min-w-0 flex-1 overflow-x-hidden px-0 pb-0 pt-8">
           {children}
         </main>
       </div>

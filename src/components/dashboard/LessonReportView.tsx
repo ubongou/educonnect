@@ -26,7 +26,7 @@ export function LessonReportView({ report }: { report: LessonReportViewData }) {
   const c = confidenceBadge(report.confidence_level);
 
   return (
-    <article className="flex flex-col gap-6">
+    <article className="flex w-full min-w-0 flex-col gap-6">
       {/* Session summary header */}
       <div className="rounded-lg bg-navy p-5 text-white">
         <div className="flex flex-wrap items-center justify-between gap-3">

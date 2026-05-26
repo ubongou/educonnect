@@ -151,12 +151,12 @@ export default async function DashboardSessionsPage({
           </p>
         </div>
       ) : (
-        <div className="flex flex-col gap-6 overflow-hidden md:grid md:grid-cols-[240px_1fr] md:gap-8 md:overflow-visible">
-          <aside className="max-w-full">
+        <div className="flex w-full min-w-0 flex-col gap-6 md:grid md:grid-cols-[240px_1fr] md:gap-8">
+          <aside className="w-full min-w-0">
             <p className="mb-3 font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
               Lessons
             </p>
-            <ul className="flex gap-2 overflow-x-auto pb-3 md:flex-col md:overflow-x-visible md:pb-0">
+            <ul className="flex w-full gap-2 overflow-x-auto pb-3 md:flex-col md:overflow-x-visible md:pb-0">
               {reports.map((r) => {
                 const active = r.id === activeId;
                 const conf = confidenceBadge(r.confidence_level);
@@ -197,7 +197,7 @@ export default async function DashboardSessionsPage({
             </ul>
           </aside>
 
-          <div className="min-w-0">
+          <div className="w-full min-w-0">
             {view ? (
               <LessonReportView report={view} />
             ) : (
