@@ -25,7 +25,7 @@ const teacherLinks: SidebarLink[] = [
 const adminLinks: SidebarLink[] = [
   { href: "/admin", label: "Overview", icon: <IconGrid /> },
   { href: "/admin/students", label: "Students", icon: <IconUsers /> },
-  { href: "/admin/parents", label: "Parents", icon: <IconHeart /> },
+  { href: "/admin/parents", label: "Parents", icon: <IconFamily /> },
   { href: "/admin/teachers", label: "Teachers", icon: <IconGrad /> },
   { href: "/admin/enrollments", label: "Enrollments", icon: <IconClipboard /> },
   { href: "/admin/schedule", label: "Schedule", icon: <IconClock /> },
@@ -63,7 +63,7 @@ export function Sidebar({
   const links = linksForRole(role);
 
   const nav = (
-    <nav className="flex flex-col gap-1 px-4 pt-6" aria-label="Dashboard navigation">
+    <nav className="flex flex-col gap-0.5 px-3 pt-4" aria-label="Dashboard navigation">
       {links.map((l) => {
         const active = isActive(l.href, pathname, role);
         return (
@@ -72,13 +72,13 @@ export function Sidebar({
             href={l.href}
             onClick={onClose}
             className={clsx(
-              "flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium transition-colors",
+              "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[13px] font-medium transition-colors",
               active
                 ? "bg-paper text-navy"
                 : "text-[#6b7680] hover:bg-paper hover:text-navy",
             )}
           >
-            <span className="w-6 shrink-0">{l.icon}</span>
+            <span className="w-5 shrink-0 [&>svg]:h-[18px] [&>svg]:w-[18px]">{l.icon}</span>
             {l.label}
           </Link>
         );
@@ -89,7 +89,7 @@ export function Sidebar({
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex md:w-[240px] md:shrink-0 md:flex-col border-r border-line bg-white">
+      <aside className="hidden md:flex md:w-[200px] md:shrink-0 md:flex-col border-r border-line bg-white pt-24">
         <div className="border-l-4 border-coral flex flex-1 flex-col">
           {nav}
         </div>
@@ -178,10 +178,15 @@ function IconClock() {
   );
 }
 
-function IconHeart() {
+function IconFamily() {
   return (
     <svg {...s}>
-      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+      <circle cx="12" cy="5" r="3" />
+      <path d="M12 8a5 5 0 0 0-5 5v2h10v-2a5 5 0 0 0-5-5z" />
+      <circle cx="5" cy="10" r="2.5" />
+      <path d="M5 12.5A3.5 3.5 0 0 0 1.5 16v1.5h4" />
+      <circle cx="19" cy="10" r="2.5" />
+      <path d="M19 12.5a3.5 3.5 0 0 1 3.5 3.5v1.5h-4" />
     </svg>
   );
 }

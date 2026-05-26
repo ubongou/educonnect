@@ -151,17 +151,17 @@ export default async function DashboardSessionsPage({
           </p>
         </div>
       ) : (
-        <div className="grid gap-8 md:grid-cols-[280px_1fr]">
+        <div className="flex flex-col gap-8 md:grid md:grid-cols-[280px_1fr]">
           <aside>
             <p className="mb-3 font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
               Lessons
             </p>
-            <ul className="flex flex-col gap-2">
+            <ul className="flex flex-row gap-2 overflow-x-auto pb-2 md:flex-col md:overflow-x-visible md:pb-0">
               {reports.map((r) => {
                 const active = r.id === activeId;
                 const conf = confidenceBadge(r.confidence_level);
                 return (
-                  <li key={r.id}>
+                  <li key={r.id} className="min-w-[200px] shrink-0 md:min-w-0 md:shrink">
                     <Link
                       href={`/dashboard/sessions?child=${selected.id}&report=${r.id}`}
                       aria-current={active ? "page" : undefined}
