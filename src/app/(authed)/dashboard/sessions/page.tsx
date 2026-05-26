@@ -151,52 +151,50 @@ export default async function DashboardSessionsPage({
           </p>
         </div>
       ) : (
-        <div className="flex flex-col gap-6 md:grid md:grid-cols-[240px_1fr] md:gap-8">
-          <aside className="min-w-0">
+        <div className="flex flex-col gap-6 overflow-hidden md:grid md:grid-cols-[240px_1fr] md:gap-8 md:overflow-visible">
+          <aside className="max-w-full">
             <p className="mb-3 font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
               Lessons
             </p>
-            <div className="-mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0">
-              <ul className="flex gap-2 overflow-x-auto pb-3 md:flex-col md:overflow-x-visible md:pb-0">
-                {reports.map((r) => {
-                  const active = r.id === activeId;
-                  const conf = confidenceBadge(r.confidence_level);
-                  return (
-                    <li key={r.id} className="w-[180px] shrink-0 md:w-auto md:shrink">
-                      <Link
-                        href={`/dashboard/sessions?child=${selected.id}&report=${r.id}`}
-                        aria-current={active ? "page" : undefined}
-                        className={`block rounded-2xl border px-4 py-3 transition-colors ${
-                          active
-                            ? "border-navy bg-navy text-white"
-                            : "border-navy/10 bg-white hover:border-navy/30"
+            <ul className="flex gap-2 overflow-x-auto pb-3 md:flex-col md:overflow-x-visible md:pb-0">
+              {reports.map((r) => {
+                const active = r.id === activeId;
+                const conf = confidenceBadge(r.confidence_level);
+                return (
+                  <li key={r.id} className="w-[180px] shrink-0 md:w-auto md:shrink">
+                    <Link
+                      href={`/dashboard/sessions?child=${selected.id}&report=${r.id}`}
+                      aria-current={active ? "page" : undefined}
+                      className={`block rounded-2xl border px-4 py-3 transition-colors ${
+                        active
+                          ? "border-navy bg-navy text-white"
+                          : "border-navy/10 bg-white hover:border-navy/30"
+                      }`}
+                    >
+                      <p
+                        className={`font-heading text-[13px] font-semibold ${
+                          active ? "text-yellow" : "text-navy"
                         }`}
                       >
-                        <p
-                          className={`font-heading text-[13px] font-semibold ${
-                            active ? "text-yellow" : "text-navy"
-                          }`}
-                        >
-                          {formatDate(r.lesson_date)}
-                        </p>
-                        <p
-                          className={`mt-1 truncate text-[12px] ${
-                            active ? "text-white/70" : "text-g600"
-                          }`}
-                        >
-                          {r.subjects?.name ?? "Subject"} · {r.lesson_focus}
-                        </p>
-                        <div className="mt-2">
-                          <StatusBadge tone={conf.tone} onDark={active}>
-                            {conf.label}
-                          </StatusBadge>
-                        </div>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
+                        {formatDate(r.lesson_date)}
+                      </p>
+                      <p
+                        className={`mt-1 truncate text-[12px] ${
+                          active ? "text-white/70" : "text-g600"
+                        }`}
+                      >
+                        {r.subjects?.name ?? "Subject"} · {r.lesson_focus}
+                      </p>
+                      <div className="mt-2">
+                        <StatusBadge tone={conf.tone} onDark={active}>
+                          {conf.label}
+                        </StatusBadge>
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
           </aside>
 
           <div className="min-w-0">

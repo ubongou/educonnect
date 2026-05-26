@@ -88,9 +88,9 @@ export function Sidebar({
 
   return (
     <>
-      {/* Desktop sidebar — sticky so it stays visible on scroll */}
-      <aside className="hidden md:block md:w-[200px] md:shrink-0">
-        <div className="sticky top-[94px] border-r border-line bg-white pt-4">
+      {/* Desktop sidebar — sticky nav inside a full-height column */}
+      <aside className="hidden md:flex md:w-[200px] md:shrink-0 md:flex-col border-r border-line bg-white">
+        <div className="sticky top-[94px] pt-4">
           <div className="border-l-4 border-coral">
             {nav}
           </div>

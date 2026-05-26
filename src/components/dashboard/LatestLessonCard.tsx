@@ -22,9 +22,11 @@ type LatestLesson = {
 export function LatestLessonCard({
   lesson,
   nextSessionLabel,
+  childId,
 }: {
   lesson: LatestLesson | null;
   nextSessionLabel?: string | null;
+  childId?: string;
 }) {
   if (!lesson) {
     return (
@@ -105,7 +107,7 @@ export function LatestLessonCard({
 
       <div className="mt-6 flex justify-end">
         <Link
-          href={`/dashboard/reports/${lesson.id}`}
+          href={childId ? `/dashboard/sessions?child=${childId}&report=${lesson.id}` : `/dashboard/reports/${lesson.id}`}
           className="inline-flex items-center gap-1 rounded-pill border border-yellow bg-yellow px-4 py-1.5 font-heading text-[12px] font-semibold text-navy transition-colors hover:bg-yellow/90"
         >
           See more

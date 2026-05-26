@@ -38,12 +38,12 @@ export function DashboardShell({
             aria-label={sidebarOpen ? "Close menu" : "Open menu"}
             aria-expanded={sidebarOpen}
             onClick={() => setSidebarOpen((v) => !v)}
-            className="flex h-9 w-9 items-center justify-center rounded-pill bg-white/20 md:hidden"
+            className="flex h-11 w-11 items-center justify-center rounded-pill bg-white/20 md:hidden"
           >
-            <span className="flex flex-col gap-[4px]">
-              <span className="block h-[2px] w-[16px] rounded-sm bg-white" />
-              <span className="block h-[2px] w-[16px] rounded-sm bg-white" />
-              <span className="block h-[2px] w-[16px] rounded-sm bg-white" />
+            <span className="flex flex-col gap-[5px]">
+              <span className="block h-[2px] w-[20px] rounded-sm bg-white" />
+              <span className="block h-[2px] w-[20px] rounded-sm bg-white" />
+              <span className="block h-[2px] w-[20px] rounded-sm bg-white" />
             </span>
           </button>
 
@@ -55,9 +55,9 @@ export function DashboardShell({
             <BrandLogo mode="on-blue" size="md" />
           </Link>
 
-          <div className="ml-auto flex items-center gap-3 sm:gap-4">
-            <span className="font-heading text-[12px] font-medium text-[rgba(4,19,28,0.82)] sm:text-[14px]">
-              {displayName.split(" ")[0]}
+          <div className="ml-auto flex items-center gap-4">
+            <span className="hidden font-heading text-[14px] font-medium text-[rgba(4,19,28,0.82)] md:inline">
+              {displayName}
             </span>
             <button
               type="button"

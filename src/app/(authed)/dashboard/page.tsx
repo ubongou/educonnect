@@ -292,6 +292,7 @@ export default async function DashboardOverview({
       {/* Latest lesson + behaviours (side-by-side on desktop) */}
       <section className="grid gap-6 md:grid-cols-[1.1fr_1fr]">
         <LatestLessonCard
+          childId={selected.id}
           lesson={
             latest
               ? {
