@@ -8,11 +8,7 @@ import { LatestLessonCard } from "@/components/dashboard/LatestLessonCard";
 import { BehavioursCard } from "@/components/dashboard/BehavioursCard";
 import { createClient } from "@/lib/supabase/server";
 import { getParentChildren, pickChild, childTabColor } from "@/lib/dashboard/children";
-import {
-  bucket6,
-  confidenceLabels,
-  confidenceBadge,
-} from "@/lib/scales";
+import { confidenceBadge } from "@/lib/scales";
 import { formatDate } from "@/lib/format";
 
 type ReportRow = {
@@ -118,17 +114,17 @@ export default async function DashboardOverview({
 
   const reportRows = ((reports ?? []) as unknown as ReportRow[]);
 
-  // Confidence line chart — last 6 reports, bucketed 1..6.
+  // Confidence line chart — last 6 reports, raw 1–10 scale (same as skills chart).
   const lastReportsForConfidence = reportRows.slice(-6);
   const confidenceChart = {
-    points: lastReportsForConfidence.map((r) => bucket6(r.confidence_level) + 1),
+    points: lastReportsForConfidence.map((r) => r.confidence_level),
     xLabels: lastReportsForConfidence.map((r) =>
       new Date(r.lesson_date).toLocaleDateString("en-GB", {
         day: "numeric",
         month: "short",
       }),
     ),
-    yLabels: [...confidenceLabels], // bottom → top: Withdrawn … Exceptional
+    yLabels: ["0", "2", "4", "6", "8", "10"],
   };
 
   // Skill chart — average rating per report, filtered to selected subject, last 6 reports.
@@ -223,9 +219,10 @@ export default async function DashboardOverview({
             ]}
             xLabels={confidenceChart.xLabels}
             yLabels={confidenceChart.yLabels}
-            yMin={1}
-            yMax={6}
-            height={132}
+            yMin={0}
+            yMax={10}
+            yAxisWidth={32}
+            height={120}
           />
         )}
       </section>
@@ -279,6 +276,7 @@ export default async function DashboardOverview({
             yLabels={skillChart.yLabels}
             yMin={0}
             yMax={10}
+            yAxisWidth={32}
             height={120}
             caption={`Average across all ${
               selectedSubject === "mathematics"
