@@ -242,17 +242,12 @@ export const defaultPricingFaq: PricingFaqContent = {
     {
       question: "Can I pause or cancel my sessions?",
       answer:
-        "Yes. We understand that life happens. You can pause or cancel your plan at any time with 48 hours' notice. If you've already completed sessions, there are no refunds — but you keep any unused sessions you've paid for.",
+        "Yes. We understand that life happens. You can pause or cancel your plan at any time with 48 hours' notice.",
     },
     {
       question: "What if my child needs more sessions than I've purchased?",
       answer:
         "You can add more sessions at any time. Additional sessions are billed at the per-session rate for your plan. Just let your teacher know and we'll arrange the scheduling.",
-    },
-    {
-      question: "Do the free sessions expire?",
-      answer:
-        "No, they don't expire. If you purchase the 24-session or 48-session packages, your free sessions are valid for the entire duration of your plan, plus 30 days after. You can use them whenever you need.",
     },
     {
       question: "Can I change my child's teacher if it's not working out?",
