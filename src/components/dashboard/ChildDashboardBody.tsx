@@ -51,10 +51,10 @@ function averageSkill(ratings: Array<{ rating: number }>): number | null {
 }
 
 // How many recent reports the progression charts plot. A rolling window —
-// 10 keeps the line legible (and tappable) down to phone width while still
-// showing a clear trend. The x-axis dates are angled in LineChart so they
-// don't collide at this density.
-const CHART_POINTS = 10;
+// 12 shows more of the trend while staying legible (and tappable) down to
+// phone width. The x-axis dates are angled in LineChart so they don't collide
+// at this density. Applied to both the confidence and skill charts.
+const CHART_POINTS = 12;
 
 /**
  * The per-child body of the parent dashboard: confidence progression, average
