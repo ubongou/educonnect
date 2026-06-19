@@ -47,6 +47,35 @@ export const sessionCreateSchema = z.object({
 
 export type SessionCreateInput = z.infer<typeof sessionCreateSchema>;
 
+// Admin creates several future sessions for one approved enrollment at once.
+export const sessionBulkCreateSchema = z.object({
+  enrollment_id: z.string().uuid(),
+  rows: z
+    .array(
+      z.object({
+        scheduled_at: z
+          .string()
+          .refine((s) => !Number.isNaN(Date.parse(s)), "Expected an ISO timestamp"),
+        duration_minutes: z.coerce.number().int().min(15).max(240),
+      }),
+    )
+    .min(1, "Add at least one session row."),
+});
+
+export type SessionBulkCreateInput = z.infer<typeof sessionBulkCreateSchema>;
+
+// -----------------------------------------------------------------------------
+// Admin creates an enrollment on a parent's behalf (auto-approved)
+// -----------------------------------------------------------------------------
+
+export const adminEnrollmentCreateSchema = z.object({
+  student_id: z.string().uuid(),
+  subject_id: z.string().uuid(),
+  teacher_id: z.string().uuid().nullable().optional(),
+});
+
+export type AdminEnrollmentCreateInput = z.infer<typeof adminEnrollmentCreateSchema>;
+
 // -----------------------------------------------------------------------------
 // Intake — mirrors IntakeJson in src/types/domain.ts
 // -----------------------------------------------------------------------------
@@ -272,6 +301,41 @@ export const lessonReportSchema = z.object({
 });
 
 export type LessonReportInput = z.infer<typeof lessonReportSchema>;
+
+// -----------------------------------------------------------------------------
+// Admin bulk-imports past sessions, each with a full lesson report.
+// One enrollment is chosen above the paste; each row is a completed lesson.
+// Numbers are coerced so a pasted (string) table parses without pre-casting.
+// duration_minutes is capped at the sessions table's 15..240 range (these
+// rows become sessions). Per-skill ratings are intentionally omitted — they
+// can be added later via the admin report edit screen.
+// -----------------------------------------------------------------------------
+
+const importRating1to10 = z.coerce.number().int().min(1).max(10);
+const importRating0to10 = z.coerce.number().int().min(0).max(10);
+
+export const importedSessionRowSchema = z.object({
+  lesson_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Expected YYYY-MM-DD"),
+  duration_minutes: z.coerce.number().int().min(15).max(240),
+  lesson_focus: z.string().min(1, "lesson_focus is required"),
+  understanding_check: importRating1to10,
+  confidence_level: importRating1to10,
+  participation: importRating0to10,
+  focus_rating: importRating0to10,
+  homework: importRating0to10,
+  lesson_highlights: z.string().optional(),
+  next_focus: z.string().optional(),
+  how_to_help_at_home: z.string().optional(),
+});
+
+export type ImportedSessionRow = z.infer<typeof importedSessionRowSchema>;
+
+export const sessionImportSchema = z.object({
+  enrollment_id: z.string().uuid(),
+  rows: z.array(importedSessionRowSchema).min(1, "Paste at least one row."),
+});
+
+export type SessionImportInput = z.infer<typeof sessionImportSchema>;
 
 // Edit payload — same shape minus student/subject (those are immutable for
 // an existing report; the update RPC patches the row in place by id).

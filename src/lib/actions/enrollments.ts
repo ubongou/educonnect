@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { adminEnrollmentCreateSchema } from "@/lib/validation";
 
 export type EnrollmentRequestResult =
   | { ok: true }
@@ -36,6 +37,64 @@ export async function requestEnrollments(
   if (error) return { ok: false, error: error.message };
 
   revalidatePath(`/dashboard/children/${studentId}`);
+  return { ok: true };
+}
+
+/**
+ * Admin-only: create an enrollment directly on a parent's behalf, already
+ * approved (and optionally with a teacher assigned). Today parents request and
+ * admins approve; this is the admin-initiated path. `requested_by` is set to
+ * the student's linked parent for a truthful audit trail, falling back to the
+ * acting admin when the student has no linked parent yet.
+ *
+ * Uses upsert on the (student_id, subject_id) unique index so creating an
+ * enrollment that already exists (e.g. a pending request) flips it to approved
+ * with the chosen teacher rather than erroring. RLS restricts writes to admins.
+ */
+export async function createEnrollmentAsAdmin(
+  input: unknown,
+): Promise<EnrollmentRequestResult> {
+  const parsed = adminEnrollmentCreateSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Auth required" };
+
+  const { data: link } = await supabase
+    .from("parent_students")
+    .select("parent_id")
+    .eq("student_id", parsed.data.student_id)
+    .limit(1)
+    .maybeSingle();
+  const requestedBy = link?.parent_id ?? user.id;
+
+  const { error } = await supabase.from("enrollments").upsert(
+    {
+      student_id: parsed.data.student_id,
+      subject_id: parsed.data.subject_id,
+      requested_by: requestedBy,
+      status: "approved",
+      teacher_id: parsed.data.teacher_id ?? null,
+      decided_by: user.id,
+      decided_at: new Date().toISOString(),
+    },
+    { onConflict: "student_id,subject_id" },
+  );
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/enrollments");
+  revalidatePath("/admin/schedule");
+  revalidatePath("/admin");
+  revalidatePath(`/admin/students/${parsed.data.student_id}`);
+  if (parsed.data.teacher_id) {
+    revalidatePath(`/admin/teachers/${parsed.data.teacher_id}`);
+  }
   return { ok: true };
 }
 

@@ -29,6 +29,7 @@ const adminLinks: SidebarLink[] = [
   { href: "/admin/teachers", label: "Teachers", icon: <IconGrad /> },
   { href: "/admin/enrollments", label: "Enrollments", icon: <IconClipboard /> },
   { href: "/admin/schedule", label: "Schedule", icon: <IconClock /> },
+  { href: "/admin/sessions/import", label: "Import", icon: <IconCalendar /> },
 ];
 
 function linksForRole(role: Role): SidebarLink[] {

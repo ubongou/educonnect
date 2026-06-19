@@ -5,6 +5,7 @@ import {
   SessionScheduler,
   type SchedulableEnrollment,
 } from "@/components/admin/SessionScheduler";
+import { BulkSessionForm } from "@/components/admin/BulkSessionForm";
 
 type SessionRow = {
   id: string;
@@ -106,6 +107,29 @@ export default async function AdminSchedulePage() {
           Schedule a session
         </h2>
         <SessionScheduler enrollments={schedulableRows} />
+      </section>
+
+      <section className="mb-12">
+        <h2 className="mb-4 font-heading text-[11px] font-bold uppercase tracking-[0.12em] text-g400">
+          Schedule multiple sessions
+        </h2>
+        <BulkSessionForm enrollments={schedulableRows} />
+      </section>
+
+      <section className="mb-12">
+        <h2 className="mb-2 font-heading text-[11px] font-bold uppercase tracking-[0.12em] text-g400">
+          Import past sessions
+        </h2>
+        <p className="text-[14px] text-g600">
+          Bulk-add lessons that already happened, each with a full report, on the{" "}
+          <Link
+            href="/admin/sessions/import"
+            className="font-semibold text-blue underline-offset-4 hover:underline"
+          >
+            import page
+          </Link>
+          .
+        </p>
       </section>
 
       <section>
