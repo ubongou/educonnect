@@ -135,14 +135,16 @@ export function LineChart({
           </svg>
         </div>
       </div>
-      {/* x-axis labels */}
+      {/* x-axis labels — angled 45° so dense date labels don't collide */}
       <div className="flex" style={xAxisStyle}>
         {xLabels.map((lbl, i) => (
           <div
             key={`${lbl}-${i}`}
-            className="flex-1 text-center text-[10px] text-g400"
+            className="flex min-h-[34px] flex-1 justify-center"
           >
-            {lbl}
+            <span className="mt-1 inline-block -rotate-45 whitespace-nowrap text-[9px] leading-none text-g400">
+              {lbl}
+            </span>
           </div>
         ))}
       </div>

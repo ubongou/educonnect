@@ -50,6 +50,12 @@ function averageSkill(ratings: Array<{ rating: number }>): number | null {
   return Math.round((sum / ratings.length) * 10) / 10;
 }
 
+// How many recent reports the progression charts plot. A rolling window —
+// 10 keeps the line legible (and tappable) down to phone width while still
+// showing a clear trend. The x-axis dates are angled in LineChart so they
+// don't collide at this density.
+const CHART_POINTS = 10;
+
 /**
  * The per-child body of the parent dashboard: confidence progression, average
  * skill progression (with subject sub-tabs), and the latest-lesson + behaviours
@@ -104,8 +110,8 @@ export async function ChildDashboardBody({
 
   const reportRows = (reports ?? []) as unknown as ReportRow[];
 
-  // Confidence line chart — last 6 reports, raw 1–10 scale.
-  const lastReportsForConfidence = reportRows.slice(-6);
+  // Confidence line chart — last N reports, raw 1–10 scale.
+  const lastReportsForConfidence = reportRows.slice(-CHART_POINTS);
   const confidenceChart = {
     points: lastReportsForConfidence.map((r) => r.confidence_level),
     xLabels: lastReportsForConfidence.map((r) =>
@@ -116,11 +122,11 @@ export async function ChildDashboardBody({
     ),
   };
 
-  // Skill chart — average rating per report, filtered to selected subject, last 6.
+  // Skill chart — average rating per report, filtered to selected subject.
   const subjectReports = reportRows.filter(
     (r) => r.subjects?.slug === selectedSubject,
   );
-  const lastSkillReports = subjectReports.slice(-6);
+  const lastSkillReports = subjectReports.slice(-CHART_POINTS);
   const skillChart = {
     points: lastSkillReports.map((r) => averageSkill(r.skill_ratings)),
     xLabels: lastSkillReports.map((r) =>
@@ -216,7 +222,7 @@ export async function ChildDashboardBody({
             yMax={10}
             yAxisWidth={32}
             height={120}
-            caption={`Average across all ${subjectLabel(selectedSubject)} skills, last 6 sessions`}
+            caption={`Average across all ${subjectLabel(selectedSubject)} skills, last ${CHART_POINTS} sessions`}
           />
         )}
       </section>
