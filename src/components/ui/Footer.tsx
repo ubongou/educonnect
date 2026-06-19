@@ -36,7 +36,7 @@ function MarketingFooter() {
           <div className="footer-col">
             <Link href="/" className="brand" aria-label="Masani — go to home">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/brand-v2/logo-dark.jpeg" alt="Masani" loading="lazy" />
+              <img src="/brand/logo-navy-bg.png" alt="Masani" loading="lazy" />
             </Link>
             <p>
               Personal tutoring from Nigeria&apos;s best teachers — for families

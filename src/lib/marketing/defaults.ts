@@ -45,8 +45,8 @@ export const defaultGlobals: GlobalsContent = {
 
 export const defaultHero: HeroContent = {
   headingPart1: "Personal Tutoring from ",
-  headingAccent: "World Class Teachers",
-  headingPart2: "",
+  headingAccent: "World Class",
+  headingPart2: " Teachers",
   subheading:
     "Masani provides your children with private, one-on-one instruction from the finest educators — rigorously vetted, carefully matched, and deeply invested in every child they teach.",
   primaryCtaLabel: "Book a free session",
@@ -84,12 +84,12 @@ export const defaultWhyGrid: WhyGridContent = {
       body: "Learn from passionate educators who bring out the best in every student. Our teachers are carefully selected for their expertise, empathy, and ability to inspire confidence in learners.",
     },
     {
-      title: "Flexible, Child-Centered Learning",
-      body: "We work around your schedule, not the other way around. Choose the times, formats, and goals that suit your child's needs — all while staying informed and involved every step of the way.",
+      title: "Flexible, Child-Centred Learning",
+      body: "Every student learns differently. We tailor each session to your child's pace, goals, and learning style, building lessons around the individual rather than forcing them to fit a fixed curriculum.",
     },
     {
       title: "Academic and Personal Growth",
-      body: "Our approach goes beyond test scores. We help students build confidence, resilience, and a genuine love for learning. Every session is a step toward becoming a more capable, self-assured learner.",
+      body: "Real progress goes beyond test scores. We help students build confidence, resilience, and a genuine love for learning that stays with them and carries far beyond any single session.",
     },
   ],
 };
@@ -136,13 +136,13 @@ export const defaultFounders: FoundersContent = {
     {
       name: "Unyime Okorosobo",
       role: "Co-founder",
-      bio: "Unyime holds a Master's in International Education from the University of Manchester and a B.Sc. in Computer Science from Bowen University. A third-generation educator with more than 15 years in classrooms and school leadership, she was named one of Nigeria's 50 Most Inspirational Teachers in 2023. She is a Microsoft Certified Educator, has trained thousands of teachers on classroom technology integration, and runs Strategic Maths — an initiative transforming how numeracy is taught across Nigerian schools. Her work sits at the intersection of educational excellence and lasting systemic change.",
+      bio: "Unyime holds a Master's in International Education from the University of Manchester and a B.Sc. in Computer Science from Bowen University. A third-generation educator with more than 15 years in teaching and education leadership, she was named one of Nigeria's 50 Most Inspirational Teachers in 2023 and has trained thousands of educators in classroom technology.",
       photoAlt: "Unyime Okorosobo, Co-founder of Masani",
     },
     {
       name: "Grace Amoka",
       role: "Co-founder",
-      bio: "Grace holds a degree in Computer Engineering from Covenant University and a Master's in Educational Technology from the University of Ilorin. With over nine years of experience as a teacher, coach, and education consultant, she has worked across K-12 systems on three continents, consulted for the World Bank, and served as a programme coordinator at the African Leadership Academy and Teach for Nigeria — training over 400 educators across more than seven countries. She brings rare rigour and operational depth to everything she builds.",
+      bio: "Grace holds a degree in Computer Engineering from Covenant University and a Master's in Educational Technology from the University of Ilorin. With more than nine years in teaching and education leadership, she has trained over 400 educators across seven countries, working with organisations including the World Bank, the African Leadership Academy, and Teach for Nigeria.",
       photoAlt: "Grace Amoka, Co-founder of Masani",
     },
   ],
@@ -237,7 +237,7 @@ export const defaultPricingFaq: PricingFaqContent = {
     {
       question: "Do you offer corporate or group discounts?",
       answer:
-        "We work with schools and organizations on bulk packages. If you're interested in pricing for a group, contact us directly and we can discuss options.",
+        "We work with schools and organisations on bulk packages. If you're interested in pricing for a group, contact us directly and we can discuss options.",
     },
   ],
 };

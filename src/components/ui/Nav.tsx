@@ -146,7 +146,7 @@ function MarketingNav({ activeHref }: { activeHref?: string }) {
             ref={brandRef}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand-v2/logo-light.jpeg" alt="Masani" />
+            <img src="/brand/logo-blue-bg.png" alt="Masani" />
           </Link>
           <nav className="nav-links" aria-label="Primary navigation" ref={linksRef}>
             {marketingLinks.map((l) => (

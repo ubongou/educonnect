@@ -3,22 +3,25 @@ import clsx from "clsx";
 
 type Mode = "on-blue" | "on-navy" | "on-white" | "on-yellow";
 
-// Heights in px. Width scales from the source aspect (~6.4:1 for both assets
-// after the blue logo was cropped to match the white one).
+// Heights in px. Width scales from each asset's source aspect ratio.
 const sizes = {
   sm: 26,
   md: 34,
   lg: 44,
 } as const;
 
-// The approved wordmark files (from the client brand guide).
-//   - logo-white.png: white wordmark on transparent — for dark backgrounds.
-//   - logo-blue.png:  blue wordmark on transparent  — for light backgrounds.
+// The approved Masani wordmark files.
+//   - logo-blue-bg.png:  baked onto the brand's sky-blue (#3EBEFF) — for
+//     surfaces that are exactly that blue (nav pill, dashboard header).
+//   - logo-navy-bg.png:  baked onto the brand's navy (#04131C) — for dark
+//     navy surfaces (authed footer).
+//   - logo-transparent.png: transparent background, blue wordmark — for
+//     light surfaces that aren't the exact brand blue (cream, white, yellow).
 const assets: Record<Mode, { src: string; w: number; h: number }> = {
-  "on-blue": { src: "/brand/logo-white.png", w: 1452, h: 226 },
-  "on-navy": { src: "/brand/logo-white.png", w: 1452, h: 226 },
-  "on-yellow": { src: "/brand/logo-blue.png", w: 1536, h: 240 },
-  "on-white": { src: "/brand/logo-blue.png", w: 1536, h: 240 },
+  "on-blue": { src: "/brand/logo-blue-bg.png", w: 1800, h: 323 },
+  "on-navy": { src: "/brand/logo-navy-bg.png", w: 1800, h: 323 },
+  "on-yellow": { src: "/brand/logo-transparent.png", w: 1400, h: 233 },
+  "on-white": { src: "/brand/logo-transparent.png", w: 1400, h: 233 },
 };
 
 export function BrandLogo({
