@@ -37,9 +37,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "masani | Personal Tutoring from World Class Teachers",
+  title: "Masani | Personal Tutoring from World Class Teachers",
   description:
-    "masani — Personal Tutoring from World Class Teachers. One-on-one sessions in Maths, English, and Science. Backed by MIT.",
+    "Masani — Personal Tutoring from World Class Teachers. One-on-one sessions in Maths, English, and Science. Backed by MIT.",
 };
 
 export default function RootLayout({

@@ -39,7 +39,6 @@ export function PricingFAQ({ content }: { content: PricingFaqContent }) {
       <div className="container">
         <div className="faq-head">
           <div className="reveal">
-            <span className="eyebrow">{content.eyebrow}</span>
             <h2 id="faq-heading" style={{ marginTop: 14 }}>
               {content.title}
             </h2>

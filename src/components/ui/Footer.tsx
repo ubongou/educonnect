@@ -34,9 +34,9 @@ function MarketingFooter() {
       <div className="container">
         <div className="footer-top">
           <div className="footer-col">
-            <Link href="/" className="brand" aria-label="masani — go to home">
+            <Link href="/" className="brand" aria-label="Masani — go to home">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/brand-v2/logo-dark.jpeg" alt="masani" loading="lazy" />
+              <img src="/brand-v2/logo-dark.jpeg" alt="Masani" loading="lazy" />
             </Link>
             <p>
               Personal tutoring from Nigeria&apos;s best teachers — for families
@@ -47,7 +47,7 @@ function MarketingFooter() {
             <h4>Explore</h4>
             <ul>
               <li>
-                <Link href="/#why">Why masani</Link>
+                <Link href="/#why">Why Masani</Link>
               </li>
               <li>
                 <Link href="/#about">About</Link>
@@ -92,7 +92,7 @@ function MarketingFooter() {
           </div>
         </div>
         <div className="footer-bottom">
-          <span>© 2025 masani · joinmasani.com</span>
+          <span>© 2025 Masani · joinmasani.com</span>
           <span>Backed by MIT</span>
         </div>
       </div>
@@ -119,7 +119,7 @@ function AuthedFooter({ role }: { role?: "parent" | "admin" }) {
           ))}
         </ul>
         <p className="text-[12px] text-white/20">
-          © 2026 masani · joinmasani.com
+          © 2026 Masani · joinmasani.com
         </p>
       </div>
     </footer>

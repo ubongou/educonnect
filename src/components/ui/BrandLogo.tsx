@@ -37,7 +37,7 @@ export function BrandLogo({
   return (
     <Image
       src={src}
-      alt="masani"
+      alt="Masani"
       width={width}
       height={height}
       priority

@@ -7,9 +7,9 @@ import { MarketingScrollReveal } from "@/components/marketing/MarketingScrollRev
 import { getPricingContent } from "@/lib/marketing/content";
 
 export const metadata: Metadata = {
-  title: "Pricing — masani",
+  title: "Pricing — Masani",
   description:
-    "Flexible, transparent pricing for masani tutoring. Choose the package that works for your family — 8, 24, or 48 sessions with no hidden fees.",
+    "Flexible, transparent pricing for Masani tutoring. Choose the package that works for your family — 8, 24, or 48 sessions with no hidden fees.",
 };
 
 export default function PricingPage() {

@@ -53,7 +53,6 @@ export function WhyGrid({ content }: { content: WhyGridContent }) {
       <div className="container">
         <div className="section-head">
           <div className="reveal">
-            <span className="eyebrow">{content.eyebrow}</span>
             <h2 id="why-heading" style={{ marginTop: 14 }}>
               {content.title}
             </h2>
@@ -67,9 +66,6 @@ export function WhyGrid({ content }: { content: WhyGridContent }) {
               key={i}
               className={`pillar ${pillarTones[i]} reveal${i > 0 ? ` delay-${i}` : ""}`}
             >
-              <span className="num" aria-hidden="true">
-                {card.numLabel}
-              </span>
               <div className="icon" aria-hidden="true">
                 {pillarIcons[i]}
               </div>

@@ -21,7 +21,6 @@ export type GlobalsContent = {
 // -----------------------------------------------------------------------------
 
 export type HeroContent = {
-  eyebrow: string;
   headingPart1: string;
   headingAccent: string;
   headingPart2: string;
@@ -50,13 +49,11 @@ export type MarqueeContent = {
 // -----------------------------------------------------------------------------
 
 export type WhyGridCard = {
-  numLabel: string;
   title: string;
   body: string;
 };
 
 export type WhyGridContent = {
-  eyebrow: string;
   title: string;
   subtitle: string;
   cards: WhyGridCard[];
@@ -67,7 +64,6 @@ export type WhyGridContent = {
 // -----------------------------------------------------------------------------
 
 export type HowItWorksContent = {
-  eyebrow: string;
   title: string;
   subtitle: string;
   imageAlt: string;
@@ -85,7 +81,6 @@ export type TestimonialQuote = {
 };
 
 export type TestimonialsContent = {
-  eyebrow: string;
   title: string;
   quotes: TestimonialQuote[];
 };
@@ -102,7 +97,6 @@ export type Founder = {
 };
 
 export type FoundersContent = {
-  eyebrow: string;
   headingLead: string;
   headingHighlight: string;
   intro: string;
@@ -115,7 +109,6 @@ export type FoundersContent = {
 // -----------------------------------------------------------------------------
 
 export type ContactContent = {
-  eyebrow: string;
   title: string;
   lead: string;
   email: string;
@@ -132,7 +125,6 @@ export type ContactContent = {
 // -----------------------------------------------------------------------------
 
 export type PricingIntroContent = {
-  eyebrow: string;
   titlePart1: string;
   titleAccent: string;
   titlePart2: string;
@@ -175,7 +167,6 @@ export type FaqItem = {
 };
 
 export type PricingFaqContent = {
-  eyebrow: string;
   title: string;
   intro: string;
   items: FaqItem[];

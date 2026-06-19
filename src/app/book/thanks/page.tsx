@@ -6,7 +6,7 @@ import { getGlobals } from "@/lib/marketing/content";
 import { PickSessionButton } from "@/components/booking/PickSessionButton";
 
 export const metadata: Metadata = {
-  title: "One more step — masani",
+  title: "One more step — Masani",
   description:
     "Pick a session time on the calendar to confirm your free trial booking.",
 };

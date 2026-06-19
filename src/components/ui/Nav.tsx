@@ -10,7 +10,7 @@ import { trackEvent } from "@/lib/analytics";
 type NavLink = { href: string; label: string };
 
 const marketingLinks: NavLink[] = [
-  { href: "/#why", label: "Why masani" },
+  { href: "/#why", label: "Why Masani" },
   { href: "/#about", label: "About" },
   { href: "/pricing", label: "Pricing" },
   { href: "/#contact", label: "Contact" },
@@ -142,11 +142,11 @@ function MarketingNav({ activeHref }: { activeHref?: string }) {
           <Link
             href="/"
             className="brand"
-            aria-label="masani — go to home"
+            aria-label="Masani — go to home"
             ref={brandRef}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand-v2/logo-light.jpeg" alt="masani" />
+            <img src="/brand-v2/logo-light.jpeg" alt="Masani" />
           </Link>
           <nav className="nav-links" aria-label="Primary navigation" ref={linksRef}>
             {marketingLinks.map((l) => (
@@ -222,7 +222,7 @@ function AuthedNav(props: Extract<Props, { mode: "authed" }>) {
       <nav className="mx-auto flex max-w-[1280px] items-center justify-between rounded-pill border-2 border-navy bg-blue py-2 pr-2 pl-6">
         <Link
           href={homeForRole(props.role)}
-          aria-label="masani home"
+          aria-label="Masani home"
           className="shrink-0"
         >
           <BrandLogo mode="on-blue" size="md" />

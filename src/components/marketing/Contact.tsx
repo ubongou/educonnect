@@ -81,9 +81,6 @@ export function Contact({ content }: { content: ContactContent }) {
     <section className="contact" id="contact" aria-labelledby="contact-heading">
       <div className="container contact-grid">
         <div className="reveal">
-          <span className="eyebrow" style={{ marginBottom: 18 }}>
-            {content.eyebrow}
-          </span>
           <h2 id="contact-heading" style={{ marginTop: 14 }}>
             {content.title}
           </h2>

@@ -37,7 +37,6 @@ export function PricingTable({
   return (
     <section className="pricing-hero" aria-labelledby="pricing-heading">
       <div className="container pricing-hero-content">
-        <span className="eyebrow pricing-eyebrow reveal">{intro.eyebrow}</span>
         <h1 id="pricing-heading" className="reveal delay-1">
           {intro.titlePart1}
           {intro.titlePart1 && intro.titleAccent ? " " : null}

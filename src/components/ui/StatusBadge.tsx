@@ -24,7 +24,7 @@ const toneClassesOnDark: Record<BadgeTone, string> = {
 
 /**
  * Small, reusable labelled badge. Tones match the inspiration's bg-green /
- * bg-amber / bg-gray / bg-blue palette but rethemed onto masani tokens:
+ * bg-amber / bg-gray / bg-blue palette but rethemed onto Masani tokens:
  *
  *   gray   — subdued / early stages (Struggling, Hesitant)
  *   amber  — developing (Developing, Secure)

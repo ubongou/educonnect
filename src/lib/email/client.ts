@@ -17,7 +17,7 @@ export function getResend(): Resend | null {
 
 export function getFromAddress(): string {
   return (
-    process.env.RESEND_FROM_EMAIL ?? "masani <onboarding@resend.dev>"
+    process.env.RESEND_FROM_EMAIL ?? "Masani <onboarding@resend.dev>"
   );
 }
 

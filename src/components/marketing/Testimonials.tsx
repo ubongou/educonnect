@@ -6,7 +6,6 @@ export function Testimonials({ content }: { content: TestimonialsContent }) {
       <div className="container">
         <div className="section-head">
           <div className="reveal">
-            <span className="eyebrow">{content.eyebrow}</span>
             <h2 id="testi-heading" style={{ marginTop: 14 }}>
               {content.title}
             </h2>

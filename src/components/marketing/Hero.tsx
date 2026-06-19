@@ -13,7 +13,6 @@ export function Hero({ content }: { content: HeroContent }) {
     <section className="hero" id="top">
       <div className="container hero-grid">
         <div className="hero-copy">
-          <span className="eyebrow hero-eyebrow reveal">{content.eyebrow}</span>
           <h1 className="reveal delay-1">
             {content.headingPart1}
             {content.headingPart1 && content.headingAccent ? " " : null}

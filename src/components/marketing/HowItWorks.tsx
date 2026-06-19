@@ -8,7 +8,6 @@ export function HowItWorks({ content }: { content: HowItWorksContent }) {
     <section className="ddl" id="how" aria-labelledby="ddl-heading">
       <div className="container ddl-content">
         <div className="ddl-head reveal">
-          <span className="eyebrow">{content.eyebrow}</span>
           <h2 id="ddl-heading">{content.title}</h2>
           <p>{content.subtitle}</p>
         </div>

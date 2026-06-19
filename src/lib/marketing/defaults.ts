@@ -44,12 +44,11 @@ export const defaultGlobals: GlobalsContent = {
 // -----------------------------------------------------------------------------
 
 export const defaultHero: HeroContent = {
-  eyebrow: "Tutoring service · One-on-one",
   headingPart1: "Personal Tutoring from ",
-  headingAccent: "Nigeria's Best",
-  headingPart2: " Teachers",
+  headingAccent: "World Class Teachers",
+  headingPart2: "",
   subheading:
-    "masani is a tutoring service that provides your children with private, one-on-one instruction from Nigeria's finest educators — rigorously vetted, carefully matched, and deeply invested in every child they teach.",
+    "Masani provides your children with private, one-on-one instruction from the finest educators — rigorously vetted, carefully matched, and deeply invested in every child they teach.",
   primaryCtaLabel: "Book a free session",
   secondaryCtaLabel: "Pricing",
   microcopy: "No commitment. Booking takes 2 minutes.",
@@ -57,7 +56,7 @@ export const defaultHero: HeroContent = {
   card1Body: "Top 3% of applicants",
   card2Title: "Families worldwide",
   card2Body: "UK · US · Canada",
-  heroImageAlt: "masani student engaged in a one-on-one lesson",
+  heroImageAlt: "Masani student engaged in a one-on-one lesson",
   mitBadgeAlt: "Backed by MIT — Massachusetts Institute of Technology",
 };
 
@@ -68,30 +67,27 @@ export const defaultMarquee: MarqueeContent = {
     "Sciences",
     "Reading",
     "11+ Prep",
-    "SAT & IGCSE",
-    "Coding",
+    "SAT & ACT",
     "Creative Writing",
+    "Public Speaking",
+    "Algebra",
   ],
 };
 
 export const defaultWhyGrid: WhyGridContent = {
-  eyebrow: "Why masani",
   title: "What sets us apart",
   subtitle:
     "We do not list tutors for parents to browse. We select, vet, and place the right teacher for each child.",
   cards: [
     {
-      numLabel: "01 / Teachers",
       title: "Exceptional Teachers",
       body: "Learn from passionate educators who bring out the best in every student. Our teachers are carefully selected for their expertise, empathy, and ability to inspire confidence in learners.",
     },
     {
-      numLabel: "02 / Approach",
       title: "Flexible, Child-Centered Learning",
       body: "We work around your schedule, not the other way around. Choose the times, formats, and goals that suit your child's needs — all while staying informed and involved every step of the way.",
     },
     {
-      numLabel: "03 / Outcomes",
       title: "Academic and Personal Growth",
       body: "Our approach goes beyond test scores. We help students build confidence, resilience, and a genuine love for learning. Every session is a step toward becoming a more capable, self-assured learner.",
     },
@@ -99,20 +95,18 @@ export const defaultWhyGrid: WhyGridContent = {
 };
 
 export const defaultHowItWorks: HowItWorksContent = {
-  eyebrow: "Data driven results",
   title: "Track progress with real-time insights",
   subtitle:
     "Watch your child's confidence, skills, and learning behaviours improve. Our dashboard gives you visibility into every session, every milestone.",
   imageAlt:
-    "masani parent dashboard showing student progress and session data",
+    "Masani parent dashboard showing student progress and session data",
 };
 
 export const defaultTestimonials: TestimonialsContent = {
-  eyebrow: "Testimonials",
   title: "Real results, real families",
   quotes: [
     {
-      body: "The tutors have been outstanding — patient, professional, and deeply committed. I would wholeheartedly recommend masani to any parent looking to see tangible improvement in their children's learning journey.",
+      body: "The tutors have been outstanding — patient, professional, and deeply committed. I would wholeheartedly recommend Masani to any parent looking to see tangible improvement in their children's learning journey.",
       author: "Mr. Ugbehe",
       where: "Scotland, UK",
       initial: "U",
@@ -124,7 +118,7 @@ export const defaultTestimonials: TestimonialsContent = {
       initial: "F",
     },
     {
-      body: "Our daughter gets excited to connect with her masani tutor. Her attitude toward learning mathematics has changed completely. Her self-confidence has increased and she is eager to learn new concepts.",
+      body: "Our daughter gets excited to connect with her Masani tutor. Her attitude toward learning mathematics has changed completely. Her self-confidence has increased and she is eager to learn new concepts.",
       author: "Mrs. Joanne",
       where: "United States",
       initial: "J",
@@ -133,38 +127,35 @@ export const defaultTestimonials: TestimonialsContent = {
 };
 
 export const defaultFounders: FoundersContent = {
-  eyebrow: "About",
   headingLead: "Built on one belief: ",
-  headingHighlight: " Teaching quality determines everything.",
+  headingHighlight: "teaching quality determines everything.",
   intro:
-    "masani was built on a simple belief: the quality of teaching determines everything. We recruit and vet Nigeria's most capable teachers, then work with families around the world to give every child access to genuinely excellent instruction.",
-  intro2:
-    "We are a tutoring service — not a platform — and stay accountable for every teacher we place and every child we serve.",
+    "Masani was built on a simple belief: the quality of teaching determines everything. We recruit and vet the most capable teachers, then work with families around the world to give every child access to genuinely excellent instruction.",
+  intro2: "We stay accountable for every teacher we place and every child we serve.",
   founders: [
     {
       name: "Unyime Okorosobo",
       role: "Co-founder",
       bio: "Unyime holds a Master's in International Education from the University of Manchester and a B.Sc. in Computer Science from Bowen University. A third-generation educator with more than 15 years in classrooms and school leadership, she was named one of Nigeria's 50 Most Inspirational Teachers in 2023. She is a Microsoft Certified Educator, has trained thousands of teachers on classroom technology integration, and runs Strategic Maths — an initiative transforming how numeracy is taught across Nigerian schools. Her work sits at the intersection of educational excellence and lasting systemic change.",
-      photoAlt: "Unyime Okorosobo, Co-founder of masani",
+      photoAlt: "Unyime Okorosobo, Co-founder of Masani",
     },
     {
       name: "Grace Amoka",
       role: "Co-founder",
       bio: "Grace holds a degree in Computer Engineering from Covenant University and a Master's in Educational Technology from the University of Ilorin. With over nine years of experience as a teacher, coach, and education consultant, she has worked across K-12 systems on three continents, consulted for the World Bank, and served as a programme coordinator at the African Leadership Academy and Teach for Nigeria — training over 400 educators across more than seven countries. She brings rare rigour and operational depth to everything she builds.",
-      photoAlt: "Grace Amoka, Co-founder of masani",
+      photoAlt: "Grace Amoka, Co-founder of Masani",
     },
   ],
 };
 
 export const defaultContact: ContactContent = {
-  eyebrow: "Contact",
   title: "Let's talk",
   lead:
     "Have questions before booking? Send us a message and we'll get back to you within 24 hours.",
   email: "admin@joinmasani.com",
   instagramLabel: "Instagram · @joinmasani",
   instagramUrl: "https://www.instagram.com/joinmasani/",
-  facebookLabel: "Facebook · masani",
+  facebookLabel: "Facebook · Masani",
   facebookUrl: "https://www.facebook.com/profile.php?id=61572098883786",
   whatsappLabel: "WhatsApp · +234 901 724 6528",
   whatsappUrl: "https://wa.me/2349017246528",
@@ -175,7 +166,6 @@ export const defaultContact: ContactContent = {
 // -----------------------------------------------------------------------------
 
 export const defaultPricingIntro: PricingIntroContent = {
-  eyebrow: "Flexible pricing · No hidden fees",
   titlePart1: "Invest in your child's ",
   titleAccent: "learning",
   titlePart2: "",
@@ -225,10 +215,9 @@ export const defaultPricingTiers: PricingTiersContent = {
 };
 
 export const defaultPricingFaq: PricingFaqContent = {
-  eyebrow: "Questions?",
   title: "Frequently asked",
   intro:
-    "Everything you need to know about masani pricing and how we work. Can't find your answer? Get in touch.",
+    "Everything you need to know about Masani pricing and how we work. Can't find your answer? Get in touch.",
   items: [
     {
       question: "Can I pause or cancel my sessions?",

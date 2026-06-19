@@ -49,7 +49,7 @@ export function DashboardShell({
 
           <Link
             href={homeForRole(role)}
-            aria-label="masani home"
+            aria-label="Masani home"
             className="shrink-0"
           >
             <BrandLogo mode="on-blue" size="md" />

@@ -7,9 +7,6 @@ export function FoundersAbout({ content }: { content: FoundersContent }) {
       <div className="container">
         <div className="about-intro">
           <div className="reveal">
-            <span className="eyebrow" style={{ marginBottom: 18 }}>
-              {content.eyebrow}
-            </span>
             <h2 id="about-heading" style={{ marginTop: 14 }}>
               {content.headingLead}{" "}
               <em>{content.headingHighlight}</em>
