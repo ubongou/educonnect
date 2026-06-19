@@ -69,7 +69,7 @@ export default async function DashboardOverview({
             Parent dashboard
           </p>
           <h1 className="mt-1 font-heading text-[clamp(28px,3vw,40px)] font-semibold tracking-[-0.02em] text-navy">
-            Welcome to EduConnect
+            Welcome to masani
           </h1>
           <p className="mt-2 text-[14px] text-g600">
             Add your first child to start tracking progress.

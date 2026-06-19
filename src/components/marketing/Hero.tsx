@@ -1,28 +1,13 @@
 "use client";
 
-import { resolveAssetUrl } from "@/lib/marketing/assetUrl";
 import { bundledAssets } from "@/lib/marketing/defaults";
 import type { HeroContent } from "@/lib/marketing/schemas";
 import Link from "next/link";
 import { trackEvent } from "@/lib/analytics";
 
-export function Hero({
-  content,
-  updatedAt,
-}: {
-  content: HeroContent;
-  updatedAt: string | null;
-}) {
-  const heroImage = resolveAssetUrl(
-    content.heroImagePath,
-    bundledAssets.heroImage,
-    updatedAt ?? undefined,
-  );
-  const mitBadge = resolveAssetUrl(
-    content.mitBadgePath,
-    bundledAssets.mitBadge,
-    updatedAt ?? undefined,
-  );
+export function Hero({ content }: { content: HeroContent }) {
+  const heroImage = bundledAssets.heroImage;
+  const mitBadge = bundledAssets.mitBadge;
 
   return (
     <section className="hero" id="top">

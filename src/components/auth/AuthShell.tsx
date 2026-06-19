@@ -17,7 +17,7 @@ export function AuthShell({
   return (
     <div className="flex min-h-screen flex-col bg-paper">
       <header className="px-7 py-6">
-        <Link href="/" aria-label="EduConnect home" className="inline-block">
+        <Link href="/" aria-label="masani home" className="inline-block">
           <BrandLogo mode="on-white" size="md" />
         </Link>
       </header>

@@ -10,7 +10,7 @@ import { trackEvent } from "@/lib/analytics";
 type NavLink = { href: string; label: string };
 
 const marketingLinks: NavLink[] = [
-  { href: "/#why", label: "Why EduConnect" },
+  { href: "/#why", label: "Why masani" },
   { href: "/#about", label: "About" },
   { href: "/pricing", label: "Pricing" },
   { href: "/#contact", label: "Contact" },
@@ -30,7 +30,6 @@ const adminLinks: NavLink[] = [
   { href: "/admin/teachers", label: "Teachers" },
   { href: "/admin/enrollments", label: "Enrollments" },
   { href: "/admin/schedule", label: "Schedule" },
-  { href: "/admin/content", label: "Content" },
 ];
 
 const teacherLinks: NavLink[] = [
@@ -143,11 +142,11 @@ function MarketingNav({ activeHref }: { activeHref?: string }) {
           <Link
             href="/"
             className="brand"
-            aria-label="EduConnect — go to home"
+            aria-label="masani — go to home"
             ref={brandRef}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand-v2/logo-light.jpeg" alt="EduConnect" />
+            <img src="/brand-v2/logo-light.jpeg" alt="masani" />
           </Link>
           <nav className="nav-links" aria-label="Primary navigation" ref={linksRef}>
             {marketingLinks.map((l) => (
@@ -223,7 +222,7 @@ function AuthedNav(props: Extract<Props, { mode: "authed" }>) {
       <nav className="mx-auto flex max-w-[1280px] items-center justify-between rounded-pill border-2 border-navy bg-blue py-2 pr-2 pl-6">
         <Link
           href={homeForRole(props.role)}
-          aria-label="EduConnect home"
+          aria-label="masani home"
           className="shrink-0"
         >
           <BrandLogo mode="on-blue" size="md" />

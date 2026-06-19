@@ -1,14 +1,7 @@
-import { resolveAssetUrl } from "@/lib/marketing/assetUrl";
 import { bundledAssets } from "@/lib/marketing/defaults";
 import type { FoundersContent } from "@/lib/marketing/schemas";
 
-export function FoundersAbout({
-  content,
-  updatedAt,
-}: {
-  content: FoundersContent;
-  updatedAt: string | null;
-}) {
+export function FoundersAbout({ content }: { content: FoundersContent }) {
   return (
     <section className="about" id="about" aria-labelledby="about-heading">
       <div className="container">
@@ -28,11 +21,8 @@ export function FoundersAbout({
 
         <div className="founders">
           {content.founders.map((f, i) => {
-            const photo = resolveAssetUrl(
-              f.photoPath,
-              bundledAssets.founderPhotos[i] ?? bundledAssets.founderPhotos[0],
-              updatedAt ?? undefined,
-            );
+            const photo =
+              bundledAssets.founderPhotos[i] ?? bundledAssets.founderPhotos[0];
             return (
               <article
                 key={i}

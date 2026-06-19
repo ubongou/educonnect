@@ -28,8 +28,8 @@ export async function sendBookingRequestEmail(
     return { ok: true, skipped: true, reason: "RESEND_API_KEY not set" };
   }
 
-  const globals = await getGlobals();
-  const adminEmail = globals.content.adminEmail;
+  const globals = getGlobals();
+  const adminEmail = globals.adminEmail;
   if (!adminEmail) {
     return { ok: false, error: "Admin email not configured" };
   }
@@ -41,7 +41,7 @@ export async function sendBookingRequestEmail(
     from: getFromAddress(),
     to: adminEmail,
     replyTo: input.parent_email,
-    subject: `[EduConnect booking] ${input.child_name} — ${subjectLabel[input.subject]} (${sourceLabel})`,
+    subject: `[masani booking] ${input.child_name} — ${subjectLabel[input.subject]} (${sourceLabel})`,
     html,
     text,
   });
@@ -92,7 +92,7 @@ function render(
     <html>
       <body style="margin:0;padding:24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#04131C;background:#FBF9F4;">
         <div style="max-width:620px;margin:0 auto;background:#fff;border:1px solid #e8e3d6;border-radius:18px;padding:32px;">
-          <p style="margin:0 0 4px;font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#6b7680;">EduConnect booking request</p>
+          <p style="margin:0 0 4px;font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#6b7680;">masani booking request</p>
           <h1 style="margin:0 0 20px;font-size:22px;line-height:1.2;color:#04131C;">${esc(i.child_name)} — trial ${esc(subjectLabel[i.subject])}</h1>
           <table style="border-collapse:collapse;font-size:14px;color:#3a4750;">${rows}</table>
           <hr style="border:none;border-top:1px solid #e8e3d6;margin:24px 0 16px;" />
@@ -103,7 +103,7 @@ function render(
   `.trim();
 
   const text = [
-    "EduConnect booking request",
+    "masani booking request",
     "",
     ...fields.map(([k, v]) => `${k}: ${v}`),
     "",

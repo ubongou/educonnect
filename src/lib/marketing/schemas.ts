@@ -1,178 +1,143 @@
-import { z } from "zod";
-
 /**
- * Zod shapes for every section of the marketing CMS. Each schema is the
- * source of truth for both the admin form (to validate on save) and the
- * read-side parser in `content.ts` (to validate on read with a defaults
- * fallback).
- *
- * Image fields store either `""` (use the bundled /public asset) or a
- * Storage path under the `marketing-assets` bucket — never a full URL.
- * The resolver in `assetUrl.ts` turns the path into a CDN URL at render
- * time and appends a cachebuster.
+ * Plain TypeScript content shapes for the marketing pages. These used to be
+ * Zod schemas backing a database-editable CMS; content is now static
+ * literals in `defaults.ts`, checked at compile time by these types.
  */
-
-const nonEmpty = (msg = "Required") => z.string().trim().min(1, msg);
-const optionalText = z.string().trim().default("");
-const imagePath = z.string().trim().default("");
 
 // -----------------------------------------------------------------------------
 // Globals
 // -----------------------------------------------------------------------------
 
-export const globalsSchema = z.object({
-  bookingUrl: nonEmpty("Booking URL is required").url("Must be a valid URL"),
-  adminEmail: nonEmpty("Admin email is required").email("Must be a valid email"),
-  websiteUrl: nonEmpty("Website URL is required").url("Must be a valid URL"),
-  instagramUrl: optionalText,
-  facebookUrl: optionalText,
-});
-
-export type GlobalsContent = z.infer<typeof globalsSchema>;
+export type GlobalsContent = {
+  bookingUrl: string;
+  adminEmail: string;
+  websiteUrl: string;
+  instagramUrl: string;
+  facebookUrl: string;
+};
 
 // -----------------------------------------------------------------------------
 // Home / Hero
 // -----------------------------------------------------------------------------
 
-export const heroSchema = z.object({
-  eyebrow: nonEmpty(),
-  headingPart1: optionalText,
-  headingAccent: optionalText,
-  headingPart2: optionalText,
-  subheading: nonEmpty(),
-  primaryCtaLabel: nonEmpty(),
-  secondaryCtaLabel: nonEmpty(),
-  microcopy: nonEmpty(),
-  card1Title: nonEmpty(),
-  card1Body: nonEmpty(),
-  card2Title: nonEmpty(),
-  card2Body: nonEmpty(),
-  heroImagePath: imagePath,
-  heroImageAlt: nonEmpty(),
-  mitBadgePath: imagePath,
-  mitBadgeAlt: nonEmpty(),
-});
-
-export type HeroContent = z.infer<typeof heroSchema>;
+export type HeroContent = {
+  eyebrow: string;
+  headingPart1: string;
+  headingAccent: string;
+  headingPart2: string;
+  subheading: string;
+  primaryCtaLabel: string;
+  secondaryCtaLabel: string;
+  microcopy: string;
+  card1Title: string;
+  card1Body: string;
+  card2Title: string;
+  card2Body: string;
+  heroImageAlt: string;
+  mitBadgeAlt: string;
+};
 
 // -----------------------------------------------------------------------------
 // Home / Marquee
 // -----------------------------------------------------------------------------
 
-export const marqueeSchema = z.object({
-  subjects: z.array(nonEmpty()).min(2).max(24),
-});
-
-export type MarqueeContent = z.infer<typeof marqueeSchema>;
+export type MarqueeContent = {
+  subjects: string[];
+};
 
 // -----------------------------------------------------------------------------
 // Home / Why grid
 // -----------------------------------------------------------------------------
 
-const whyGridCardSchema = z.object({
-  numLabel: nonEmpty(),
-  title: nonEmpty(),
-  body: nonEmpty(),
-});
+export type WhyGridCard = {
+  numLabel: string;
+  title: string;
+  body: string;
+};
 
-export const whyGridSchema = z.object({
-  eyebrow: nonEmpty(),
-  title: nonEmpty(),
-  subtitle: nonEmpty(),
-  cards: z.array(whyGridCardSchema).length(3),
-});
-
-export type WhyGridContent = z.infer<typeof whyGridSchema>;
+export type WhyGridContent = {
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  cards: WhyGridCard[];
+};
 
 // -----------------------------------------------------------------------------
-// Home / Data driven (was "how it works" in v1 — section_key kept for
-// migration continuity, content shape rewritten to match the new design)
+// Home / Data driven
 // -----------------------------------------------------------------------------
 
-export const howItWorksSchema = z.object({
-  eyebrow: nonEmpty(),
-  title: nonEmpty(),
-  subtitle: nonEmpty(),
-  imagePath: imagePath,
-  imageAlt: nonEmpty(),
-});
-
-export type HowItWorksContent = z.infer<typeof howItWorksSchema>;
+export type HowItWorksContent = {
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  imageAlt: string;
+};
 
 // -----------------------------------------------------------------------------
 // Home / Testimonials
 // -----------------------------------------------------------------------------
 
-const testimonialQuoteSchema = z.object({
-  body: nonEmpty(),
-  author: nonEmpty(),
-  where: nonEmpty(),
-  initial: z.string().trim().min(1).max(2),
-});
+export type TestimonialQuote = {
+  body: string;
+  author: string;
+  where: string;
+  initial: string;
+};
 
-export const testimonialsSchema = z.object({
-  eyebrow: nonEmpty(),
-  title: nonEmpty(),
-  quotes: z.array(testimonialQuoteSchema).length(3),
-});
-
-export type TestimonialsContent = z.infer<typeof testimonialsSchema>;
+export type TestimonialsContent = {
+  eyebrow: string;
+  title: string;
+  quotes: TestimonialQuote[];
+};
 
 // -----------------------------------------------------------------------------
 // Home / Founders
 // -----------------------------------------------------------------------------
 
-const founderSchema = z.object({
-  name: nonEmpty(),
-  role: nonEmpty(),
-  bio: nonEmpty(),
-  photoPath: imagePath,
-  photoAlt: nonEmpty(),
-});
+export type Founder = {
+  name: string;
+  role: string;
+  bio: string;
+  photoAlt: string;
+};
 
-export const foundersSchema = z.object({
-  eyebrow: nonEmpty(),
-  headingLead: nonEmpty(),
-  headingHighlight: nonEmpty(),
-  intro: nonEmpty(),
-  intro2: optionalText,
-  founders: z.array(founderSchema).length(2),
-});
-
-export type FoundersContent = z.infer<typeof foundersSchema>;
+export type FoundersContent = {
+  eyebrow: string;
+  headingLead: string;
+  headingHighlight: string;
+  intro: string;
+  intro2: string;
+  founders: Founder[];
+};
 
 // -----------------------------------------------------------------------------
 // Home / Contact
 // -----------------------------------------------------------------------------
 
-export const contactSchema = z.object({
-  eyebrow: nonEmpty(),
-  title: nonEmpty(),
-  lead: nonEmpty(),
-  email: nonEmpty().email(),
-  instagramLabel: nonEmpty(),
-  instagramUrl: optionalText,
-  facebookLabel: nonEmpty(),
-  facebookUrl: optionalText,
-  whatsappLabel: optionalText,
-  whatsappUrl: optionalText,
-});
-
-export type ContactContent = z.infer<typeof contactSchema>;
+export type ContactContent = {
+  eyebrow: string;
+  title: string;
+  lead: string;
+  email: string;
+  instagramLabel: string;
+  instagramUrl: string;
+  facebookLabel: string;
+  facebookUrl: string;
+  whatsappLabel: string;
+  whatsappUrl: string;
+};
 
 // -----------------------------------------------------------------------------
 // Pricing / Intro
 // -----------------------------------------------------------------------------
 
-export const pricingIntroSchema = z.object({
-  eyebrow: nonEmpty(),
-  titlePart1: optionalText,
-  titleAccent: optionalText,
-  titlePart2: optionalText,
-  subtitle: nonEmpty(),
-});
-
-export type PricingIntroContent = z.infer<typeof pricingIntroSchema>;
+export type PricingIntroContent = {
+  eyebrow: string;
+  titlePart1: string;
+  titleAccent: string;
+  titlePart2: string;
+  subtitle: string;
+};
 
 // -----------------------------------------------------------------------------
 // Pricing / Tiers
@@ -181,88 +146,37 @@ export type PricingIntroContent = z.infer<typeof pricingIntroSchema>;
 export const currencyCodes = ["NGN", "USD", "GBP", "CAD"] as const;
 export type CurrencyCode = (typeof currencyCodes)[number];
 
-const priceSchema = z.object({
-  perSession: z.number().nonnegative(),
-  total: z.number().nonnegative(),
-  saving: z.number().nonnegative(),
-  free: z.number().int().nonnegative(),
-});
+export type Price = {
+  perSession: number;
+  total: number;
+  saving: number;
+  free: number;
+};
 
-const tierSchema = z.object({
-  sessions: z.number().int().positive(),
-  duration: nonEmpty(),
-  popular: z.boolean(),
-  noCommitmentMessage: nonEmpty(),
-  prices: z.object({
-    NGN: priceSchema,
-    USD: priceSchema,
-    GBP: priceSchema,
-    CAD: priceSchema,
-  }),
-});
+export type Tier = {
+  sessions: number;
+  duration: string;
+  popular: boolean;
+  noCommitmentMessage: string;
+  prices: Record<CurrencyCode, Price>;
+};
 
-export const pricingTiersSchema = z.object({
-  tiers: z.array(tierSchema).length(3),
-});
-
-export type PricingTiersContent = z.infer<typeof pricingTiersSchema>;
-export type Tier = z.infer<typeof tierSchema>;
-export type Price = z.infer<typeof priceSchema>;
+export type PricingTiersContent = {
+  tiers: Tier[];
+};
 
 // -----------------------------------------------------------------------------
 // Pricing / FAQ
 // -----------------------------------------------------------------------------
 
-const faqItemSchema = z.object({
-  question: nonEmpty(),
-  answer: nonEmpty(),
-});
+export type FaqItem = {
+  question: string;
+  answer: string;
+};
 
-export const pricingFaqSchema = z.object({
-  eyebrow: nonEmpty(),
-  title: nonEmpty(),
-  intro: nonEmpty(),
-  items: z.array(faqItemSchema).min(1).max(12),
-});
-
-export type PricingFaqContent = z.infer<typeof pricingFaqSchema>;
-
-// -----------------------------------------------------------------------------
-// Section registry — couples a (page_slug, section_key) with its schema.
-// -----------------------------------------------------------------------------
-
-export const sectionRegistry = {
-  globals: { pageSlug: "globals", sectionKey: "globals", schema: globalsSchema },
-  hero: { pageSlug: "home", sectionKey: "hero", schema: heroSchema },
-  marquee: { pageSlug: "home", sectionKey: "marquee", schema: marqueeSchema },
-  why_grid: { pageSlug: "home", sectionKey: "why_grid", schema: whyGridSchema },
-  how_it_works: {
-    pageSlug: "home",
-    sectionKey: "how_it_works",
-    schema: howItWorksSchema,
-  },
-  testimonials: {
-    pageSlug: "home",
-    sectionKey: "testimonials",
-    schema: testimonialsSchema,
-  },
-  founders: { pageSlug: "home", sectionKey: "founders", schema: foundersSchema },
-  contact: { pageSlug: "home", sectionKey: "contact", schema: contactSchema },
-  pricing_intro: {
-    pageSlug: "pricing",
-    sectionKey: "intro",
-    schema: pricingIntroSchema,
-  },
-  pricing_tiers: {
-    pageSlug: "pricing",
-    sectionKey: "tiers",
-    schema: pricingTiersSchema,
-  },
-  pricing_faq: {
-    pageSlug: "pricing",
-    sectionKey: "faq",
-    schema: pricingFaqSchema,
-  },
-} as const;
-
-export type SectionId = keyof typeof sectionRegistry;
+export type PricingFaqContent = {
+  eyebrow: string;
+  title: string;
+  intro: string;
+  items: FaqItem[];
+};

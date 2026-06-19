@@ -6,7 +6,7 @@ import { MarketingScrollReveal } from "@/components/marketing/MarketingScrollRev
 import { BookingForm } from "@/components/booking/BookingForm";
 
 export const metadata: Metadata = {
-  title: "Book a free trial — EduConnect",
+  title: "Book a free trial — masani",
   description:
     "Tell us about your child and we'll match you with a tutor for a free trial session.",
 };

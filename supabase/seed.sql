@@ -1,4 +1,4 @@
--- EduConnect LMS — seed: default subjects and their skill trackers.
+-- masani LMS — seed: default subjects and their skill trackers.
 -- Idempotent; safe to re-run against an existing database.
 
 insert into public.subjects (name, slug) values

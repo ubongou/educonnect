@@ -37,7 +37,7 @@ export function BrandLogo({
   return (
     <Image
       src={src}
-      alt="EduConnect"
+      alt="masani"
       width={width}
       height={height}
       priority

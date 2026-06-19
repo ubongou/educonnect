@@ -13,7 +13,6 @@ const adminLinks = [
   { href: "/admin/students", label: "Students" },
   { href: "/admin/enrollments", label: "Enrollments" },
   { href: "/admin/reports", label: "Reports" },
-  { href: "/admin/content", label: "Content" },
 ];
 
 export function Footer({
@@ -35,9 +34,9 @@ function MarketingFooter() {
       <div className="container">
         <div className="footer-top">
           <div className="footer-col">
-            <Link href="/" className="brand" aria-label="EduConnect — go to home">
+            <Link href="/" className="brand" aria-label="masani — go to home">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/brand-v2/logo-dark.jpeg" alt="EduConnect" loading="lazy" />
+              <img src="/brand-v2/logo-dark.jpeg" alt="masani" loading="lazy" />
             </Link>
             <p>
               Personal tutoring from Nigeria&apos;s best teachers — for families
@@ -48,7 +47,7 @@ function MarketingFooter() {
             <h4>Explore</h4>
             <ul>
               <li>
-                <Link href="/#why">Why EduConnect</Link>
+                <Link href="/#why">Why masani</Link>
               </li>
               <li>
                 <Link href="/#about">About</Link>
@@ -76,24 +75,24 @@ function MarketingFooter() {
             <h4>Get in touch</h4>
             <ul>
               <li>
-                <a href="mailto:admin@joineduconnect.com">
-                  admin@joineduconnect.com
+                <a href="mailto:admin@joinmasani.com">
+                  admin@joinmasani.com
                 </a>
               </li>
               <li>
                 <a
-                  href="https://joineduconnect.com"
+                  href="https://joinmasani.com"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  joineduconnect.com
+                  joinmasani.com
                 </a>
               </li>
             </ul>
           </div>
         </div>
         <div className="footer-bottom">
-          <span>© 2025 EduConnect · joineduconnect.com</span>
+          <span>© 2025 masani · joinmasani.com</span>
           <span>Backed by MIT</span>
         </div>
       </div>
@@ -120,7 +119,7 @@ function AuthedFooter({ role }: { role?: "parent" | "admin" }) {
           ))}
         </ul>
         <p className="text-[12px] text-white/20">
-          © 2026 EduConnect · joineduconnect.com
+          © 2026 masani · joinmasani.com
         </p>
       </div>
     </footer>

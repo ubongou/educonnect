@@ -19,8 +19,8 @@ const admin = createClient<Database>(url, key, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
-const parentEmail = "parent.demo@joineduconnect.com";
-const teacherEmail = "teacher.demo@joineduconnect.com";
+const parentEmail = "parent.demo@joinmasani.com";
+const teacherEmail = "teacher.demo@joinmasani.com";
 const parentName = "Adaeze Okonkwo";
 const teacherName = "Ayobola Adeyemi";
 const childFullName = "Temi Coker";

@@ -12,7 +12,7 @@ export default async function ForgotPasswordPage({
   return (
     <AuthShell
       title={<>Reset your password.</>}
-      subtitle="Enter the email tied to your EduConnect account — we'll email you a link to set a new password."
+      subtitle="Enter the email tied to your masani account — we'll email you a link to set a new password."
       footer={
         <>
           Remembered it?{" "}

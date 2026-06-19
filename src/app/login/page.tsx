@@ -15,7 +15,7 @@ export default async function LoginPage({
       subtitle="Sign in to see your child's progress and upcoming sessions."
       footer={
         <>
-          New to EduConnect?{" "}
+          New to masani?{" "}
           <Link href="/signup" className="font-semibold text-navy underline-offset-4 hover:underline">
             Create an account
           </Link>

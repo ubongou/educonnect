@@ -111,7 +111,7 @@ export function renderLessonReportEmail(data: LessonReportEmailData): {
           <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width:600px;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(4,19,28,0.06);">
             <tr>
               <td style="background:${BRAND_NAVY};padding:22px 28px;">
-                <p style="margin:0;font:800 14px Arial,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:${BRAND_YELLOW};">EduConnect</p>
+                <p style="margin:0;font:800 14px Arial,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:${BRAND_YELLOW};">masani</p>
                 <p style="margin:6px 0 0;font:800 22px Arial,sans-serif;color:#ffffff;">New lesson report</p>
               </td>
             </tr>
@@ -203,7 +203,7 @@ export function renderLessonReportEmail(data: LessonReportEmailData): {
     "",
     `View the full report: ${data.reportUrl}`,
     "",
-    "— EduConnect",
+    "— masani",
   ]
     .filter(Boolean)
     .join("\n");

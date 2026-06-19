@@ -8,7 +8,7 @@ if (!url || !key) {
   throw new Error("Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY");
 }
 
-const email = process.argv[2] ?? "teacher.demo@joineduconnect.com";
+const email = process.argv[2] ?? "teacher.demo@joinmasani.com";
 const fullName = process.argv[3] ?? "Demo Teacher";
 const password =
   process.argv[4] ??

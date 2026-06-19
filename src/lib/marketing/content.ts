@@ -1,4 +1,3 @@
-import { createClient } from "@/lib/supabase/server";
 import {
   defaultContact,
   defaultFounders,
@@ -25,170 +24,43 @@ import type {
   TestimonialsContent,
   WhyGridContent,
 } from "./schemas";
-import {
-  contactSchema,
-  foundersSchema,
-  globalsSchema,
-  heroSchema,
-  howItWorksSchema,
-  marqueeSchema,
-  pricingFaqSchema,
-  pricingIntroSchema,
-  pricingTiersSchema,
-  testimonialsSchema,
-  whyGridSchema,
-} from "./schemas";
-import type { ZodType } from "zod";
-
-type SectionRow = {
-  page_slug: string;
-  section_key: string;
-  content: unknown;
-  updated_at: string;
-};
-
-type SectionMap = Map<string, SectionRow>;
-
-function key(pageSlug: string, sectionKey: string): string {
-  return `${pageSlug}/${sectionKey}`;
-}
-
-function pickSection<T>(
-  map: SectionMap,
-  pageSlug: string,
-  sectionKey: string,
-  schema: ZodType<T>,
-  fallback: T,
-): { content: T; updatedAt: string | null } {
-  const row = map.get(key(pageSlug, sectionKey));
-  if (!row) return { content: fallback, updatedAt: null };
-
-  const parsed = schema.safeParse(row.content);
-  if (!parsed.success) {
-    console.warn(
-      `[marketing] ${pageSlug}/${sectionKey} failed parse — using defaults:`,
-      parsed.error.issues[0]?.message,
-    );
-    return { content: fallback, updatedAt: row.updated_at };
-  }
-  return { content: parsed.data, updatedAt: row.updated_at };
-}
-
-async function fetchSections(pageSlugs: string[]): Promise<SectionMap> {
-  const map: SectionMap = new Map();
-  try {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("site_sections")
-      .select("page_slug, section_key, content, updated_at")
-      .in("page_slug", pageSlugs);
-
-    if (error) {
-      console.warn("[marketing] site_sections fetch failed:", error.message);
-      return map;
-    }
-
-    for (const row of data ?? []) {
-      map.set(key(row.page_slug, row.section_key), row as SectionRow);
-    }
-  } catch (err) {
-    console.warn("[marketing] site_sections fetch threw:", err);
-  }
-  return map;
-}
-
-// -----------------------------------------------------------------------------
-// Public API
-// -----------------------------------------------------------------------------
-
-export type WithUpdatedAt<T> = { content: T; updatedAt: string | null };
 
 export type HomeContent = {
-  hero: WithUpdatedAt<HeroContent>;
-  marquee: WithUpdatedAt<MarqueeContent>;
-  whyGrid: WithUpdatedAt<WhyGridContent>;
-  howItWorks: WithUpdatedAt<HowItWorksContent>;
-  testimonials: WithUpdatedAt<TestimonialsContent>;
-  founders: WithUpdatedAt<FoundersContent>;
-  contact: WithUpdatedAt<ContactContent>;
+  hero: HeroContent;
+  marquee: MarqueeContent;
+  whyGrid: WhyGridContent;
+  howItWorks: HowItWorksContent;
+  testimonials: TestimonialsContent;
+  founders: FoundersContent;
+  contact: ContactContent;
 };
 
 export type PricingContent = {
-  intro: WithUpdatedAt<PricingIntroContent>;
-  tiers: WithUpdatedAt<PricingTiersContent>;
-  faq: WithUpdatedAt<PricingFaqContent>;
+  intro: PricingIntroContent;
+  tiers: PricingTiersContent;
+  faq: PricingFaqContent;
 };
 
-export async function getGlobals(): Promise<WithUpdatedAt<GlobalsContent>> {
-  const map = await fetchSections(["globals"]);
-  return pickSection(map, "globals", "globals", globalsSchema, defaultGlobals);
+export function getGlobals(): GlobalsContent {
+  return defaultGlobals;
 }
 
-export async function getHomeContent(): Promise<HomeContent> {
-  const map = await fetchSections(["home"]);
-  const hero = pickSection(map, "home", "hero", heroSchema, defaultHero);
-  // Legacy DB rows can have empty heading parts (pre-redesign or admin-saved
-  // blanks). Restore the default split-title so the h1 never ships empty.
-  const h = hero.content;
-  if (!h.headingPart1.trim() && !h.headingAccent.trim() && !h.headingPart2.trim()) {
-    hero.content = {
-      ...h,
-      headingPart1: defaultHero.headingPart1,
-      headingAccent: defaultHero.headingAccent,
-      headingPart2: defaultHero.headingPart2,
-    };
-  }
+export function getHomeContent(): HomeContent {
   return {
-    hero,
-    marquee: pickSection(map, "home", "marquee", marqueeSchema, defaultMarquee),
-    whyGrid: pickSection(map, "home", "why_grid", whyGridSchema, defaultWhyGrid),
-    howItWorks: pickSection(
-      map,
-      "home",
-      "how_it_works",
-      howItWorksSchema,
-      defaultHowItWorks,
-    ),
-    testimonials: pickSection(
-      map,
-      "home",
-      "testimonials",
-      testimonialsSchema,
-      defaultTestimonials,
-    ),
-    founders: pickSection(map, "home", "founders", foundersSchema, defaultFounders),
-    contact: pickSection(map, "home", "contact", contactSchema, defaultContact),
+    hero: defaultHero,
+    marquee: defaultMarquee,
+    whyGrid: defaultWhyGrid,
+    howItWorks: defaultHowItWorks,
+    testimonials: defaultTestimonials,
+    founders: defaultFounders,
+    contact: defaultContact,
   };
 }
 
-export async function getPricingContent(): Promise<PricingContent> {
-  const map = await fetchSections(["pricing"]);
-  const intro = pickSection(map, "pricing", "intro", pricingIntroSchema, defaultPricingIntro);
-  const c = intro.content;
-  if (!c.titlePart1.trim() && !c.titleAccent.trim() && !c.titlePart2.trim()) {
-    intro.content = {
-      ...c,
-      titlePart1: defaultPricingIntro.titlePart1,
-      titleAccent: defaultPricingIntro.titleAccent,
-      titlePart2: defaultPricingIntro.titlePart2,
-    };
-  }
+export function getPricingContent(): PricingContent {
   return {
-    intro,
-    tiers: pickSection(map, "pricing", "tiers", pricingTiersSchema, defaultPricingTiers),
-    faq: pickSection(map, "pricing", "faq", pricingFaqSchema, defaultPricingFaq),
+    intro: defaultPricingIntro,
+    tiers: defaultPricingTiers,
+    faq: defaultPricingFaq,
   };
-}
-
-/**
- * Admin-side helper: load one section's raw content for editing.
- */
-export async function getSectionForEdit<T>(
-  pageSlug: string,
-  sectionKey: string,
-  schema: ZodType<T>,
-  fallback: T,
-): Promise<{ content: T; updatedAt: string | null }> {
-  const map = await fetchSections([pageSlug]);
-  return pickSection(map, pageSlug, sectionKey, schema, fallback);
 }

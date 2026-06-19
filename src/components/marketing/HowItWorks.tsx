@@ -1,19 +1,8 @@
-import { resolveAssetUrl } from "@/lib/marketing/assetUrl";
 import { bundledAssets } from "@/lib/marketing/defaults";
 import type { HowItWorksContent } from "@/lib/marketing/schemas";
 
-export function HowItWorks({
-  content,
-  updatedAt,
-}: {
-  content: HowItWorksContent;
-  updatedAt: string | null;
-}) {
-  const dashboardImage = resolveAssetUrl(
-    content.imagePath,
-    bundledAssets.dashboardImage,
-    updatedAt ?? undefined,
-  );
+export function HowItWorks({ content }: { content: HowItWorksContent }) {
+  const dashboardImage = bundledAssets.dashboardImage;
 
   return (
     <section className="ddl" id="how" aria-labelledby="ddl-heading">

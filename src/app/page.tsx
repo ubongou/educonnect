@@ -10,10 +10,8 @@ import { Contact } from "@/components/marketing/Contact";
 import { MarketingScrollReveal } from "@/components/marketing/MarketingScrollReveal";
 import { getHomeContent } from "@/lib/marketing/content";
 
-export const dynamic = "force-dynamic";
-
-export default async function Home() {
-  const home = await getHomeContent();
+export default function Home() {
+  const home = getHomeContent();
 
   return (
     <div className="mkt-root">
@@ -23,22 +21,13 @@ export default async function Home() {
       </a>
       <Nav mode="marketing" />
       <main id="main-content">
-        <Hero
-          content={home.hero.content}
-          updatedAt={home.hero.updatedAt}
-        />
-        <Marquee content={home.marquee.content} />
-        <WhyGrid content={home.whyGrid.content} />
-        <HowItWorks
-          content={home.howItWorks.content}
-          updatedAt={home.howItWorks.updatedAt}
-        />
-        <Testimonials content={home.testimonials.content} />
-        <FoundersAbout
-          content={home.founders.content}
-          updatedAt={home.founders.updatedAt}
-        />
-        <Contact content={home.contact.content} />
+        <Hero content={home.hero} />
+        <Marquee content={home.marquee} />
+        <WhyGrid content={home.whyGrid} />
+        <HowItWorks content={home.howItWorks} />
+        <Testimonials content={home.testimonials} />
+        <FoundersAbout content={home.founders} />
+        <Contact content={home.contact} />
       </main>
       <Footer mode="marketing" />
     </div>

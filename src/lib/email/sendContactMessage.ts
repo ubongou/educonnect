@@ -28,8 +28,8 @@ export async function sendContactMessage(
     return { ok: true, skipped: true, reason: "RESEND_API_KEY not set" };
   }
 
-  const globals = await getGlobals();
-  const adminEmail = globals.content.adminEmail;
+  const globals = getGlobals();
+  const adminEmail = globals.adminEmail;
   if (!adminEmail) {
     return { ok: false, error: "Admin email not configured" };
   }
@@ -40,7 +40,7 @@ export async function sendContactMessage(
     from: getFromAddress(),
     to: adminEmail,
     replyTo: input.email,
-    subject: `[EduConnect contact] ${input.subject}`,
+    subject: `[masani contact] ${input.subject}`,
     html,
     text,
   });
@@ -73,7 +73,7 @@ function renderContactEmail(input: ContactMessageInput): {
     <html>
       <body style="margin:0;padding:24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#04131C;background:#FBF9F4;">
         <div style="max-width:560px;margin:0 auto;background:#fff;border:1px solid #e8e3d6;border-radius:18px;padding:32px;">
-          <p style="margin:0 0 4px;font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#6b7680;">EduConnect contact form</p>
+          <p style="margin:0 0 4px;font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#6b7680;">masani contact form</p>
           <h1 style="margin:0 0 20px;font-size:22px;line-height:1.2;color:#04131C;">${safeSubject}</h1>
           <table style="border-collapse:collapse;font-size:14px;color:#3a4750;">
             <tr><td style="padding:4px 12px 4px 0;color:#6b7680;">From</td><td style="padding:4px 0;">${safeName}</td></tr>
@@ -90,7 +90,7 @@ function renderContactEmail(input: ContactMessageInput): {
   `.trim();
 
   const text = [
-    "EduConnect contact form",
+    "masani contact form",
     "",
     `Subject: ${input.subject}`,
     `From:    ${input.name} <${input.email}>`,

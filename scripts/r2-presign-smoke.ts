@@ -40,8 +40,8 @@ const res = await fetch(url, {
   body,
   headers: {
     "Content-Type": "video/mp4",
-    Origin: "https://www.joineduconnect.com",
-    Referer: "https://www.joineduconnect.com/",
+    Origin: "https://www.joinmasani.com",
+    Referer: "https://www.joinmasani.com/",
     "User-Agent":
       "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Mobile Safari/537.36",
     "sec-ch-ua":

@@ -6,16 +6,14 @@ import { getGlobals } from "@/lib/marketing/content";
 import { PickSessionButton } from "@/components/booking/PickSessionButton";
 
 export const metadata: Metadata = {
-  title: "One more step — EduConnect",
+  title: "One more step — masani",
   description:
     "Pick a session time on the calendar to confirm your free trial booking.",
 };
 
-export const dynamic = "force-dynamic";
-
-export default async function BookThanksPage() {
-  const globals = await getGlobals();
-  const calendarUrl = globals.content.bookingUrl;
+export default function BookThanksPage() {
+  const globals = getGlobals();
+  const calendarUrl = globals.bookingUrl;
 
   return (
     <div className="mkt-root">

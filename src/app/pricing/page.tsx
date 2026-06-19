@@ -7,15 +7,13 @@ import { MarketingScrollReveal } from "@/components/marketing/MarketingScrollRev
 import { getPricingContent } from "@/lib/marketing/content";
 
 export const metadata: Metadata = {
-  title: "Pricing — EduConnect",
+  title: "Pricing — masani",
   description:
-    "Flexible, transparent pricing for EduConnect tutoring. Choose the package that works for your family — 8, 24, or 48 sessions with no hidden fees.",
+    "Flexible, transparent pricing for masani tutoring. Choose the package that works for your family — 8, 24, or 48 sessions with no hidden fees.",
 };
 
-export const dynamic = "force-dynamic";
-
-export default async function PricingPage() {
-  const pricing = await getPricingContent();
+export default function PricingPage() {
+  const pricing = getPricingContent();
 
   return (
     <div className="mkt-root">
@@ -25,11 +23,8 @@ export default async function PricingPage() {
       </a>
       <Nav mode="marketing" activeHref="/pricing" />
       <main id="main-content">
-        <PricingTable
-          intro={pricing.intro.content}
-          tiers={pricing.tiers.content}
-        />
-        <PricingFAQ content={pricing.faq.content} />
+        <PricingTable intro={pricing.intro} tiers={pricing.tiers} />
+        <PricingFAQ content={pricing.faq} />
       </main>
       <Footer mode="marketing" />
     </div>

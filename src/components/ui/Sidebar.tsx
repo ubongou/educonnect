@@ -29,7 +29,6 @@ const adminLinks: SidebarLink[] = [
   { href: "/admin/teachers", label: "Teachers", icon: <IconGrad /> },
   { href: "/admin/enrollments", label: "Enrollments", icon: <IconClipboard /> },
   { href: "/admin/schedule", label: "Schedule", icon: <IconClock /> },
-  { href: "/admin/content", label: "Content", icon: <IconPencil /> },
 ];
 
 function linksForRole(role: Role): SidebarLink[] {
@@ -209,15 +208,6 @@ function IconClipboard() {
       <rect x="8" y="2" width="8" height="4" rx="1" />
       <line x1="8" y1="12" x2="16" y2="12" />
       <line x1="8" y1="16" x2="12" y2="16" />
-    </svg>
-  );
-}
-
-function IconPencil() {
-  return (
-    <svg {...s}>
-      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
     </svg>
   );
 }

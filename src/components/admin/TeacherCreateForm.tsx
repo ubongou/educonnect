@@ -90,7 +90,7 @@ export function TeacherCreateForm() {
           name="email"
           required
           autoComplete="off"
-          placeholder="teacher@educonnect.com"
+          placeholder="teacher@joinmasani.com"
           defaultValue={values?.email ?? ""}
           className={inputBase}
         />
