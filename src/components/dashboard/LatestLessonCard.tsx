@@ -23,10 +23,13 @@ export function LatestLessonCard({
   lesson,
   nextSessionLabel,
   childId,
+  reportHref,
 }: {
   lesson: LatestLesson | null;
   nextSessionLabel?: string | null;
   childId?: string;
+  /** Overrides the default "See more" target (used by the admin view). */
+  reportHref?: string;
 }) {
   if (!lesson) {
     return (
@@ -107,7 +110,12 @@ export function LatestLessonCard({
 
       <div className="mt-6 flex justify-end">
         <Link
-          href={childId ? `/dashboard/sessions?child=${childId}&report=${lesson.id}` : `/dashboard/reports/${lesson.id}`}
+          href={
+            reportHref ??
+            (childId
+              ? `/dashboard/sessions?child=${childId}&report=${lesson.id}`
+              : `/dashboard/reports/${lesson.id}`)
+          }
           className="inline-flex items-center gap-1 rounded-pill border border-yellow bg-yellow px-4 py-1.5 font-heading text-[12px] font-semibold text-navy transition-colors hover:bg-yellow/90"
         >
           See more

@@ -2,14 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { createClient } from "@/lib/supabase/server";
-import {
-  formatRegistrationNumber,
-  formatDate,
-  formatSkillRating,
-} from "@/lib/format";
+import { formatRegistrationNumber, formatDate } from "@/lib/format";
 import type { IntakeJson } from "@/types/domain";
 import { IntakeSummary } from "@/components/dashboard/IntakeSummary";
 import { TeacherAssign, type TeacherOption } from "@/components/admin/TeacherAssign";
+import {
+  ChildDashboardBody,
+  isSubjectSlug,
+} from "@/components/dashboard/ChildDashboardBody";
 
 type EnrollmentRow = {
   id: string;
@@ -57,10 +57,14 @@ function StatusPill({ status }: { status: string }) {
 
 export default async function AdminStudentDetail({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ subject?: string }>;
 }) {
   const { id } = await params;
+  const { subject: subjectRaw } = await searchParams;
+  const selectedSubject = isSubjectSlug(subjectRaw) ? subjectRaw : "mathematics";
   const supabase = await createClient();
 
   const [{ data: student }, { data: teacherList }] = await Promise.all([
@@ -215,6 +219,23 @@ export default async function AdminStudentDetail({
 
       <section className="mt-10">
         <h2 className="mb-4 font-heading text-[11px] font-bold uppercase tracking-[0.12em] text-g400">
+          Parent dashboard view
+        </h2>
+        <p className="mb-4 text-[13px] text-g600">
+          Exactly what {displayName}&apos;s parent sees on their dashboard.
+        </p>
+        <ChildDashboardBody
+          studentId={student.id}
+          childDisplayName={displayName}
+          childRegistrationNumber={student.registration_number}
+          selectedSubject={selectedSubject}
+          subjectHref={(slug) => `/admin/students/${student.id}?subject=${slug}`}
+          variant="admin"
+        />
+      </section>
+
+      <section className="mt-10">
+        <h2 className="mb-4 font-heading text-[11px] font-bold uppercase tracking-[0.12em] text-g400">
           Lesson reports
         </h2>
         {reports.length === 0 ? (
@@ -241,10 +262,10 @@ export default async function AdminStudentDetail({
                     </td>
                     <td className="px-5 py-3 text-navy">{r.subjects?.name ?? "—"}</td>
                     <td className="px-5 py-3 tabular-nums text-navy">
-                      {formatSkillRating(r.understanding_check)}
+                      {r.understanding_check}/10
                     </td>
                     <td className="px-5 py-3 tabular-nums text-navy">
-                      {formatSkillRating(r.confidence_level)}
+                      {r.confidence_level}/10
                     </td>
                     <td className="px-5 py-3 text-right">
                       <Link
