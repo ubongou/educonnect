@@ -15,6 +15,7 @@ export type LessonReportEmailData = {
   homework: number; // 0..10
   nextFocus: string | null;
   howToHelpAtHome: string | null;
+  recordingUrl: string | null;
   reportUrl: string;
 };
 
@@ -159,11 +160,18 @@ export function renderLessonReportEmail(data: LessonReportEmailData): {
                   ${behaviourRow("Homework completion", data.homework)}
                 </table>
 
-                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:28px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:28px;">
                   <tr>
                     <td align="left">
                       <a href="${escapeHtml(data.reportUrl)}" style="display:inline-block;background:${BRAND_BLUE};color:${BRAND_NAVY};font:800 13px Arial,sans-serif;text-decoration:none;padding:12px 22px;border-radius:99px;border:2px solid ${BRAND_NAVY};">View the full report</a>
                     </td>
+                    ${
+                      data.recordingUrl
+                        ? `<td align="left" style="padding-left:10px;">
+                      <a href="${escapeHtml(data.recordingUrl)}" style="display:inline-block;background:#ffffff;color:${BRAND_NAVY};font:800 13px Arial,sans-serif;text-decoration:none;padding:12px 22px;border-radius:99px;border:2px solid ${BRAND_NAVY};">▶ Watch recording</a>
+                    </td>`
+                        : ""
+                    }
                   </tr>
                 </table>
               </td>
@@ -202,6 +210,7 @@ export function renderLessonReportEmail(data: LessonReportEmailData): {
     `Homework:      ${data.homework}/10`,
     "",
     `View the full report: ${data.reportUrl}`,
+    data.recordingUrl ? `Watch the class recording: ${data.recordingUrl}` : "",
     "",
     "— Masani",
   ]

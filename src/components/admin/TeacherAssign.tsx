@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { assignEnrollmentTeacher } from "@/lib/actions/enrollments";
@@ -67,9 +68,9 @@ export function TeacherAssign({
       {teachers.length === 0 && (
         <p className="text-[12px] text-g400">
           No teachers exist yet. Create one in{" "}
-          <a href="/admin/teachers/new" className="underline-offset-4 hover:underline">
+          <Link href="/admin/teachers/new" className="underline-offset-4 hover:underline">
             Teachers
-          </a>
+          </Link>
           .
         </p>
       )}

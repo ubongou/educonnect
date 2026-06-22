@@ -16,6 +16,7 @@ export type LessonReportViewData = {
   homework: number;
   next_focus: string | null;
   how_to_help_at_home: string | null;
+  recording_url: string | null;
   subject_name: string;
   teacher_name: string | null;
   skill_ratings: Array<{ name: string; rating: number }>;
@@ -42,6 +43,17 @@ export function LessonReportView({ report }: { report: LessonReportViewData }) {
         <h2 className="mt-2 font-heading text-[22px] font-semibold">
           {report.lesson_focus}
         </h2>
+        {report.recording_url && (
+          <a
+            href={report.recording_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-flex items-center gap-2 rounded-pill border-2 border-navy bg-blue px-5 py-[9px] font-heading text-[13px] font-bold text-navy transition-colors hover:bg-yellow"
+          >
+            <span aria-hidden="true">▶</span>
+            Watch class recording
+          </a>
+        )}
       </div>
 
       {/* Lesson highlights — surfaced above metrics per client feedback */}

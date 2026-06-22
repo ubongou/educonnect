@@ -19,6 +19,7 @@ type EditLoadReport = {
   homework: number;
   next_focus: string | null;
   how_to_help_at_home: string | null;
+  recording_url: string | null;
   students: {
     id: string;
     full_name: string;
@@ -53,7 +54,7 @@ export default async function AdminReportEditPage({
       id, subject_id, lesson_date, duration_minutes, lesson_focus,
       understanding_check, confidence_level, lesson_highlights,
       participation, focus_rating, homework,
-      next_focus, how_to_help_at_home,
+      next_focus, how_to_help_at_home, recording_url,
       students ( id, full_name, preferred_name ),
       subjects ( name ),
       skill_ratings:lesson_report_skill_ratings (
@@ -125,6 +126,7 @@ export default async function AdminReportEditPage({
           lesson_highlights: report.lesson_highlights,
           next_focus: report.next_focus,
           how_to_help_at_home: report.how_to_help_at_home,
+          recording_url: report.recording_url,
           understanding_check: report.understanding_check,
           confidence_level: report.confidence_level,
           participation: report.participation,

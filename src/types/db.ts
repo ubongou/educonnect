@@ -255,6 +255,7 @@ export type Database = {
           lesson_highlights: string | null
           next_focus: string | null
           participation: number
+          recording_url: string | null
           session_id: string | null
           student_id: string
           subject_id: string
@@ -278,6 +279,7 @@ export type Database = {
           lesson_highlights?: string | null
           next_focus?: string | null
           participation: number
+          recording_url?: string | null
           session_id?: string | null
           student_id: string
           subject_id: string
@@ -301,6 +303,7 @@ export type Database = {
           lesson_highlights?: string | null
           next_focus?: string | null
           participation?: number
+          recording_url?: string | null
           session_id?: string | null
           student_id?: string
           subject_id?: string
@@ -739,6 +742,7 @@ export type Database = {
           p_lesson_highlights: string
           p_next_focus: string
           p_participation: number
+          p_recording_url?: string
           p_session_id?: string
           p_skill_ratings: Json
           p_student_id: string

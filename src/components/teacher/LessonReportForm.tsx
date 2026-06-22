@@ -46,6 +46,7 @@ export function LessonReportForm({ session, skills }: Props) {
   const [nextFocus, setNextFocus] = useState("");
   const [highlights, setHighlights] = useState("");
   const [helpAtHome, setHelpAtHome] = useState("");
+  const [recordingUrl, setRecordingUrl] = useState("");
 
   const [understanding, setUnderstanding] = useState(5);
   const [confidence, setConfidence] = useState(5);
@@ -85,6 +86,7 @@ export function LessonReportForm({ session, skills }: Props) {
       homework,
       next_focus: nextFocus || undefined,
       how_to_help_at_home: helpAtHome || undefined,
+      recording_url: recordingUrl.trim() || undefined,
       skill_ratings: skills.map((s) => ({
         skill_id: s.id,
         rating: skillRatings[s.id] ?? 0,
@@ -195,6 +197,21 @@ export function LessonReportForm({ session, skills }: Props) {
               className={inputBase}
             />
           </FormField>
+          <div className="md:col-span-2">
+            <FormField
+              label="Class recording link"
+              hint="Optional — paste a shareable https link (Zoom, Meet, Loom, unlisted YouTube). Make sure anyone with the link can view it."
+            >
+              <input
+                type="url"
+                inputMode="url"
+                value={recordingUrl}
+                onChange={(e) => setRecordingUrl(e.target.value)}
+                placeholder="https://…"
+                className={inputBase}
+              />
+            </FormField>
+          </div>
         </div>
       </section>
 

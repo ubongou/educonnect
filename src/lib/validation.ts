@@ -298,6 +298,18 @@ export type StudentDocumentUploadInput = z.infer<
 const rating1to10 = z.number().int().min(1).max(10);
 const rating0to10 = z.number().int().min(0).max(10);
 
+// External class-recording link (Zoom / Meet / Loom / unlisted YouTube …).
+// Optional, and an empty string is treated as "no link" so the form can send
+// a blank field without tripping URL validation.
+const recordingUrl = z
+  .string()
+  .trim()
+  .url("Enter a valid link")
+  .startsWith("https://", "Link must start with https://")
+  .max(2048, "Link is too long")
+  .optional()
+  .or(z.literal(""));
+
 export const lessonReportSchema = z.object({
   student_id: z.string().uuid(),
   subject_id: z.string().uuid(),
@@ -312,6 +324,7 @@ export const lessonReportSchema = z.object({
   homework: rating0to10,
   next_focus: z.string().optional(),
   how_to_help_at_home: z.string().optional(),
+  recording_url: recordingUrl,
   skill_ratings: z
     .array(
       z.object({
@@ -373,6 +386,7 @@ export const lessonReportEditSchema = z.object({
   homework: rating0to10,
   next_focus: z.string().optional(),
   how_to_help_at_home: z.string().optional(),
+  recording_url: recordingUrl,
   skill_ratings: z
     .array(
       z.object({

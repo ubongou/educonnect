@@ -25,6 +25,7 @@ type Props = {
     lesson_highlights: string | null;
     next_focus: string | null;
     how_to_help_at_home: string | null;
+    recording_url: string | null;
     understanding_check: number;
     confidence_level: number;
     participation: number;
@@ -49,6 +50,7 @@ export function AdminReportEditForm({
   const [highlights, setHighlights] = useState(initial.lesson_highlights ?? "");
   const [nextFocus, setNextFocus] = useState(initial.next_focus ?? "");
   const [helpAtHome, setHelpAtHome] = useState(initial.how_to_help_at_home ?? "");
+  const [recordingUrl, setRecordingUrl] = useState(initial.recording_url ?? "");
 
   const [understanding, setUnderstanding] = useState(initial.understanding_check);
   const [confidence, setConfidence] = useState(initial.confidence_level);
@@ -85,6 +87,7 @@ export function AdminReportEditForm({
       homework,
       next_focus: nextFocus || undefined,
       how_to_help_at_home: helpAtHome || undefined,
+      recording_url: recordingUrl.trim() || undefined,
       skill_ratings: skills.map((s) => ({
         skill_id: s.id,
         rating: skillRatings[s.id] ?? 0,
@@ -180,6 +183,21 @@ export function AdminReportEditForm({
               className={inputBase}
             />
           </FormField>
+          <div className="md:col-span-2">
+            <FormField
+              label="Class recording link"
+              hint="Optional — a shareable https link (Zoom, Meet, Loom, unlisted YouTube). Clear the field to remove it."
+            >
+              <input
+                type="url"
+                inputMode="url"
+                value={recordingUrl}
+                onChange={(e) => setRecordingUrl(e.target.value)}
+                placeholder="https://…"
+                className={inputBase}
+              />
+            </FormField>
+          </div>
         </div>
       </section>
 

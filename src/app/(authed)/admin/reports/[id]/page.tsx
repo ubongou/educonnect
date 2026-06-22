@@ -24,6 +24,7 @@ type FullReport = {
   homework: number;
   next_focus: string | null;
   how_to_help_at_home: string | null;
+  recording_url: string | null;
   emailed_at: string | null;
   students: {
     id: string;
@@ -57,7 +58,7 @@ export default async function AdminReportDetailPage({
       id, lesson_date, duration_minutes, lesson_focus,
       understanding_check, confidence_level, lesson_highlights,
       participation, focus_rating, homework,
-      next_focus, how_to_help_at_home, emailed_at,
+      next_focus, how_to_help_at_home, recording_url, emailed_at,
       students ( id, full_name, preferred_name ),
       subjects ( name ),
       uploader:profiles!lesson_reports_uploaded_by_fkey ( full_name ),
@@ -86,6 +87,7 @@ export default async function AdminReportDetailPage({
     homework: report.homework,
     next_focus: report.next_focus,
     how_to_help_at_home: report.how_to_help_at_home,
+    recording_url: report.recording_url,
     subject_name: report.subjects?.name ?? "Subject",
     teacher_name: report.uploader?.full_name ?? null,
     skill_ratings: (report.skill_ratings ?? [])

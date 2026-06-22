@@ -29,7 +29,7 @@ export async function sendLessonReportEmail(
       id, lesson_date, lesson_focus, lesson_highlights,
       understanding_check, confidence_level,
       participation, focus_rating, homework,
-      next_focus, how_to_help_at_home,
+      next_focus, how_to_help_at_home, recording_url,
       student_id,
       students ( full_name, preferred_name ),
       subjects ( name ),
@@ -117,6 +117,7 @@ export async function sendLessonReportEmail(
       homework: report.homework,
       nextFocus: report.next_focus,
       howToHelpAtHome: report.how_to_help_at_home,
+      recordingUrl: report.recording_url,
       reportUrl,
     };
 

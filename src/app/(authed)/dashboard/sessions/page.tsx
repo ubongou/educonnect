@@ -32,6 +32,7 @@ type FullReport = {
   homework: number;
   next_focus: string | null;
   how_to_help_at_home: string | null;
+  recording_url: string | null;
   subjects: { name: string } | null;
   uploader: { full_name: string | null } | null;
   skill_ratings: Array<{
@@ -82,7 +83,7 @@ export default async function DashboardSessionsPage({
           id, lesson_date, duration_minutes, lesson_focus,
           understanding_check, confidence_level, lesson_highlights,
           participation, focus_rating, homework,
-          next_focus, how_to_help_at_home,
+          next_focus, how_to_help_at_home, recording_url,
           subjects ( name ),
           uploader:profiles!lesson_reports_uploaded_by_fkey ( full_name ),
           skill_ratings:lesson_report_skill_ratings (
@@ -118,6 +119,7 @@ export default async function DashboardSessionsPage({
         homework: full.homework,
         next_focus: full.next_focus,
         how_to_help_at_home: full.how_to_help_at_home,
+        recording_url: full.recording_url,
         subject_name: full.subjects?.name ?? "Subject",
         teacher_name: full.uploader?.full_name ?? null,
         skill_ratings: (full.skill_ratings ?? [])

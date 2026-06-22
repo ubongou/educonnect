@@ -58,6 +58,7 @@ export async function submitLessonReport(input: unknown): Promise<SubmitReportRe
     p_how_to_help_at_home: parsed.data.how_to_help_at_home ?? "",
     p_skill_ratings: parsed.data.skill_ratings,
     p_session_id: sessionId,
+    p_recording_url: parsed.data.recording_url || "",
   });
 
   if (error) {
@@ -139,6 +140,7 @@ export async function updateLessonReport(
     p_next_focus: parsed.data.next_focus ?? "",
     p_how_to_help_at_home: parsed.data.how_to_help_at_home ?? "",
     p_skill_ratings: parsed.data.skill_ratings,
+    p_recording_url: parsed.data.recording_url || "",
   });
 
   if (error) return { ok: false, error: error.message };
