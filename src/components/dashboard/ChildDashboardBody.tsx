@@ -40,7 +40,7 @@ type ReportRow = {
 };
 
 type UpcomingSession = {
-  scheduled_at: string;
+  session_date: string;
   subjects: { name: string } | null;
 };
 
@@ -110,16 +110,17 @@ export async function ChildDashboardBody({
         `,
       )
       .eq("student_id", studentId)
+      .is("deleted_at", null)
       .order("lesson_date", { ascending: true })
       .order("created_at", { ascending: true })
       .limit(60),
     supabase
       .from("sessions")
-      .select("scheduled_at, subjects ( name )")
+      .select("session_date, subjects ( name )")
       .eq("student_id", studentId)
       .eq("status", "scheduled")
-      .gte("scheduled_at", new Date().toISOString())
-      .order("scheduled_at", { ascending: true })
+      .gte("session_date", new Date().toISOString().slice(0, 10))
+      .order("session_date", { ascending: true })
       .limit(1),
   ]);
 
@@ -276,12 +277,11 @@ export async function ChildDashboardBody({
           }
           nextSessionLabel={
             next
-              ? `${new Date(next.scheduled_at).toLocaleString("en-GB", {
+              ? `${new Date(next.session_date).toLocaleDateString("en-GB", {
                   weekday: "short",
                   day: "2-digit",
                   month: "short",
-                  hour: "2-digit",
-                  minute: "2-digit",
+                  year: "numeric",
                 })}${next.subjects?.name ? ` · ${next.subjects.name}` : ""}`
               : null
           }

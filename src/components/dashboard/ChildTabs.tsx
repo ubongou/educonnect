@@ -15,21 +15,21 @@ export type ChildTabOption = {
  */
 export function ChildTabs({
   basePath,
-  children,
+  tabs,
   activeId,
 }: {
   basePath: string;
-  children: ChildTabOption[];
+  tabs: ChildTabOption[];
   activeId: string | null;
 }) {
-  if (children.length <= 1) return null;
+  if (tabs.length <= 1) return null;
 
   return (
     <nav
       aria-label="Select child"
       className="mb-8 flex flex-wrap items-center gap-2"
     >
-      {children.map((c) => {
+      {tabs.map((c) => {
         const active = c.id === activeId;
         const href = `${basePath}?child=${c.id}`;
         return (

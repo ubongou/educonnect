@@ -36,7 +36,6 @@ const teacherLinks: NavLink[] = [
   { href: "/teacher", label: "Overview" },
   { href: "/teacher/sessions", label: "Sessions" },
   { href: "/teacher/students", label: "Students" },
-  { href: "/teacher/schedule", label: "Schedule" },
 ];
 
 type Role = "parent" | "admin" | "teacher";

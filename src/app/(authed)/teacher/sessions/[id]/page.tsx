@@ -11,7 +11,7 @@ import {
 
 type RawSession = {
   id: string;
-  scheduled_at: string;
+  session_date: string;
   duration_minutes: number;
   status: string;
   student_id: string;
@@ -39,7 +39,7 @@ export default async function TeacherSessionComposerPage({
     .from("sessions")
     .select(
       `
-      id, scheduled_at, duration_minutes, status,
+      id, session_date, duration_minutes, status,
       student_id, subject_id, lesson_report_id,
       students ( full_name, preferred_name ),
       subjects ( name )
@@ -71,7 +71,7 @@ export default async function TeacherSessionComposerPage({
 
   const composable: ComposableSession = {
     id: session.id,
-    scheduled_at: session.scheduled_at,
+    session_date: session.session_date,
     duration_minutes: session.duration_minutes,
     student_id: session.student_id,
     subject_id: session.subject_id,

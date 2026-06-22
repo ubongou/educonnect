@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import { BatteryBars } from "@/components/ui/BatteryBars";
@@ -10,7 +10,7 @@ import { submitLessonReport } from "@/lib/actions/reports";
 
 export type ComposableSession = {
   id: string;
-  scheduled_at: string;
+  session_date: string;
   duration_minutes: number;
   student_id: string;
   subject_id: string;
@@ -37,15 +37,10 @@ function todayIso(): string {
 
 export function LessonReportForm({ session, skills }: Props) {
   const router = useRouter();
-  const defaultDate = useMemo(() => {
-    // Default lesson_date to the session's scheduled calendar day, not today,
-    // in case the teacher writes up the report the next morning.
-    const d = new Date(session.scheduled_at);
-    const pad = (n: number) => String(n).padStart(2, "0");
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-  }, [session.scheduled_at]);
-
-  const [lessonDate, setLessonDate] = useState(defaultDate || todayIso());
+  // Default lesson_date to the session's scheduled calendar day, not today,
+  // in case the teacher writes up the report the next morning. session_date is
+  // already a YYYY-MM-DD string, so it's used directly.
+  const [lessonDate, setLessonDate] = useState(session.session_date || todayIso());
   const [duration, setDuration] = useState(session.duration_minutes);
   const [lessonFocus, setLessonFocus] = useState("");
   const [nextFocus, setNextFocus] = useState("");
@@ -116,12 +111,11 @@ export function LessonReportForm({ session, skills }: Props) {
             {session.student_name}
           </span>
           <span className="text-[12px] text-white/60">
-            {new Date(session.scheduled_at).toLocaleString("en-GB", {
+            {new Date(session.session_date).toLocaleDateString("en-GB", {
               weekday: "short",
               day: "2-digit",
               month: "short",
-              hour: "2-digit",
-              minute: "2-digit",
+              year: "numeric",
             })}
           </span>
         </div>

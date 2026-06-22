@@ -90,7 +90,7 @@ export default async function DashboardOverview({
 
       <ChildTabs
         basePath="/dashboard"
-        children={childOptions}
+        tabs={childOptions}
         activeId={selected.id}
       />
 

@@ -11,11 +11,11 @@ export type SchedulableEnrollment = {
   teacher_name: string;
 };
 
-function toLocalInput(d: Date): string {
-  // Produce a "YYYY-MM-DDTHH:MM" string in the viewer's local time suitable
-  // for <input type="datetime-local">.
+function toDateInput(d: Date): string {
+  // Produce a "YYYY-MM-DD" string in the viewer's local time for <input
+  // type="date">. Sessions are scheduled by calendar day only — no time.
   const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
 export function SessionScheduler({
@@ -25,10 +25,9 @@ export function SessionScheduler({
 }) {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(16, 0, 0, 0);
 
   const [enrollmentId, setEnrollmentId] = useState(enrollments[0]?.id ?? "");
-  const [when, setWhen] = useState(toLocalInput(tomorrow));
+  const [when, setWhen] = useState(toDateInput(tomorrow));
   const [duration, setDuration] = useState("60");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -44,12 +43,10 @@ export function SessionScheduler({
       return;
     }
 
-    const iso = new Date(when).toISOString();
-
     startTransition(async () => {
       const res = await createSession({
         enrollment_id: enrollmentId,
-        scheduled_at: iso,
+        session_date: when,
         duration_minutes: Number(duration),
       });
       if (res.ok) {
@@ -99,10 +96,10 @@ export function SessionScheduler({
       <div className="grid gap-4 md:grid-cols-[1fr_160px]">
         <label className="flex flex-col gap-[7px]">
           <span className="font-heading text-[13px] font-semibold text-navy">
-            Date &amp; time
+            Date
           </span>
           <input
-            type="datetime-local"
+            type="date"
             value={when}
             onChange={(e) => setWhen(e.target.value)}
             required

@@ -6,6 +6,9 @@ import { formatRegistrationNumber, formatDate } from "@/lib/format";
 import type { IntakeJson } from "@/types/domain";
 import { IntakeSummary } from "@/components/dashboard/IntakeSummary";
 import { TeacherAssign, type TeacherOption } from "@/components/admin/TeacherAssign";
+import { StudentManageBar } from "@/components/admin/StudentManageBar";
+import { EnrollmentDeleteButton } from "@/components/admin/EnrollmentDeleteButton";
+import type { StudentFieldValues } from "@/components/admin/StudentFormFields";
 import {
   ChildDashboardBody,
   isSubjectSlug,
@@ -74,6 +77,7 @@ export default async function AdminStudentDetail({
         `
         id, registration_number, full_name, preferred_name, age, gender,
         current_school, curriculum, curriculum_other, intake, intake_submitted_at,
+        archived_at,
         parent_students ( profiles ( id, full_name, email, phone ) ),
         enrollments (
           id, status, decided_at, created_at, teacher_id,
@@ -81,10 +85,14 @@ export default async function AdminStudentDetail({
           teacher:profiles!enrollments_teacher_id_fkey(id, full_name)
         ),
         lesson_reports (id, lesson_date, understanding_check, confidence_level, subjects(name, slug)),
+        sessions (id),
         intake_files (id, kind, original_filename, size_bytes, uploaded_at)
         `,
       )
       .eq("id", id)
+      // Hide soft-deleted reports from the embedded list (filter on the
+      // embedded resource keeps the student row but drops deleted reports).
+      .is("lesson_reports.deleted_at", null)
       .maybeSingle(),
     supabase
       .from("profiles")
@@ -111,6 +119,27 @@ export default async function AdminStudentDetail({
   );
   const intake = (student.intake ?? null) as IntakeJson | null;
 
+  const archived = student.archived_at != null;
+  const sessionCount = ((student.sessions ?? []) as { id: string }[]).length;
+  const intakeFileCount = ((student.intake_files ?? []) as { id: string }[]).length;
+  const deleteCascade = [
+    `${enrollments.length} enrollment${enrollments.length === 1 ? "" : "s"}`,
+    `${sessionCount} session${sessionCount === 1 ? "" : "s"}`,
+    `${reports.length} lesson report${reports.length === 1 ? "" : "s"}`,
+    `${intakeFileCount} intake file${intakeFileCount === 1 ? "" : "s"}`,
+    `${parents.length} parent link${parents.length === 1 ? "" : "s"}`,
+    "any uploaded documents",
+  ];
+  const editInitial: StudentFieldValues = {
+    full_name: student.full_name ?? "",
+    preferred_name: student.preferred_name ?? "",
+    age: typeof student.age === "number" ? String(student.age) : "",
+    gender: student.gender ?? "",
+    current_school: student.current_school ?? "",
+    curriculum: student.curriculum ?? "",
+    curriculum_other: student.curriculum_other ?? "",
+  };
+
   return (
     <Container>
       <div className="mb-4 text-[13px] text-g600">
@@ -125,9 +154,16 @@ export default async function AdminStudentDetail({
 
       <div className="flex flex-wrap items-end justify-between gap-6 border-b border-line pb-8">
         <div>
-          <span className="inline-flex items-center gap-2 rounded-pill border border-navy bg-yellow px-3 py-1 font-heading text-[11px] font-semibold uppercase tracking-[0.1em] text-navy">
-            {formatRegistrationNumber(student.registration_number)}
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-2 rounded-pill border border-navy bg-yellow px-3 py-1 font-heading text-[11px] font-semibold uppercase tracking-[0.1em] text-navy">
+              {formatRegistrationNumber(student.registration_number)}
+            </span>
+            {archived && (
+              <span className="inline-flex items-center rounded-pill border border-g400/40 bg-g100 px-3 py-1 font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g600">
+                Archived
+              </span>
+            )}
+          </div>
           <h1 className="mt-3 font-heading text-[clamp(28px,3.4vw,40px)] font-semibold leading-tight text-navy">
             {displayName}
           </h1>
@@ -137,6 +173,13 @@ export default async function AdminStudentDetail({
             {typeof student.age === "number" && ` · age ${student.age}`}
           </p>
         </div>
+        <StudentManageBar
+          studentId={student.id}
+          registrationNumber={student.registration_number}
+          archived={archived}
+          initial={editInitial}
+          cascade={deleteCascade}
+        />
       </div>
 
       <section className="mt-10">
@@ -210,6 +253,10 @@ export default async function AdminStudentDetail({
                     />
                   )}
                   <StatusPill status={e.status} />
+                  <EnrollmentDeleteButton
+                    enrollmentId={e.id}
+                    subjectName={e.subjects?.name ?? "this"}
+                  />
                 </div>
               </li>
             ))}

@@ -12,7 +12,9 @@ type StatCard = {
 export default async function AdminOverview() {
   const supabase = await createClient();
 
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const sevenDaysAgoDate = new Date();
+  sevenDaysAgoDate.setDate(sevenDaysAgoDate.getDate() - 7);
+  const sevenDaysAgo = sevenDaysAgoDate.toISOString();
 
   const [students, pendingEnrollments, recentReports] = await Promise.all([
     supabase.from("students").select("*", { count: "exact", head: true }),
@@ -23,6 +25,7 @@ export default async function AdminOverview() {
     supabase
       .from("lesson_reports")
       .select("*", { count: "exact", head: true })
+      .is("deleted_at", null)
       .gte("created_at", sevenDaysAgo),
   ]);
 

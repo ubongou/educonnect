@@ -45,7 +45,7 @@ export default async function AdminTeachersPage() {
           .select("teacher_id")
           .in("teacher_id", teacherIds)
           .eq("status", "scheduled")
-          .gte("scheduled_at", new Date().toISOString())
+          .gte("session_date", new Date().toISOString().slice(0, 10))
       : { data: [] },
   ]);
 

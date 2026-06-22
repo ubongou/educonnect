@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { sendLessonReportEmail } from "@/lib/email/sendLessonReport";
 import { lessonReportSchema, lessonReportEditSchema } from "@/lib/validation";
@@ -149,5 +150,34 @@ export async function updateLessonReport(
   revalidatePath("/teacher");
   revalidatePath(`/teacher/reports/${reportId}`);
 
+  return { ok: true };
+}
+
+/**
+ * Admin-only: soft-delete or restore a lesson report. A soft-deleted report
+ * disappears from every parent/teacher/admin read surface and the charts, but
+ * the row (and the session that links to it) stays put, so restore brings it
+ * back exactly as it was. Writes go through lesson_reports_admin_write.
+ */
+export async function setReportDeleted(
+  reportId: string,
+  deleted: boolean,
+): Promise<UpdateReportResult> {
+  await requireAdmin();
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("lesson_reports")
+    .update({ deleted_at: deleted ? new Date().toISOString() : null })
+    .eq("id", reportId);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/reports");
+  revalidatePath(`/admin/reports/${reportId}`);
+  revalidatePath("/admin");
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/sessions");
+  revalidatePath("/teacher");
   return { ok: true };
 }

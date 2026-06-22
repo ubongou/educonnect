@@ -14,6 +14,7 @@ export type StudentRow = {
   current_school: string | null;
   curriculum: string | null;
   intake_submitted_at: string | null;
+  archived_at: string | null;
 };
 
 function matches(s: StudentRow, q: string): boolean {
@@ -92,6 +93,11 @@ export function StudentsTable({ rows }: { rows: StudentRow[] }) {
                     >
                       {s.full_name}
                     </Link>
+                    {s.archived_at && (
+                      <span className="ml-2 inline-flex items-center rounded-pill border border-g400/40 bg-g100 px-2 py-[1px] font-heading text-[10px] font-bold uppercase tracking-[0.1em] text-g600">
+                        Archived
+                      </span>
+                    )}
                   </td>
                   <td className="px-5 py-3 text-g600">{s.preferred_name ?? "—"}</td>
                   <td className="px-5 py-3 text-g600">{s.current_school ?? "—"}</td>

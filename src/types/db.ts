@@ -241,6 +241,7 @@ export type Database = {
         Row: {
           confidence_level: number
           created_at: string
+          deleted_at: string | null
           duration_minutes: number
           edited_at: string | null
           edited_by: string | null
@@ -263,6 +264,7 @@ export type Database = {
         Insert: {
           confidence_level: number
           created_at?: string
+          deleted_at?: string | null
           duration_minutes: number
           edited_at?: string | null
           edited_by?: string | null
@@ -285,6 +287,7 @@ export type Database = {
         Update: {
           confidence_level?: number
           created_at?: string
+          deleted_at?: string | null
           duration_minutes?: number
           edited_at?: string | null
           edited_by?: string | null
@@ -415,7 +418,8 @@ export type Database = {
           enrollment_id: string
           id: string
           lesson_report_id: string | null
-          scheduled_at: string
+          scheduled_at: string | null
+          session_date: string
           status: string
           student_id: string
           subject_id: string
@@ -427,7 +431,8 @@ export type Database = {
           enrollment_id: string
           id?: string
           lesson_report_id?: string | null
-          scheduled_at: string
+          scheduled_at?: string | null
+          session_date: string
           status?: string
           student_id: string
           subject_id: string
@@ -439,7 +444,8 @@ export type Database = {
           enrollment_id?: string
           id?: string
           lesson_report_id?: string | null
-          scheduled_at?: string
+          scheduled_at?: string | null
+          session_date?: string
           status?: string
           student_id?: string
           subject_id?: string
@@ -551,6 +557,7 @@ export type Database = {
         Row: {
           added_by: string | null
           age: number | null
+          archived_at: string | null
           created_at: string
           current_school: string | null
           curriculum: string | null
@@ -566,6 +573,7 @@ export type Database = {
         Insert: {
           added_by?: string | null
           age?: number | null
+          archived_at?: string | null
           created_at?: string
           current_school?: string | null
           curriculum?: string | null
@@ -581,6 +589,7 @@ export type Database = {
         Update: {
           added_by?: string | null
           age?: number | null
+          archived_at?: string | null
           created_at?: string
           current_school?: string | null
           curriculum?: string | null
@@ -761,6 +770,65 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "lesson_reports"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      set_session_attendance: {
+        Args: {
+          p_session_id: string
+          p_status: string
+        }
+        Returns: {
+          created_at: string
+          duration_minutes: number
+          enrollment_id: string
+          id: string
+          lesson_report_id: string | null
+          scheduled_at: string | null
+          session_date: string
+          status: string
+          student_id: string
+          subject_id: string
+          teacher_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "sessions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_create_student: {
+        Args: {
+          p_age: number
+          p_current_school: string
+          p_curriculum: string
+          p_curriculum_other: string
+          p_full_name: string
+          p_gender: string
+          p_parent_id: string | null
+          p_preferred_name: string
+        }
+        Returns: {
+          added_by: string | null
+          age: number | null
+          archived_at: string | null
+          created_at: string
+          current_school: string | null
+          curriculum: string | null
+          curriculum_other: string | null
+          full_name: string
+          gender: string | null
+          id: string
+          intake: Json
+          intake_submitted_at: string | null
+          preferred_name: string | null
+          registration_number: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "students"
           isOneToOne: true
           isSetofReturn: false
         }

@@ -68,6 +68,7 @@ export default async function DashboardSessionsPage({
       `,
     )
     .eq("student_id", selected.id)
+    .is("deleted_at", null)
     .order("lesson_date", { ascending: false });
 
   const reports = (reportList ?? []) as unknown as ReportListRow[];
@@ -92,6 +93,7 @@ export default async function DashboardSessionsPage({
         )
         .eq("id", activeId)
         .eq("student_id", selected.id)
+        .is("deleted_at", null)
         .maybeSingle()
     : { data: null };
 
@@ -140,7 +142,7 @@ export default async function DashboardSessionsPage({
 
       <ChildTabs
         basePath="/dashboard/sessions"
-        children={childOptions}
+        tabs={childOptions}
         activeId={selected.id}
       />
 

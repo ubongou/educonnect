@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { SessionAttendanceControl } from "@/components/teacher/SessionAttendanceControl";
 import { requireTeacher } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 type SessionRow = {
   id: string;
-  scheduled_at: string;
+  session_date: string;
   duration_minutes: number;
   status: string;
   lesson_report_id: string | null;
@@ -31,8 +32,8 @@ const toneByStatus: Record<string, "blue" | "gray" | "coral" | "green"> = {
 
 // Sessions are scheduled by date only — group and label by calendar day, never
 // by time of day.
-function dayKey(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-GB", {
+function dayKey(date: string): string {
+  return new Date(date).toLocaleDateString("en-GB", {
     weekday: "long",
     day: "2-digit",
     month: "short",
@@ -43,7 +44,7 @@ function dayKey(iso: string): string {
 function groupByDay(rows: SessionRow[]): Map<string, SessionRow[]> {
   const out = new Map<string, SessionRow[]>();
   for (const r of rows) {
-    const key = dayKey(r.scheduled_at);
+    const key = dayKey(r.session_date);
     if (!out.has(key)) out.set(key, []);
     out.get(key)!.push(r);
   }
@@ -68,35 +69,37 @@ export default async function TeacherSessionsPage({
 
   const supabase = await createClient();
 
+  // Sessions are date-only — compare by YYYY-MM-DD calendar day. Lexicographic
+  // string comparison is correct for that fixed-width format.
   const now = new Date();
-  const startOfToday = new Date(now);
-  startOfToday.setHours(0, 0, 0, 0);
-  const startOfTomorrow = new Date(startOfToday);
-  startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
+  const today = now.toISOString().slice(0, 10);
   // Bound the window so the list stays cheap, but reach back far enough to
   // catch recently-completed sessions still awaiting a write-up.
-  const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+  const sixtyAgo = new Date(now);
+  sixtyAgo.setDate(sixtyAgo.getDate() - 60);
+  const sixtyDaysAgo = sixtyAgo.toISOString().slice(0, 10);
 
   const { data } = await supabase
     .from("sessions")
     .select(
       `
-      id, scheduled_at, duration_minutes, status, lesson_report_id,
+      id, session_date, duration_minutes, status, lesson_report_id,
       students ( id, full_name, preferred_name ),
       subjects ( name )
       `,
     )
     .eq("teacher_id", profile.id)
-    .gte("scheduled_at", sixtyDaysAgo.toISOString())
-    .order("scheduled_at", { ascending: true })
+    .gte("session_date", sixtyDaysAgo)
+    .order("session_date", { ascending: true })
     .limit(200);
 
   const allRows = (data ?? []) as unknown as SessionRow[];
 
   const needsReport = (s: SessionRow) =>
-    s.lesson_report_id === null && s.status !== "cancelled";
-  const isPastOrToday = (s: SessionRow) =>
-    new Date(s.scheduled_at) < startOfTomorrow;
+    s.lesson_report_id === null &&
+    s.status !== "cancelled" &&
+    s.status !== "no_show";
+  const isPastOrToday = (s: SessionRow) => s.session_date <= today;
   const reportDue = (s: SessionRow) => needsReport(s) && isPastOrToday(s);
 
   const dueCount = allRows.filter(reportDue).length;
@@ -104,7 +107,7 @@ export default async function TeacherSessionsPage({
   let rows: SessionRow[];
   if (filter === "upcoming") {
     // Soonest first.
-    rows = allRows.filter((s) => new Date(s.scheduled_at) >= startOfToday);
+    rows = allRows.filter((s) => s.session_date >= today);
   } else if (filter === "needs") {
     // Most recent first — the latest unwritten lesson sits at the top.
     rows = allRows.filter(reportDue).reverse();
@@ -213,6 +216,12 @@ export default async function TeacherSessionsPage({
                               View report →
                             </Link>
                           )
+                        )}
+                        {(due || s.status === "no_show") && (
+                          <SessionAttendanceControl
+                            sessionId={s.id}
+                            status={s.status}
+                          />
                         )}
                         <StatusBadge tone={tone}>
                           {s.status.replace("_", " ")}

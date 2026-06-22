@@ -75,9 +75,12 @@ export default async function AdminParentsPage() {
                     }`}
                   >
                     <td className="px-5 py-3 font-heading font-bold">
-                      <span className={active ? "text-navy" : "text-g600"}>
+                      <Link
+                        href={`/admin/parents/${r.id}`}
+                        className={`underline-offset-4 hover:underline ${active ? "text-navy" : "text-g600"}`}
+                      >
                         {r.full_name ?? "Unnamed parent"}
-                      </span>
+                      </Link>
                     </td>
                     <td className="px-5 py-3">
                       {r.email ? (

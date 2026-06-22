@@ -98,6 +98,87 @@ export async function createEnrollmentAsAdmin(
   return { ok: true };
 }
 
+/**
+ * Admin-only: permanently delete an enrollment. The sessions FK to enrollments
+ * is ON DELETE CASCADE, so this also removes every session hung off it
+ * (scheduled, completed, cancelled). Lesson reports have no enrollment FK, so
+ * they survive — but a completed session's report will no longer link back to
+ * a live enrollment. Use for genuinely mistaken enrollments; the UI gates this
+ * behind a cascade-aware confirm. RLS restricts deletes to admins.
+ */
+export async function deleteEnrollment(
+  enrollmentId: string,
+): Promise<EnrollmentRequestResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Auth required" };
+
+  const { data: previous } = await supabase
+    .from("enrollments")
+    .select("student_id, teacher_id")
+    .eq("id", enrollmentId)
+    .maybeSingle();
+
+  const { error } = await supabase
+    .from("enrollments")
+    .delete()
+    .eq("id", enrollmentId);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/enrollments");
+  revalidatePath("/admin/schedule");
+  revalidatePath("/admin");
+  if (previous?.student_id) {
+    revalidatePath(`/admin/students/${previous.student_id}`);
+  }
+  if (previous?.teacher_id) {
+    revalidatePath(`/admin/teachers/${previous.teacher_id}`);
+  }
+  return { ok: true };
+}
+
+/**
+ * Admin-only: approve several pending enrollments in one go, optionally
+ * assigning the same teacher to all of them. Only rows still 'pending' are
+ * touched (the `.eq("status","pending")` guard makes a double-submit a no-op).
+ * Teachers can be left unassigned and set per-enrollment afterwards. RLS
+ * restricts writes to admins.
+ */
+export async function approveEnrollmentsBulk(
+  ids: string[],
+  teacherId?: string | null,
+): Promise<EnrollmentRequestResult> {
+  if (ids.length === 0) return { ok: false, error: "Select at least one request." };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Auth required" };
+
+  const { error } = await supabase
+    .from("enrollments")
+    .update({
+      status: "approved",
+      decided_by: user.id,
+      decided_at: new Date().toISOString(),
+      ...(teacherId ? { teacher_id: teacherId } : {}),
+    })
+    .in("id", ids)
+    .eq("status", "pending");
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/enrollments");
+  revalidatePath("/admin/schedule");
+  revalidatePath("/admin");
+  if (teacherId) revalidatePath(`/admin/teachers/${teacherId}`);
+  return { ok: true };
+}
+
 export type EnrollmentDecision = "approved" | "rejected";
 
 /**

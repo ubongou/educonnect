@@ -34,14 +34,28 @@ export const teacherCreateSchema = z.object({
 export type TeacherCreateInput = z.infer<typeof teacherCreateSchema>;
 
 // -----------------------------------------------------------------------------
+// Admin edits an existing parent or teacher profile (name / phone / email)
+// -----------------------------------------------------------------------------
+
+export const adminProfileUpdateSchema = z.object({
+  full_name: z.string().trim().min(1, "Full name is required"),
+  phone: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => (v ? v : undefined)),
+  email: z.string().trim().email("Enter a valid email"),
+});
+
+export type AdminProfileUpdateInput = z.infer<typeof adminProfileUpdateSchema>;
+
+// -----------------------------------------------------------------------------
 // Admin schedules a one-off session for an approved enrollment
 // -----------------------------------------------------------------------------
 
 export const sessionCreateSchema = z.object({
   enrollment_id: z.string().uuid(),
-  scheduled_at: z
-    .string()
-    .refine((s) => !Number.isNaN(Date.parse(s)), "Expected an ISO timestamp"),
+  session_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Expected YYYY-MM-DD"),
   duration_minutes: z.coerce.number().int().min(15).max(240),
 });
 
@@ -53,9 +67,9 @@ export const sessionBulkCreateSchema = z.object({
   rows: z
     .array(
       z.object({
-        scheduled_at: z
+        session_date: z
           .string()
-          .refine((s) => !Number.isNaN(Date.parse(s)), "Expected an ISO timestamp"),
+          .regex(/^\d{4}-\d{2}-\d{2}$/, "Expected YYYY-MM-DD"),
         duration_minutes: z.coerce.number().int().min(15).max(240),
       }),
     )
@@ -221,6 +235,14 @@ export const childInfoSchema = z.object({
 });
 
 export type ChildInfoInput = z.infer<typeof childInfoSchema>;
+
+// Admin creates a student directly (optionally linked to an existing parent).
+// Reuses the child-info fields; intake starts empty and is filled later.
+export const adminStudentCreateSchema = childInfoSchema.extend({
+  parent_id: z.string().uuid().nullable().optional(),
+});
+
+export type AdminStudentCreateInput = z.infer<typeof adminStudentCreateSchema>;
 
 export const onboardingSchema = intakeSchema.extend({
   childInfo: childInfoSchema,

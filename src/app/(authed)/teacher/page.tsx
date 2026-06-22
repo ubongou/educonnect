@@ -6,16 +6,15 @@ import { requireTeacher } from "@/lib/auth";
 
 type SessionRow = {
   id: string;
-  scheduled_at: string;
+  session_date: string;
   duration_minutes: number;
   students: { id: string; full_name: string; preferred_name: string | null } | null;
   subjects: { name: string } | null;
 };
 
 // Sessions are scheduled by date only — no time of day.
-function friendlyWhen(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleDateString("en-GB", {
+function friendlyWhen(date: string): string {
+  return new Date(date).toLocaleDateString("en-GB", {
     weekday: "short",
     day: "2-digit",
     month: "short",
@@ -31,28 +30,31 @@ export default async function TeacherOverview({
   const { submitted } = await searchParams;
 
   const supabase = await createClient();
-  const now = new Date();
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  // Sessions are date-only — "upcoming" is today or later by calendar day.
+  const today = new Date().toISOString().slice(0, 10);
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
   const [{ data: upcoming }, reportsSevenDays, studentsCount] = await Promise.all([
     supabase
       .from("sessions")
       .select(
         `
-        id, scheduled_at, duration_minutes,
+        id, session_date, duration_minutes,
         students ( id, full_name, preferred_name ),
         subjects ( name )
         `,
       )
       .eq("teacher_id", profile.id)
       .eq("status", "scheduled")
-      .gte("scheduled_at", now.toISOString())
-      .order("scheduled_at", { ascending: true })
+      .gte("session_date", today)
+      .order("session_date", { ascending: true })
       .limit(5),
     supabase
       .from("lesson_reports")
       .select("id", { count: "exact", head: true })
       .eq("uploaded_by", profile.id)
+      .is("deleted_at", null)
       .gte("created_at", sevenDaysAgo.toISOString()),
     supabase
       .from("enrollments")
@@ -169,7 +171,7 @@ export default async function TeacherOverview({
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-[13px] text-g600">
-                    {friendlyWhen(s.scheduled_at)}
+                    {friendlyWhen(s.session_date)}
                   </span>
                   <StatusBadge tone="blue">Scheduled</StatusBadge>
                 </div>

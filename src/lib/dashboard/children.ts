@@ -25,6 +25,7 @@ export async function getParentChildren(pathname: string): Promise<{
   const { data } = await supabase
     .from("students")
     .select("id, full_name, preferred_name, registration_number, created_at")
+    .is("archived_at", null)
     .order("created_at", { ascending: true });
 
   const children: ParentChild[] = (data ?? []).map((s) => ({

@@ -389,6 +389,7 @@ for (const l of lessons) {
       subject_id: mathsSubject.id,
       teacher_id: teacherId,
       scheduled_at: scheduledAt,
+      session_date: lessonDate,
       duration_minutes: 60,
       status: "completed",
       created_at: scheduledAt,
@@ -490,6 +491,7 @@ for (const offset of [2, 9]) {
     subject_id: mathsSubject.id,
     teacher_id: teacherId,
     scheduled_at: scheduledAt.toISOString(),
+    session_date: scheduledAt.toISOString().slice(0, 10),
     duration_minutes: 60,
     status: "scheduled",
   });

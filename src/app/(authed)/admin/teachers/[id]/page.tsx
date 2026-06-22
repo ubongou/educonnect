@@ -3,10 +3,7 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate, formatRegistrationNumber } from "@/lib/format";
-import {
-  DeactivateToggle,
-  StatusPill,
-} from "@/components/admin/DeactivateToggle";
+import { ProfileManageBar } from "@/components/admin/ProfileManageBar";
 
 type EnrollmentRow = {
   id: string;
@@ -22,7 +19,7 @@ type EnrollmentRow = {
 
 type SessionRow = {
   id: string;
-  scheduled_at: string;
+  session_date: string;
   status: string;
   students: { id: string; full_name: string; preferred_name: string | null } | null;
   subjects: { name: string } | null;
@@ -45,35 +42,51 @@ export default async function AdminTeacherDetail({
 
   if (!teacher) notFound();
 
-  const [{ data: enrollments }, { data: sessions }] = await Promise.all([
-    supabase
-      .from("enrollments")
-      .select(
-        `
+  const [{ data: enrollments }, { data: sessions }, { data: otherTeachers }] =
+    await Promise.all([
+      supabase
+        .from("enrollments")
+        .select(
+          `
         id, status,
         students ( id, full_name, preferred_name, registration_number ),
         subjects ( id, name )
         `,
-      )
-      .eq("teacher_id", id)
-      .order("created_at", { ascending: false }),
-    supabase
-      .from("sessions")
-      .select(
-        `
-        id, scheduled_at, status,
+        )
+        .eq("teacher_id", id)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("sessions")
+        .select(
+          `
+        id, session_date, status,
         students ( id, full_name, preferred_name ),
         subjects ( name )
         `,
-      )
-      .eq("teacher_id", id)
-      .gte("scheduled_at", new Date().toISOString())
-      .order("scheduled_at", { ascending: true })
-      .limit(20),
-  ]);
+        )
+        .eq("teacher_id", id)
+        .gte("session_date", new Date().toISOString().slice(0, 10))
+        .order("session_date", { ascending: true })
+        .limit(20),
+      supabase
+        .from("profiles")
+        .select("id, full_name")
+        .eq("role", "teacher")
+        .is("deactivated_at", null)
+        .neq("id", id)
+        .order("full_name"),
+    ]);
 
   const enr = (enrollments ?? []) as unknown as EnrollmentRow[];
   const sess = (sessions ?? []) as unknown as SessionRow[];
+
+  // Reassign data for deactivation: live workload + other active teachers.
+  const reassignTargets = (otherTeachers ?? []).map((t) => ({
+    id: t.id,
+    name: t.full_name ?? "Unnamed teacher",
+  }));
+  const activeEnrollmentCount = enr.filter((e) => e.status === "approved").length;
+  const upcomingSessionCount = sess.filter((s) => s.status === "scheduled").length;
 
   return (
     <Container>
@@ -89,21 +102,26 @@ export default async function AdminTeacherDetail({
 
       <div className="flex flex-wrap items-end justify-between gap-6 border-b border-line pb-8">
         <div>
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="font-heading text-[clamp(28px,3.4vw,40px)] font-semibold leading-tight text-navy">
-              {teacher.full_name ?? "Unnamed teacher"}
-            </h1>
-            <StatusPill active={teacher.deactivated_at == null} />
-          </div>
+          <h1 className="font-heading text-[clamp(28px,3.4vw,40px)] font-semibold leading-tight text-navy">
+            {teacher.full_name ?? "Unnamed teacher"}
+          </h1>
           <p className="mt-2 text-[14px] text-g600">
             {teacher.email ?? "no email"}
             {teacher.phone && ` · ${teacher.phone}`}
             {` · created ${formatDate(teacher.created_at)}`}
           </p>
         </div>
-        <DeactivateToggle
+        <ProfileManageBar
           profileId={teacher.id}
+          fullName={teacher.full_name ?? "Unnamed teacher"}
+          phone={teacher.phone ?? ""}
+          email={teacher.email ?? ""}
           active={teacher.deactivated_at == null}
+          reassign={{
+            targets: reassignTargets,
+            enrollmentCount: activeEnrollmentCount,
+            sessionCount: upcomingSessionCount,
+          }}
         />
       </div>
 
@@ -186,12 +204,11 @@ export default async function AdminTeacherDetail({
                 {sess.map((s) => (
                   <tr key={s.id} className="border-t border-line">
                     <td className="px-5 py-3 font-heading font-bold text-navy">
-                      {new Date(s.scheduled_at).toLocaleString("en-GB", {
+                      {new Date(s.session_date).toLocaleDateString("en-GB", {
                         weekday: "short",
                         day: "2-digit",
                         month: "short",
-                        hour: "2-digit",
-                        minute: "2-digit",
+                        year: "numeric",
                       })}
                     </td>
                     <td className="px-5 py-3 text-navy">

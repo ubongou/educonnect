@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { ResendReportButton } from "@/components/admin/ResendReportButton";
+import { ReportDeleteRestore } from "@/components/admin/ReportDeleteRestore";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { confidenceBadge, understandingBadge } from "@/lib/scales";
@@ -24,22 +25,32 @@ export default async function AdminReportsPage() {
   await requireAdmin();
   const supabase = await createClient();
 
-  const { data } = await supabase
-    .from("lesson_reports")
-    .select(
-      `
+  const reportSelect = `
       id, lesson_date, lesson_focus, understanding_check, confidence_level,
       emailed_at, created_at,
       students ( id, full_name, preferred_name ),
       subjects ( name ),
       uploader:profiles!lesson_reports_uploaded_by_fkey ( full_name )
-      `,
-    )
-    .order("lesson_date", { ascending: false })
-    .order("created_at", { ascending: false })
-    .limit(200);
+      `;
+
+  const [{ data }, { data: deletedData }] = await Promise.all([
+    supabase
+      .from("lesson_reports")
+      .select(reportSelect)
+      .is("deleted_at", null)
+      .order("lesson_date", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(200),
+    supabase
+      .from("lesson_reports")
+      .select(reportSelect)
+      .not("deleted_at", "is", null)
+      .order("lesson_date", { ascending: false })
+      .limit(50),
+  ]);
 
   const rows = (data ?? []) as unknown as ReportRow[];
+  const deletedRows = (deletedData ?? []) as unknown as ReportRow[];
 
   return (
     <Container>
@@ -141,6 +152,7 @@ export default async function AdminReportsPage() {
                           View
                         </Link>
                         <ResendReportButton reportId={r.id} />
+                        <ReportDeleteRestore reportId={r.id} deleted={false} />
                       </div>
                     </td>
                   </tr>
@@ -149,6 +161,54 @@ export default async function AdminReportsPage() {
             </tbody>
           </table>
         </div>
+      )}
+
+      {deletedRows.length > 0 && (
+        <section className="mt-12">
+          <h2 className="mb-2 font-heading text-[11px] font-bold uppercase tracking-[0.12em] text-g400">
+            Recently deleted
+          </h2>
+          <p className="mb-4 text-[13px] text-g600">
+            Hidden from parents, teachers, and the charts. Restore to bring a
+            report back exactly as it was.
+          </p>
+          <div className="overflow-hidden rounded-2xl border border-line bg-white">
+            <table className="w-full text-[14px]">
+              <thead className="bg-paper text-left font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
+                <tr>
+                  <th className="px-5 py-3">Date</th>
+                  <th className="px-5 py-3">Student</th>
+                  <th className="px-5 py-3">Subject</th>
+                  <th className="px-5 py-3">Teacher</th>
+                  <th className="px-5 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {deletedRows.map((r) => {
+                  const studentName =
+                    r.students?.preferred_name?.trim() ||
+                    r.students?.full_name ||
+                    "—";
+                  return (
+                    <tr key={r.id} className="border-t border-line text-g600">
+                      <td className="px-5 py-3 font-heading font-bold">
+                        {formatDate(r.lesson_date)}
+                      </td>
+                      <td className="px-5 py-3">{studentName}</td>
+                      <td className="px-5 py-3">{r.subjects?.name ?? "—"}</td>
+                      <td className="px-5 py-3">{r.uploader?.full_name ?? "—"}</td>
+                      <td className="px-5 py-3">
+                        <div className="flex justify-end">
+                          <ReportDeleteRestore reportId={r.id} deleted={true} />
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
       )}
     </Container>
   );

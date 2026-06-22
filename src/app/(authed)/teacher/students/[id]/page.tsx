@@ -139,6 +139,7 @@ export default async function TeacherStudentDetail({
         `,
         )
         .eq("student_id", id)
+        .is("deleted_at", null)
         .order("lesson_date", { ascending: false })
         .limit(20),
       supabase

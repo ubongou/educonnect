@@ -5,11 +5,15 @@ import {
   SessionScheduler,
   type SchedulableEnrollment,
 } from "@/components/admin/SessionScheduler";
-import { BulkSessionForm } from "@/components/admin/BulkSessionForm";
+import { RecurringSessionForm } from "@/components/admin/RecurringSessionForm";
+import {
+  SessionRowActions,
+  type SessionTeacherOption,
+} from "@/components/admin/SessionRowActions";
 
 type SessionRow = {
   id: string;
-  scheduled_at: string;
+  session_date: string;
   duration_minutes: number;
   status: string;
   students: { id: string; full_name: string; preferred_name: string | null } | null;
@@ -38,36 +42,49 @@ function StatusPill({ status }: { status: string }) {
 export default async function AdminSchedulePage() {
   const supabase = await createClient();
 
-  const now = new Date();
+  // Sessions are date-only — "upcoming" means today or later by calendar day.
+  const today = new Date().toISOString().slice(0, 10);
 
-  const [{ data: sessions }, { data: schedulable }] = await Promise.all([
-    supabase
-      .from("sessions")
-      .select(
-        `
-        id, scheduled_at, duration_minutes, status,
+  const [{ data: sessions }, { data: schedulable }, { data: teacherList }] =
+    await Promise.all([
+      supabase
+        .from("sessions")
+        .select(
+          `
+        id, session_date, duration_minutes, status,
         students ( id, full_name, preferred_name ),
         subjects ( name ),
         teacher:profiles!sessions_teacher_id_fkey ( id, full_name )
         `,
-      )
-      .gte("scheduled_at", now.toISOString())
-      .order("scheduled_at", { ascending: true })
-      .limit(60),
-    supabase
-      .from("enrollments")
-      .select(
-        `
+        )
+        .gte("session_date", today)
+        .order("session_date", { ascending: true })
+        .limit(60),
+      supabase
+        .from("enrollments")
+        .select(
+          `
         id, teacher_id,
         students ( full_name, preferred_name ),
         subjects ( name ),
         teacher:profiles!enrollments_teacher_id_fkey ( full_name )
         `,
-      )
-      .eq("status", "approved")
-      .not("teacher_id", "is", null)
-      .order("created_at", { ascending: false }),
-  ]);
+        )
+        .eq("status", "approved")
+        .not("teacher_id", "is", null)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("profiles")
+        .select("id, full_name")
+        .eq("role", "teacher")
+        .is("deactivated_at", null)
+        .order("full_name"),
+    ]);
+
+  const teacherOptions: SessionTeacherOption[] = (teacherList ?? []).map((t) => ({
+    id: t.id,
+    name: t.full_name ?? "Unnamed teacher",
+  }));
 
   const rows = (sessions ?? []) as unknown as SessionRow[];
 
@@ -111,9 +128,9 @@ export default async function AdminSchedulePage() {
 
       <section className="mb-12">
         <h2 className="mb-4 font-heading text-[11px] font-bold uppercase tracking-[0.12em] text-g400">
-          Schedule multiple sessions
+          Schedule a recurring run
         </h2>
-        <BulkSessionForm enrollments={schedulableRows} />
+        <RecurringSessionForm enrollments={schedulableRows} />
       </section>
 
       <section className="mb-12">
@@ -151,18 +168,18 @@ export default async function AdminSchedulePage() {
                   <th className="px-5 py-3">Teacher</th>
                   <th className="px-5 py-3 text-right">Duration</th>
                   <th className="px-5 py-3 text-right">Status</th>
+                  <th className="px-5 py-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {rows.map((s) => (
                   <tr key={s.id} className="border-t border-line">
                     <td className="px-5 py-3 font-heading font-bold text-navy">
-                      {new Date(s.scheduled_at).toLocaleString("en-GB", {
+                      {new Date(s.session_date).toLocaleDateString("en-GB", {
                         weekday: "short",
                         day: "2-digit",
                         month: "short",
-                        hour: "2-digit",
-                        minute: "2-digit",
+                        year: "numeric",
                       })}
                     </td>
                     <td className="px-5 py-3 text-navy">
@@ -186,6 +203,16 @@ export default async function AdminSchedulePage() {
                     </td>
                     <td className="px-5 py-3 text-right">
                       <StatusPill status={s.status} />
+                    </td>
+                    <td className="px-5 py-3 text-right">
+                      <SessionRowActions
+                        sessionId={s.id}
+                        sessionDate={s.session_date}
+                        durationMinutes={s.duration_minutes}
+                        teacherId={s.teacher?.id ?? null}
+                        status={s.status}
+                        teachers={teacherOptions}
+                      />
                     </td>
                   </tr>
                 ))}

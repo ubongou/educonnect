@@ -135,7 +135,7 @@ export default async function DashboardDocumentsPage({
 
       <ChildTabs
         basePath="/dashboard/documents"
-        children={childOptions}
+        tabs={childOptions}
         activeId={selected.id}
       />
 

@@ -8,6 +8,11 @@ import {
   sessionImportSchema,
 } from "@/lib/validation";
 
+// Sessions are date-only (migrations 0019/0020). Every write sets `session_date`
+// (a YYYY-MM-DD calendar day) and leaves the legacy `scheduled_at` timestamp
+// null; it is preserved on historical rows only and dropped in a later slice.
+const SESSION_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
 export type SessionMutationResult =
   | { ok: true; sessionId: string }
   | { ok: false; error: string };
@@ -99,7 +104,7 @@ export async function createSession(
       student_id: enrollment.student_id,
       subject_id: enrollment.subject_id,
       teacher_id: enrollment.teacher_id,
-      scheduled_at: parsed.data.scheduled_at,
+      session_date: parsed.data.session_date,
       duration_minutes: parsed.data.duration_minutes,
     })
     .select("id")
@@ -113,6 +118,104 @@ export async function createSession(
   revalidatePath("/admin");
   revalidatePath(`/admin/teachers/${enrollment.teacher_id}`);
   return { ok: true, sessionId: session.id };
+}
+
+const SESSION_STATUSES = ["scheduled", "completed", "cancelled", "no_show"] as const;
+
+export type SessionPatch = {
+  session_date?: string;
+  duration_minutes?: number;
+  teacher_id?: string;
+  status?: string;
+};
+
+/**
+ * Admin-only: edit a scheduled session — move its date, change duration,
+ * reassign the teacher, or set its status. Only the provided fields are
+ * written. Admin writes go through sessions_admin_write (FOR ALL).
+ */
+export async function updateSession(
+  id: string,
+  patch: SessionPatch,
+): Promise<SimpleMutationResult> {
+  const update: {
+    session_date?: string;
+    duration_minutes?: number;
+    teacher_id?: string;
+    status?: string;
+  } = {};
+
+  if (patch.session_date !== undefined) {
+    if (!SESSION_DATE_RE.test(patch.session_date)) {
+      return { ok: false, error: "Expected a YYYY-MM-DD date" };
+    }
+    update.session_date = patch.session_date;
+  }
+  if (patch.duration_minutes !== undefined) {
+    const d = patch.duration_minutes;
+    if (!Number.isInteger(d) || d < 15 || d > 240) {
+      return { ok: false, error: "Duration must be 15–240 minutes." };
+    }
+    update.duration_minutes = d;
+  }
+  if (patch.teacher_id !== undefined) {
+    update.teacher_id = patch.teacher_id;
+  }
+  if (patch.status !== undefined) {
+    if (!SESSION_STATUSES.includes(patch.status as (typeof SESSION_STATUSES)[number])) {
+      return { ok: false, error: "Invalid session status." };
+    }
+    update.status = patch.status;
+  }
+
+  if (Object.keys(update).length === 0) {
+    return { ok: false, error: "Nothing to update." };
+  }
+
+  const supabase = await createClient();
+  const { data: previous } = await supabase
+    .from("sessions")
+    .select("teacher_id")
+    .eq("id", id)
+    .maybeSingle();
+
+  const { error } = await supabase.from("sessions").update(update).eq("id", id);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/schedule");
+  revalidatePath("/admin");
+  if (previous?.teacher_id) revalidatePath(`/admin/teachers/${previous.teacher_id}`);
+  if (typeof update.teacher_id === "string") {
+    revalidatePath(`/admin/teachers/${update.teacher_id}`);
+  }
+  return { ok: true };
+}
+
+/**
+ * Teacher (or admin): record attendance on a session — mark a 'no_show' or
+ * revert to 'scheduled'. Goes through the set_session_attendance RPC, which
+ * checks the caller is the assigned teacher or an admin. 'completed' is not an
+ * attendance state here — that's set when the teacher files the lesson report.
+ */
+export async function setSessionAttendance(
+  sessionId: string,
+  status: "scheduled" | "no_show",
+): Promise<SimpleMutationResult> {
+  if (status !== "scheduled" && status !== "no_show") {
+    return { ok: false, error: "Invalid attendance status." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_session_attendance", {
+    p_session_id: sessionId,
+    p_status: status,
+  });
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/teacher/sessions");
+  revalidatePath("/teacher");
+  revalidatePath("/admin/schedule");
+  return { ok: true };
 }
 
 export async function cancelSession(id: string): Promise<SimpleMutationResult> {
@@ -130,16 +233,16 @@ export async function cancelSession(id: string): Promise<SimpleMutationResult> {
 
 export async function rescheduleSession(
   id: string,
-  scheduledAt: string,
+  sessionDate: string,
 ): Promise<SimpleMutationResult> {
-  if (Number.isNaN(Date.parse(scheduledAt))) {
-    return { ok: false, error: "Invalid timestamp" };
+  if (!SESSION_DATE_RE.test(sessionDate)) {
+    return { ok: false, error: "Expected a YYYY-MM-DD date" };
   }
 
   const supabase = await createClient();
   const { error } = await supabase
     .from("sessions")
-    .update({ scheduled_at: scheduledAt, status: "scheduled" })
+    .update({ session_date: sessionDate, status: "scheduled" })
     .eq("id", id);
 
   if (error) return { ok: false, error: error.message };
@@ -168,7 +271,7 @@ export async function createSessionsBulk(input: unknown): Promise<BulkSessionRes
     student_id: enrollment.student_id,
     subject_id: enrollment.subject_id,
     teacher_id: enrollment.teacher_id,
-    scheduled_at: r.scheduled_at,
+    session_date: r.session_date,
     duration_minutes: r.duration_minutes,
   }));
 
@@ -219,8 +322,7 @@ export async function importPastSessions(input: unknown): Promise<ImportSessions
         student_id: enrollment.student_id,
         subject_id: enrollment.subject_id,
         teacher_id: enrollment.teacher_id,
-        // Noon UTC keeps the calendar date stable across timezones.
-        scheduled_at: `${r.lesson_date}T12:00:00Z`,
+        session_date: r.lesson_date,
         duration_minutes: r.duration_minutes,
       })
       .select("id")

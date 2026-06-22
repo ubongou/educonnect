@@ -63,6 +63,7 @@ export default async function ParentReportDetailPage({
       `,
     )
     .eq("id", id)
+    .is("deleted_at", null)
     .maybeSingle();
 
   const report = data as unknown as FullReport | null;
