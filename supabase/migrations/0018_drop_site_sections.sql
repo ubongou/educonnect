@@ -7,14 +7,17 @@
 
 -- -----------------------------------------------------------------------------
 -- 1. marketing-assets storage bucket
+--    Drop the bucket's RLS policies here (policy DDL is allowed), but do NOT
+--    delete the bucket's objects/row in SQL: Supabase blocks direct DML on the
+--    storage.* tables ("Direct deletion from storage tables is not allowed.
+--    Use the Storage API instead."). Empty + delete the `marketing-assets`
+--    bucket via the Dashboard (Storage) or the Storage API instead — it's inert
+--    dead weight once these policies are gone and the app no longer uses it.
 -- -----------------------------------------------------------------------------
 drop policy if exists "marketing_assets_admin_delete" on storage.objects;
 drop policy if exists "marketing_assets_admin_update" on storage.objects;
 drop policy if exists "marketing_assets_admin_insert" on storage.objects;
 drop policy if exists "marketing_assets_public_read" on storage.objects;
-
-delete from storage.objects where bucket_id = 'marketing-assets';
-delete from storage.buckets where id = 'marketing-assets';
 
 -- -----------------------------------------------------------------------------
 -- 2. site_sections table
