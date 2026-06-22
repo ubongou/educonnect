@@ -19,7 +19,6 @@ const teacherLinks: SidebarLink[] = [
   { href: "/teacher", label: "Overview", icon: <IconGrid /> },
   { href: "/teacher/sessions", label: "Sessions", icon: <IconCalendar /> },
   { href: "/teacher/students", label: "Students", icon: <IconUsers /> },
-  { href: "/teacher/schedule", label: "Schedule", icon: <IconClock /> },
 ];
 
 const adminLinks: SidebarLink[] = [

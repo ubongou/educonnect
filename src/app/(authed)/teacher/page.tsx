@@ -12,14 +12,13 @@ type SessionRow = {
   subjects: { name: string } | null;
 };
 
+// Sessions are scheduled by date only — no time of day.
 function friendlyWhen(iso: string): string {
   const d = new Date(iso);
-  return d.toLocaleString("en-GB", {
+  return d.toLocaleDateString("en-GB", {
     weekday: "short",
     day: "2-digit",
     month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
   });
 }
 
@@ -118,7 +117,7 @@ export default async function TeacherOverview({
             Lesson reports you submitted this week.
           </p>
           <Link
-            href="/teacher/sessions"
+            href="/teacher/sessions?filter=needs"
             className="mt-4 inline-flex items-center font-heading text-[13px] font-bold text-blue"
           >
             New report →
@@ -135,10 +134,10 @@ export default async function TeacherOverview({
             Scheduled in the next few days.
           </p>
           <Link
-            href="/teacher/schedule"
+            href="/teacher/sessions"
             className="mt-4 inline-flex items-center font-heading text-[13px] font-bold text-blue"
           >
-            See schedule →
+            See sessions →
           </Link>
         </div>
       </div>

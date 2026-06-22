@@ -40,7 +40,7 @@ export default async function TeacherReportDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const profile = await requireTeacher();
+  await requireTeacher();
   const { id } = await params;
   const supabase = await createClient();
 
@@ -64,12 +64,12 @@ export default async function TeacherReportDetailPage({
     .eq("id", id)
     .maybeSingle();
 
+  // RLS scopes what a teacher can read: reports they uploaded, plus reports
+  // for any (student, subject) they're the enrolled teacher of — exactly what
+  // the embedded progress dashboard surfaces. A missing row means RLS blocked
+  // it, so a plain not-found is the right response.
   const report = data as unknown as FullReport | null;
   if (!report) notFound();
-  // Belt-and-braces: RLS lets teachers read reports they uploaded, but a
-  // teacher who somehow surfaces another teacher's report id shouldn't see
-  // it. Restrict explicitly to the uploader.
-  if (report.uploaded_by !== profile.id) notFound();
 
   const view: LessonReportViewData = {
     id: report.id,

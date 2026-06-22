@@ -99,6 +99,7 @@ export default async function DashboardOverview({
         childDisplayName={displayName}
         childRegistrationNumber={selected.registration_number}
         selectedSubject={selectedSubject}
+        subjectSlug={selectedSubject}
         subjectHref={(slug) => `/dashboard?child=${selected.id}&subject=${slug}`}
         variant="parent"
       />

@@ -71,6 +71,7 @@ export async function ChildDashboardBody({
   selectedSubject,
   subjectHref,
   variant,
+  subjectSlug,
 }: {
   studentId: string;
   childDisplayName: string;
@@ -78,7 +79,20 @@ export async function ChildDashboardBody({
   selectedSubject: SubjectSlug;
   /** Builds the href for a subject sub-tab (differs parent vs admin). */
   subjectHref: (slug: SubjectSlug) => string;
-  variant: "parent" | "admin";
+  /**
+   * Drives report-link targets and which affordances show. "teacher" also
+   * hides the internal subject sub-tabs — the teacher student page wraps this
+   * in an enrolment switcher instead, so the subject is fixed per dashboard.
+   */
+  variant: "parent" | "admin" | "teacher";
+  /**
+   * When set, scopes the confidence chart to this subject (same filter the
+   * skill chart applies), so multi-subject/multi-teacher confidence scores
+   * aren't blended into one unattributable line. Wire it to `selectedSubject`
+   * to keep both charts in sync with the sub-tabs. Omit to keep the original
+   * behaviour: confidence spans every subject.
+   */
+  subjectSlug?: SubjectSlug;
 }) {
   const supabase = await createClient();
 
@@ -97,6 +111,7 @@ export async function ChildDashboardBody({
       )
       .eq("student_id", studentId)
       .order("lesson_date", { ascending: true })
+      .order("created_at", { ascending: true })
       .limit(60),
     supabase
       .from("sessions")
@@ -110,8 +125,13 @@ export async function ChildDashboardBody({
 
   const reportRows = (reports ?? []) as unknown as ReportRow[];
 
-  // Confidence line chart — last N reports, raw 1–10 scale.
-  const lastReportsForConfidence = reportRows.slice(-CHART_POINTS);
+  // Confidence line chart — last N reports, raw 1–10 scale. Scoped to the
+  // subject filter when provided, matching the skill chart, so a single line
+  // never blends scores from different subjects/teachers.
+  const confidenceReports = subjectSlug
+    ? reportRows.filter((r) => r.subjects?.slug === subjectSlug)
+    : reportRows;
+  const lastReportsForConfidence = confidenceReports.slice(-CHART_POINTS);
   const confidenceChart = {
     points: lastReportsForConfidence.map((r) => r.confidence_level),
     xLabels: lastReportsForConfidence.map((r) =>
@@ -183,24 +203,26 @@ export async function ChildDashboardBody({
           <h2 className="font-heading text-[15px] font-semibold text-navy">
             Average skill level progression
           </h2>
-          <div className="flex items-center gap-2">
-            {SUBJECT_SLUGS.map((slug) => {
-              const active = slug === selectedSubject;
-              return (
-                <Link
-                  key={slug}
-                  href={subjectHref(slug)}
-                  className={`inline-flex items-center rounded-pill border px-4 py-[4px] font-heading text-[12px] font-semibold transition-colors ${
-                    active
-                      ? "border-navy bg-navy text-yellow"
-                      : "border-navy/20 bg-white text-navy hover:bg-paper"
-                  }`}
-                >
-                  {subjectLabel(slug)}
-                </Link>
-              );
-            })}
-          </div>
+          {variant !== "teacher" && (
+            <div className="flex items-center gap-2">
+              {SUBJECT_SLUGS.map((slug) => {
+                const active = slug === selectedSubject;
+                return (
+                  <Link
+                    key={slug}
+                    href={subjectHref(slug)}
+                    className={`inline-flex items-center rounded-pill border px-4 py-[4px] font-heading text-[12px] font-semibold transition-colors ${
+                      active
+                        ? "border-navy bg-navy text-yellow"
+                        : "border-navy/20 bg-white text-navy hover:bg-paper"
+                    }`}
+                  >
+                    {subjectLabel(slug)}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </div>
         {skillChart.points.every((p) => p === null) ? (
           <p className="text-[14px] text-g600">
@@ -232,7 +254,11 @@ export async function ChildDashboardBody({
         <LatestLessonCard
           childId={variant === "parent" ? studentId : undefined}
           reportHref={
-            variant === "admin" && latest ? `/admin/reports/${latest.id}` : undefined
+            latest && variant === "admin"
+              ? `/admin/reports/${latest.id}`
+              : latest && variant === "teacher"
+                ? `/teacher/reports/${latest.id}`
+                : undefined
           }
           lesson={
             latest

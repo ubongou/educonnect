@@ -229,6 +229,7 @@ export default async function AdminStudentDetail({
           childDisplayName={displayName}
           childRegistrationNumber={student.registration_number}
           selectedSubject={selectedSubject}
+          subjectSlug={selectedSubject}
           subjectHref={(slug) => `/admin/students/${student.id}?subject=${slug}`}
           variant="admin"
         />
