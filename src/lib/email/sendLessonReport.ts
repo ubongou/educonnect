@@ -3,7 +3,9 @@ import { getAppUrl, getFromAddress, getResend } from "./client";
 import {
   renderLessonReportEmail,
   type LessonReportEmailData,
+  type ReportAttachment,
 } from "./templates/lessonReport";
+import { materialKindLabel } from "@/lib/uploads/labels";
 
 export type SendLessonReportResult =
   | { ok: true; recipients: string[]; skipped: false }
@@ -95,7 +97,31 @@ export async function sendLessonReportEmail(
   const subjectName = subjectRow?.name ?? "Lesson";
   const teacherName = teacherRow?.full_name ?? null;
 
-  const reportUrl = `${getAppUrl().replace(/\/$/, "")}/dashboard/sessions?report=${report.id}`;
+  const appUrl = getAppUrl().replace(/\/$/, "");
+  const reportUrl = `${appUrl}/dashboard/sessions?report=${report.id}`;
+
+  // Files attached to this report (homework workbooks, resources). Only
+  // promoted (ready) rows are included — staged composer files that were never
+  // sent are excluded.
+  const { data: attachmentRows } = await supabase
+    .from("teacher_materials")
+    .select("id, kind, original_filename")
+    .eq("lesson_report_id", report.id)
+    .eq("status", "ready")
+    .order("uploaded_at", { ascending: true });
+
+  const attachments: ReportAttachment[] = (
+    (attachmentRows ?? []) as {
+      id: string;
+      kind: string;
+      original_filename: string;
+    }[]
+  ).map((a) => ({
+    filename: a.original_filename,
+    kindLabel: materialKindLabel(a.kind),
+    url: `${appUrl}/api/teacher-materials/${a.id}/download?disposition=attachment`,
+    isHomework: a.kind === "homework",
+  }));
 
   let allOk = true;
   let firstError: string | null = null;
@@ -119,6 +145,7 @@ export async function sendLessonReportEmail(
       howToHelpAtHome: report.how_to_help_at_home,
       recordingUrl: report.recording_url,
       reportUrl,
+      attachments,
     };
 
     const { subject, html, text } = renderLessonReportEmail(data);

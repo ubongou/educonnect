@@ -17,6 +17,15 @@ export type LessonReportEmailData = {
   howToHelpAtHome: string | null;
   recordingUrl: string | null;
   reportUrl: string;
+  /** Files attached to this report (homework workbooks, resources). */
+  attachments?: ReportAttachment[];
+};
+
+export type ReportAttachment = {
+  filename: string;
+  kindLabel: string;
+  url: string;
+  isHomework: boolean;
 };
 
 const BRAND_NAVY = "#04131C";
@@ -76,6 +85,28 @@ export function renderLessonReportEmail(data: LessonReportEmailData): {
   const c = confidenceBadge(data.confidence);
 
   const subject = `Lesson report — ${data.studentName} · ${data.subjectName} · ${fmtDate(data.lessonDate)}`;
+
+  const attachments = data.attachments ?? [];
+  const attachmentsBlock =
+    attachments.length === 0
+      ? ""
+      : `<p style="margin:26px 0 8px;font:800 11px Arial,sans-serif;letter-spacing:0.12em;text-transform:uppercase;color:#7A8690;">Homework &amp; resources</p>
+         <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+           ${attachments
+             .map(
+               (a) => `<tr><td style="padding:8px 0;border-top:1px solid #EEF1F4;">
+                 <span style="display:inline-block;padding:3px 9px;border-radius:99px;font:700 10px Arial,sans-serif;${a.isHomework ? pillStyle("amber") : pillStyle("gray")}">${escapeHtml(a.kindLabel)}</span>
+                 <a href="${escapeHtml(a.url)}" style="margin-left:8px;font:700 14px Arial,sans-serif;color:#0C7CC4;text-decoration:underline;">${escapeHtml(a.filename)}</a>
+               </td></tr>`,
+             )
+             .join("")}
+         </table>`;
+  const attachmentsText =
+    attachments.length === 0
+      ? ""
+      : `Homework & resources:\n${attachments
+          .map((a) => `  • ${a.filename} (${a.kindLabel}) — ${a.url}`)
+          .join("\n")}\n`;
 
   const greeting = data.parentFirstName
     ? `Hi ${escapeHtml(data.parentFirstName)},`
@@ -160,6 +191,8 @@ export function renderLessonReportEmail(data: LessonReportEmailData): {
                   ${behaviourRow("Homework completion", data.homework)}
                 </table>
 
+                ${attachmentsBlock}
+
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:28px;">
                   <tr>
                     <td align="left">
@@ -209,6 +242,7 @@ export function renderLessonReportEmail(data: LessonReportEmailData): {
     `Focus:         ${data.focus}/10`,
     `Homework:      ${data.homework}/10`,
     "",
+    attachmentsText,
     `View the full report: ${data.reportUrl}`,
     data.recordingUrl ? `Watch the class recording: ${data.recordingUrl}` : "",
     "",

@@ -5,6 +5,8 @@ import {
   LessonReportView,
   type LessonReportViewData,
 } from "@/components/dashboard/LessonReportView";
+import { ReportAttachmentsManager } from "@/components/teacher/ReportAttachmentsManager";
+import { loadReportFiles } from "@/lib/reports/attachments";
 import { requireTeacher } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -98,6 +100,8 @@ export default async function TeacherReportDetailPage({
     report.students?.preferred_name?.trim() || report.students?.full_name || "—";
   const studentId = report.students?.id;
 
+  const { attachments, submissions } = await loadReportFiles(supabase, id);
+
   return (
     <Container>
       <div className="mb-6 text-[13px] text-g600">
@@ -130,7 +134,18 @@ export default async function TeacherReportDetailPage({
         </h1>
       </div>
 
-      <LessonReportView report={view} />
+      <LessonReportView
+        report={view}
+        attachments={attachments}
+        submissions={submissions}
+        reviewable
+      />
+
+      {studentId && (
+        <div className="mt-6">
+          <ReportAttachmentsManager reportId={report.id} studentId={studentId} />
+        </div>
+      )}
     </Container>
   );
 }

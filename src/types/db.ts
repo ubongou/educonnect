@@ -497,8 +497,10 @@ export type Database = {
           enrollment_id: string | null
           id: string
           kind: string
+          lesson_report_id: string | null
           mime_type: string | null
           original_filename: string
+          reviewed_at: string | null
           size_bytes: number | null
           status: string
           storage_key: string
@@ -510,8 +512,10 @@ export type Database = {
           enrollment_id?: string | null
           id?: string
           kind: string
+          lesson_report_id?: string | null
           mime_type?: string | null
           original_filename: string
+          reviewed_at?: string | null
           size_bytes?: number | null
           status?: string
           storage_key: string
@@ -523,8 +527,10 @@ export type Database = {
           enrollment_id?: string | null
           id?: string
           kind?: string
+          lesson_report_id?: string | null
           mime_type?: string | null
           original_filename?: string
+          reviewed_at?: string | null
           size_bytes?: number | null
           status?: string
           storage_key?: string
@@ -673,9 +679,12 @@ export type Database = {
       }
       teacher_materials: {
         Row: {
+          emailed_at: string | null
           id: string
           kind: string
+          lesson_report_id: string | null
           mime_type: string | null
+          note: string | null
           original_filename: string
           size_bytes: number | null
           status: string
@@ -685,9 +694,12 @@ export type Database = {
           uploaded_by: string
         }
         Insert: {
+          emailed_at?: string | null
           id?: string
           kind: string
+          lesson_report_id?: string | null
           mime_type?: string | null
+          note?: string | null
           original_filename: string
           size_bytes?: number | null
           status?: string
@@ -697,9 +709,12 @@ export type Database = {
           uploaded_by: string
         }
         Update: {
+          emailed_at?: string | null
           id?: string
           kind?: string
+          lesson_report_id?: string | null
           mime_type?: string | null
+          note?: string | null
           original_filename?: string
           size_bytes?: number | null
           status?: string

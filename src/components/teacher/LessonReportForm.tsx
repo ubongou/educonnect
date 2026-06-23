@@ -6,6 +6,7 @@ import clsx from "clsx";
 import { BatteryBars } from "@/components/ui/BatteryBars";
 import { RatingScaleSlider } from "@/components/ui/RatingScaleSlider";
 import { FormField, inputBase } from "@/components/ui/FormField";
+import { ReportAttachmentsField } from "@/components/uploads/ReportAttachmentsField";
 import { submitLessonReport } from "@/lib/actions/reports";
 
 export type ComposableSession = {
@@ -59,6 +60,8 @@ export function LessonReportForm({ session, skills }: Props) {
     Object.fromEntries(skills.map((s) => [s.id, 0])),
   );
 
+  const [attachmentIds, setAttachmentIds] = useState<string[]>([]);
+
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -91,6 +94,7 @@ export function LessonReportForm({ session, skills }: Props) {
         skill_id: s.id,
         rating: skillRatings[s.id] ?? 0,
       })),
+      material_ids: attachmentIds,
     };
 
     startTransition(async () => {
@@ -287,6 +291,22 @@ export function LessonReportForm({ session, skills }: Props) {
           </div>
         </section>
       )}
+
+      {/* Homework & resources — staged uploads that ride this report's email */}
+      <section className="rounded-lg border border-line bg-white p-6">
+        <h2 className="mb-1 font-heading text-[15px] font-semibold text-navy">
+          Homework &amp; resources
+        </h2>
+        <p className="mb-4 text-[12px] text-g400">
+          Attach a workbook to complete or a reference file. It&apos;s sent to the
+          parent together with this report.
+        </p>
+        <ReportAttachmentsField
+          studentId={session.student_id}
+          onChange={setAttachmentIds}
+          disabled={pending}
+        />
+      </section>
 
       {error && (
         <div

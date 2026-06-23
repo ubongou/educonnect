@@ -40,6 +40,7 @@ export const studentDocumentPolicy: UploadPolicy = {
 
 export const teacherMaterialPolicy: UploadPolicy = {
   allowedMime: new Set([
+    "application/pdf",
     "image/png",
     "image/jpeg",
     "image/webp",
@@ -57,6 +58,44 @@ export type ValidateUploadInput = {
 export type ValidateUploadResult =
   | { ok: true }
   | { ok: false; error: string };
+
+/**
+ * The `accept` attribute for a file `<input>`, derived from the policy's
+ * MIME allowlist. Deriving this (rather than hardcoding it per component)
+ * keeps the browser hint in lockstep with the authoritative server-side
+ * allowlist — they cannot drift apart.
+ */
+export function acceptAttr(policy: UploadPolicy): string {
+  return Array.from(policy.allowedMime).join(",");
+}
+
+/** Short human label for a MIME type, used to build the upload hint. */
+const MIME_LABELS: Record<string, string> = {
+  "application/pdf": "PDF",
+  "application/msword": "DOC",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+    "DOCX",
+  "image/png": "PNG",
+  "image/jpeg": "JPG",
+  "image/webp": "WEBP",
+  "video/mp4": "MP4",
+};
+
+/**
+ * Human-readable hint line for the dropzone, e.g.
+ * "Up to 200 MB · PDF, JPG, PNG, WEBP, MP4". Also derived from the policy
+ * so the copy can never disagree with what's actually accepted.
+ */
+export function describePolicy(policy: UploadPolicy): string {
+  const mb = Math.round(policy.maxBytes / (1024 * 1024));
+  const labels = Array.from(policy.allowedMime).map(
+    (m) => MIME_LABELS[m] ?? m,
+  );
+  // De-dupe while preserving order (JPG/JPEG could collapse in future).
+  const seen = new Set<string>();
+  const unique = labels.filter((l) => (seen.has(l) ? false : seen.add(l)));
+  return `Up to ${mb} MB · ${unique.join(", ")}`;
+}
 
 export function validateUpload(
   policy: UploadPolicy,

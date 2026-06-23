@@ -8,6 +8,7 @@ import {
   type ComposableSession,
   type SubjectSkill,
 } from "@/components/teacher/LessonReportForm";
+import { sweepAbandonedAttachments } from "@/lib/uploads/sweep";
 
 type RawSession = {
   id: string;
@@ -34,6 +35,10 @@ export default async function TeacherSessionComposerPage({
   const profile = await requireTeacher();
   const { id } = await params;
   const supabase = await createClient();
+
+  // Opportunistic GC: clear out any of this teacher's abandoned staged
+  // attachments from earlier, un-submitted composer sessions.
+  await sweepAbandonedAttachments(profile.id);
 
   const { data } = await supabase
     .from("sessions")

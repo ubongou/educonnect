@@ -7,6 +7,7 @@ import {
   LessonReportView,
   type LessonReportViewData,
 } from "@/components/dashboard/LessonReportView";
+import { loadReportFiles } from "@/lib/reports/attachments";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/format";
@@ -98,6 +99,8 @@ export default async function AdminReportDetailPage({
   const studentName =
     report.students?.preferred_name?.trim() || report.students?.full_name || "—";
 
+  const { attachments, submissions } = await loadReportFiles(supabase, id);
+
   return (
     <Container>
       <div className="mb-6">
@@ -159,7 +162,11 @@ export default async function AdminReportDetailPage({
         </div>
       )}
 
-      <LessonReportView report={view} />
+      <LessonReportView
+        report={view}
+        attachments={attachments}
+        submissions={submissions}
+      />
     </Container>
   );
 }

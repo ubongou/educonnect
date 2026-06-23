@@ -2,6 +2,24 @@ import { BatteryBars } from "@/components/ui/BatteryBars";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { formatDate, formatDuration } from "@/lib/format";
 import { confidenceBadge, understandingBadge } from "@/lib/scales";
+import { isViewableMime } from "@/lib/uploads/viewable";
+import { materialKindLabel } from "@/lib/uploads/labels";
+import { HomeworkSubmit } from "@/components/dashboard/HomeworkSubmit";
+import { ReviewButton } from "@/components/teacher/ReviewButton";
+
+export type ReportAttachmentItem = {
+  id: string;
+  kind: string;
+  original_filename: string;
+  mime_type: string | null;
+};
+
+export type HomeworkSubmissionItem = {
+  id: string;
+  original_filename: string;
+  mime_type: string | null;
+  reviewed_at: string | null;
+};
 
 export type LessonReportViewData = {
   id: string;
@@ -22,9 +40,26 @@ export type LessonReportViewData = {
   skill_ratings: Array<{ name: string; rating: number }>;
 };
 
-export function LessonReportView({ report }: { report: LessonReportViewData }) {
+export function LessonReportView({
+  report,
+  attachments = [],
+  submissions = [],
+  submitContext = null,
+  reviewable = false,
+}: {
+  report: LessonReportViewData;
+  /** Files the teacher attached (homework workbooks, resources). */
+  attachments?: ReportAttachmentItem[];
+  /** Completed-homework files the parent has submitted back. */
+  submissions?: HomeworkSubmissionItem[];
+  /** When set (parent view), renders the "Submit completed work" control. */
+  submitContext?: { studentId: string } | null;
+  /** When true (teacher view), shows a "Mark reviewed" toggle per submission. */
+  reviewable?: boolean;
+}) {
   const u = understandingBadge(report.understanding_check);
   const c = confidenceBadge(report.confidence_level);
+  const hasHomework = attachments.some((a) => a.kind === "homework");
 
   return (
     <article className="flex w-full min-w-0 flex-col gap-6">
@@ -87,6 +122,102 @@ export function LessonReportView({ report }: { report: LessonReportViewData }) {
               <p className="mt-2 text-[14px] text-navy">
                 {report.how_to_help_at_home}
               </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Homework & resources */}
+      {(attachments.length > 0 || submissions.length > 0) && (
+        <div className="rounded-[28px] border border-line bg-white p-6">
+          <h3 className="mb-4 font-heading text-[14px] font-semibold text-navy">
+            Homework &amp; resources
+          </h3>
+          {attachments.length > 0 && (
+            <ul className="flex flex-col gap-2">
+              {attachments.map((a) => {
+                const isHomework = a.kind === "homework";
+                return (
+                  <li
+                    key={a.id}
+                    className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line px-4 py-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <StatusBadge tone={isHomework ? "amber" : "gray"}>
+                        {isHomework ? "Homework" : materialKindLabel(a.kind)}
+                      </StatusBadge>
+                      <span className="font-heading text-[14px] font-semibold text-navy">
+                        {a.original_filename}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {isViewableMime(a.mime_type) && (
+                        <a
+                          href={`/api/teacher-materials/${a.id}/download`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
+                        >
+                          View
+                        </a>
+                      )}
+                      <a
+                        href={`/api/teacher-materials/${a.id}/download?disposition=attachment`}
+                        className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
+                      >
+                        Download
+                      </a>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+
+          {/* Completed work — parent submits, both sides see status */}
+          {(hasHomework || submissions.length > 0) && (
+            <div className="mt-4 rounded-lg border border-dashed border-line bg-paper p-4">
+              <p className="mb-2 font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
+                Completed work
+              </p>
+              {submissions.length > 0 ? (
+                <ul className="mb-3 flex flex-col gap-2">
+                  {submissions.map((s) => (
+                    <li
+                      key={s.id}
+                      className="flex flex-wrap items-center justify-between gap-2"
+                    >
+                      <div className="flex items-center gap-2">
+                        <StatusBadge tone={s.reviewed_at ? "green" : "blue"}>
+                          {s.reviewed_at ? "Reviewed" : "Submitted"}
+                        </StatusBadge>
+                        <a
+                          href={`/api/student-documents/${s.id}/download?disposition=attachment`}
+                          className="font-heading text-[13px] font-semibold text-navy underline-offset-4 hover:underline"
+                        >
+                          {s.original_filename}
+                        </a>
+                      </div>
+                      {reviewable && (
+                        <ReviewButton
+                          documentId={s.id}
+                          reviewed={Boolean(s.reviewed_at)}
+                        />
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mb-3 text-[13px] text-g600">
+                  Nothing submitted yet.
+                </p>
+              )}
+              {submitContext && hasHomework && (
+                <HomeworkSubmit
+                  reportId={report.id}
+                  studentId={submitContext.studentId}
+                />
+              )}
             </div>
           )}
         </div>

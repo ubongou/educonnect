@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
+  acceptAttr,
+  describePolicy,
   intakeUploadPolicy,
   studentDocumentPolicy,
   teacherMaterialPolicy,
@@ -191,12 +193,13 @@ describe("validateUpload — teacherMaterialPolicy", () => {
     ).toEqual({ ok: true });
   });
 
-  it("rejects PDF — teacher materials are images/video only", () => {
-    const result = validateUpload(teacherMaterialPolicy, {
-      mimeType: "application/pdf",
-      sizeBytes: 1 * MB,
-    });
-    expect(result.ok).toBe(false);
+  it("accepts PDF — teachers can share PDFs with parents", () => {
+    expect(
+      validateUpload(teacherMaterialPolicy, {
+        mimeType: "application/pdf",
+        sizeBytes: 1 * MB,
+      }),
+    ).toEqual({ ok: true });
   });
 
   it("rejects .doc — teacher materials do NOT allow Word files", () => {
@@ -248,6 +251,39 @@ describe("policy prefixes", () => {
     ]) {
       expect(policy.prefix.endsWith("/")).toBe(false);
     }
+  });
+});
+
+describe("acceptAttr / describePolicy — derived from the policy", () => {
+  it("acceptAttr lists every allowed MIME type", () => {
+    const accept = acceptAttr(teacherMaterialPolicy);
+    expect(accept).toContain("application/pdf");
+    expect(accept).toContain("video/mp4");
+    // Every entry in the allowlist appears in the accept string.
+    for (const mime of teacherMaterialPolicy.allowedMime) {
+      expect(accept).toContain(mime);
+    }
+  });
+
+  it("accept string never drifts from the policy (regression guard)", () => {
+    // The PDF bug was a hardcoded accept attr disagreeing with the policy.
+    // Deriving it means the two are the same source of truth.
+    const accept = acceptAttr(teacherMaterialPolicy);
+    const fromPolicy = Array.from(teacherMaterialPolicy.allowedMime).join(",");
+    expect(accept).toBe(fromPolicy);
+  });
+
+  it("describePolicy mentions the size cap and friendly type labels", () => {
+    const hint = describePolicy(teacherMaterialPolicy);
+    expect(hint).toMatch(/200 MB/);
+    expect(hint).toContain("PDF");
+    expect(hint).toContain("MP4");
+  });
+
+  it("describePolicy reflects intake's Word-doc support", () => {
+    const hint = describePolicy(intakeUploadPolicy);
+    expect(hint).toContain("DOC");
+    expect(hint).toContain("DOCX");
   });
 });
 

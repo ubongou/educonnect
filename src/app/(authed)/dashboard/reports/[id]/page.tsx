@@ -5,6 +5,7 @@ import {
   LessonReportView,
   type LessonReportViewData,
 } from "@/components/dashboard/LessonReportView";
+import { loadReportFiles } from "@/lib/reports/attachments";
 import { requireParent } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -94,6 +95,8 @@ export default async function ParentReportDetailPage({
   const studentName =
     report.students?.preferred_name?.trim() || report.students?.full_name || "—";
 
+  const { attachments, submissions } = await loadReportFiles(supabase, id);
+
   return (
     <Container>
       <div className="mb-6 text-[13px] text-g600">
@@ -121,7 +124,14 @@ export default async function ParentReportDetailPage({
         )}
       </div>
 
-      <LessonReportView report={view} />
+      <LessonReportView
+        report={view}
+        attachments={attachments}
+        submissions={submissions}
+        submitContext={
+          report.students?.id ? { studentId: report.students.id } : null
+        }
+      />
     </Container>
   );
 }

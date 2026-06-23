@@ -5,6 +5,7 @@ import {
   LessonReportView,
   type LessonReportViewData,
 } from "@/components/dashboard/LessonReportView";
+import { loadReportFiles } from "@/lib/reports/attachments";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { createClient } from "@/lib/supabase/server";
 import { getParentChildren, pickChild, childTabColor } from "@/lib/dashboard/children";
@@ -128,6 +129,10 @@ export default async function DashboardSessionsPage({
       }
     : null;
 
+  const reportFiles = full
+    ? await loadReportFiles(supabase, full.id)
+    : { attachments: [], submissions: [] };
+
   return (
     <Container>
       <div className="mb-8">
@@ -203,7 +208,12 @@ export default async function DashboardSessionsPage({
 
           <div className="w-full min-w-0">
             {view ? (
-              <LessonReportView report={view} />
+              <LessonReportView
+                report={view}
+                attachments={reportFiles.attachments}
+                submissions={reportFiles.submissions}
+                submitContext={{ studentId: selected.id }}
+              />
             ) : (
               <p className="text-[14px] text-g600">Pick a lesson to view the report.</p>
             )}

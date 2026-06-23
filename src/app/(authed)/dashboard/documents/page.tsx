@@ -52,29 +52,58 @@ export default async function DashboardDocumentsPage({
   }
 
   const supabase = await createClient();
-  const [{ data }, { data: materialsData }, { data: enrollmentRows }] =
-    await Promise.all([
-      supabase
-        .from("student_documents")
-        .select(
-          "id, kind, original_filename, size_bytes, uploaded_at, mime_type, enrollment_id, enrollments ( subjects ( name ) )",
-        )
-        .eq("student_id", selected.id)
-        .order("uploaded_at", { ascending: false }),
-      supabase
-        .from("teacher_materials")
-        .select("id, kind, original_filename, size_bytes, uploaded_at, mime_type")
-        .eq("student_id", selected.id)
-        .order("uploaded_at", { ascending: false }),
-      supabase
-        .from("enrollments")
-        .select(
-          "id, subjects ( name ), teacher:profiles!enrollments_teacher_id_fkey ( full_name )",
-        )
-        .eq("student_id", selected.id)
-        .eq("status", "approved")
-        .order("created_at", { ascending: true }),
-    ]);
+  const [
+    { data },
+    { data: materialsData },
+    { data: enrollmentRows },
+    { data: homeworkData },
+    { data: submissionsData },
+  ] = await Promise.all([
+    supabase
+      .from("student_documents")
+      .select(
+        "id, kind, original_filename, size_bytes, uploaded_at, mime_type, enrollment_id, enrollments ( subjects ( name ) )",
+      )
+      .eq("student_id", selected.id)
+      // Completed-homework submissions live on the lesson report, not in the
+      // flat document archive.
+      .neq("kind", "homework_submission")
+      .order("uploaded_at", { ascending: false }),
+    supabase
+      .from("teacher_materials")
+      .select("id, kind, original_filename, size_bytes, uploaded_at, mime_type")
+      .eq("student_id", selected.id)
+      // Report attachments show under their report; this list is standalone
+      // tutor materials only.
+      .is("lesson_report_id", null)
+      .order("uploaded_at", { ascending: false }),
+    supabase
+      .from("enrollments")
+      .select(
+        "id, subjects ( name ), teacher:profiles!enrollments_teacher_id_fkey ( full_name )",
+      )
+      .eq("student_id", selected.id)
+      .eq("status", "approved")
+      .order("created_at", { ascending: true }),
+    // Homework workbooks attached to lesson reports, with their report context.
+    supabase
+      .from("teacher_materials")
+      .select(
+        "id, original_filename, mime_type, lesson_report_id, lesson_reports ( lesson_date, subjects ( name ) )",
+      )
+      .eq("student_id", selected.id)
+      .eq("kind", "homework")
+      .eq("status", "ready")
+      .not("lesson_report_id", "is", null)
+      .order("uploaded_at", { ascending: false }),
+    // Completed-homework the parent has submitted back, to derive status.
+    supabase
+      .from("student_documents")
+      .select("lesson_report_id, reviewed_at")
+      .eq("student_id", selected.id)
+      .eq("kind", "homework_submission")
+      .eq("status", "ready"),
+  ]);
 
   type EnrollmentRow = {
     id: string;
@@ -112,6 +141,59 @@ export default async function DashboardDocumentsPage({
     }),
   );
   const tutorMaterials = (materialsData ?? []) as TutorMaterialRow[];
+
+  // Homework hub: each report-attached homework workbook + its submission state.
+  type HomeworkRow = {
+    id: string;
+    original_filename: string;
+    mime_type: string | null;
+    lesson_report_id: string | null;
+    lesson_reports: {
+      lesson_date: string;
+      subjects: { name: string } | null;
+    } | null;
+  };
+  type SubmissionRow = {
+    lesson_report_id: string | null;
+    reviewed_at: string | null;
+  };
+
+  const homeworkRows = (homeworkData ?? []) as unknown as HomeworkRow[];
+  const statusByReport = new Map<
+    string,
+    { submitted: boolean; reviewed: boolean }
+  >();
+  for (const s of (submissionsData ?? []) as SubmissionRow[]) {
+    if (!s.lesson_report_id) continue;
+    const cur = statusByReport.get(s.lesson_report_id) ?? {
+      submitted: false,
+      reviewed: false,
+    };
+    cur.submitted = true;
+    if (s.reviewed_at) cur.reviewed = true;
+    statusByReport.set(s.lesson_report_id, cur);
+  }
+
+  const homeworkItems = homeworkRows.map((h) => {
+    const st = h.lesson_report_id
+      ? statusByReport.get(h.lesson_report_id)
+      : undefined;
+    const status: "todo" | "submitted" | "reviewed" = st?.reviewed
+      ? "reviewed"
+      : st?.submitted
+        ? "submitted"
+        : "todo";
+    return {
+      id: h.id,
+      original_filename: h.original_filename,
+      mime_type: h.mime_type,
+      reportId: h.lesson_report_id,
+      lessonDate: h.lesson_reports?.lesson_date ?? null,
+      subjectName: h.lesson_reports?.subjects?.name ?? null,
+      status,
+    };
+  });
+
   const childOptions: ChildTabOption[] = children.map((c, i) => ({
     id: c.id,
     label: c.preferred_name ?? c.full_name,
@@ -144,6 +226,75 @@ export default async function DashboardDocumentsPage({
         documents={documents}
         enrollments={enrollmentOptions}
       />
+
+      {homeworkItems.length > 0 && (
+        <section className="mt-10">
+          <h2 className="mb-4 font-heading text-[11px] font-bold uppercase tracking-[0.12em] text-g400">
+            Homework
+          </h2>
+          <ul className="flex flex-col gap-2">
+            {homeworkItems.map((h) => {
+              const tone =
+                h.status === "reviewed"
+                  ? "green"
+                  : h.status === "submitted"
+                    ? "blue"
+                    : "amber";
+              const label =
+                h.status === "reviewed"
+                  ? "Reviewed"
+                  : h.status === "submitted"
+                    ? "Submitted"
+                    : "To do";
+              return (
+                <li
+                  key={h.id}
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-[28px] border border-line bg-white px-5 py-3"
+                >
+                  <div className="flex items-center gap-3">
+                    <StatusBadge tone={tone}>{label}</StatusBadge>
+                    <div>
+                      <p className="font-heading text-[14px] font-semibold text-navy">
+                        {h.original_filename}
+                      </p>
+                      <p className="mt-1 text-[12px] text-g400">
+                        {h.lessonDate ? formatDate(h.lessonDate) : "Lesson"}
+                        {h.subjectName ? ` · ${h.subjectName}` : ""}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {isViewableMime(h.mime_type) && (
+                      <a
+                        href={`/api/teacher-materials/${h.id}/download`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
+                      >
+                        View
+                      </a>
+                    )}
+                    <a
+                      href={`/api/teacher-materials/${h.id}/download?disposition=attachment`}
+                      className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
+                    >
+                      Download
+                    </a>
+                    {h.reportId && (
+                      <a
+                        href={`/dashboard/sessions?child=${selected.id}&report=${h.reportId}`}
+                        className="font-heading text-[13px] font-bold text-navy underline-offset-4 hover:underline"
+                      >
+                        {h.status === "todo" ? "Submit work" : "Open report"}
+                      </a>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
 
       <section className="mt-10">
         <h2 className="mb-4 font-heading text-[11px] font-bold uppercase tracking-[0.12em] text-g400">

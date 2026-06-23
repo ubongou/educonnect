@@ -4,7 +4,16 @@ import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { sendLessonReportEmail } from "@/lib/email/sendLessonReport";
+import { sendExtraHomeworkEmail } from "@/lib/email/sendExtraHomework";
+import { promoteStagedAttachments } from "@/lib/uploads/promote";
 import { lessonReportSchema, lessonReportEditSchema } from "@/lib/validation";
+
+/** Pulls a string[] of staged attachment ids out of a raw action payload. */
+function readMaterialIds(input: unknown): string[] {
+  const raw = (input as { material_ids?: unknown }).material_ids;
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((x): x is string => typeof x === "string");
+}
 
 export type SubmitReportResult =
   | { ok: true; reportId: string }
@@ -69,6 +78,23 @@ export async function submitLessonReport(input: unknown): Promise<SubmitReportRe
   const reportId = row?.id;
   if (!reportId) {
     return { ok: false, error: "Report created but no id returned" };
+  }
+
+  // Promote any staged composer attachments onto the new report BEFORE the
+  // email fires, so they ride the report's single send.
+  const materialIds = readMaterialIds(input);
+  if (materialIds.length > 0) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) {
+      await promoteStagedAttachments(supabase, {
+        reportId,
+        studentId: parsed.data.student_id,
+        uploaderId: user.id,
+        materialIds,
+      });
+    }
   }
 
   // Fire-and-log: a Resend hiccup must not roll back a saved report.
@@ -181,5 +207,59 @@ export async function setReportDeleted(
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/sessions");
   revalidatePath("/teacher");
+  return { ok: true };
+}
+
+/**
+ * Attaches already-uploaded (staged) files to a report that has *already been
+ * sent* — the "I forgot the homework" case. Promotes the staged rows onto the
+ * report, and when `notify` is set, sends a short "extra homework added"
+ * email (not a full report re-send). Used from the teacher report view.
+ */
+export async function addMaterialsToReport(
+  reportId: string,
+  materialIds: string[],
+  notify: boolean,
+): Promise<UpdateReportResult> {
+  if (!reportId) return { ok: false, error: "Missing report id" };
+  const ids = materialIds.filter(Boolean);
+  if (ids.length === 0) return { ok: false, error: "No files to attach" };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Auth required" };
+
+  // RLS lets the assigned teacher / admin read the report.
+  const { data: report } = await supabase
+    .from("lesson_reports")
+    .select("id, student_id")
+    .eq("id", reportId)
+    .maybeSingle();
+  if (!report) return { ok: false, error: "Report not found" };
+
+  const promoted = await promoteStagedAttachments(supabase, {
+    reportId,
+    studentId: report.student_id,
+    uploaderId: user.id,
+    materialIds: ids,
+  });
+  if (promoted.length === 0) {
+    return { ok: false, error: "No matching files to attach" };
+  }
+
+  if (notify) {
+    try {
+      await sendExtraHomeworkEmail(reportId, promoted);
+    } catch (err) {
+      console.error("[extra-homework email] unexpected error:", err);
+    }
+  }
+
+  revalidatePath(`/teacher/reports/${reportId}`);
+  revalidatePath(`/dashboard/reports/${reportId}`);
+  revalidatePath("/dashboard/documents");
+  revalidatePath("/dashboard/sessions");
   return { ok: true };
 }
