@@ -13,11 +13,7 @@ import { IntakeSummary } from "@/components/dashboard/IntakeSummary";
 import { confidenceBadge, understandingBadge } from "@/lib/scales";
 import { StudentTabsNav } from "@/components/teacher/StudentTabsNav";
 import { isViewableMime } from "@/lib/uploads/viewable";
-import {
-  ChildDashboardBody,
-  isSubjectSlug,
-  type SubjectSlug,
-} from "@/components/dashboard/ChildDashboardBody";
+import { ChildDashboardBody } from "@/components/dashboard/ChildDashboardBody";
 
 type ReportRow = {
   id: string;
@@ -62,12 +58,6 @@ const kindLabels: Record<string, string> = {
   other: "Other",
 };
 
-type TeacherEnrollment = {
-  id: string;
-  status: string;
-  subjects: { name: string; slug: string } | null;
-};
-
 export default async function TeacherStudentDetail({
   params,
   searchParams,
@@ -83,34 +73,16 @@ export default async function TeacherStudentDetail({
 
   // Verify this teacher is actually assigned to this student via at least
   // one enrollment. RLS would block most reads, but an explicit check
-  // gives a nicer 404 than an empty student fetch. We also use these to scope
-  // the embedded progress dashboard to the subjects this teacher teaches.
+  // gives a nicer 404 than an empty student fetch. The embedded dashboard
+  // builds its own subject selector (scoped to this teacher's enrollments by
+  // RLS), so it stays identical to the parent and admin views.
   const { data: enrollmentData } = await supabase
     .from("enrollments")
-    .select("id, status, subjects ( name, slug )")
+    .select("id")
     .eq("student_id", id)
     .eq("teacher_id", profile.id)
-    .order("created_at", { ascending: true });
-  const teacherEnrollments = (enrollmentData ?? []) as unknown as TeacherEnrollment[];
-  if (teacherEnrollments.length === 0) notFound();
-
-  // Distinct, valid-slug subjects from approved enrollments — one dashboard
-  // per enrolment, switchable when the teacher teaches several subjects.
-  const dashboardSubjects: { slug: SubjectSlug; name: string }[] = [];
-  const seenSlugs = new Set<string>();
-  for (const e of teacherEnrollments) {
-    if (e.status !== "approved") continue;
-    const slug = e.subjects?.slug;
-    const name = e.subjects?.name;
-    if (slug && name && isSubjectSlug(slug) && !seenSlugs.has(slug)) {
-      seenSlugs.add(slug);
-      dashboardSubjects.push({ slug, name });
-    }
-  }
-  const selectedSubject: SubjectSlug | null =
-    dashboardSubjects.find((d) => d.slug === subjectRaw)?.slug ??
-    dashboardSubjects[0]?.slug ??
-    null;
+    .limit(1);
+  if ((enrollmentData ?? []).length === 0) notFound();
 
   const { data: student } = await supabase
     .from("students")
@@ -250,46 +222,19 @@ export default async function TeacherStudentDetail({
         )}
       </section>
 
-      {selectedSubject && (
-        <section className="mt-10">
-          <h2 className="mb-4 font-heading text-[11px] font-bold uppercase tracking-[0.12em] text-g400">
-            Progress dashboard
-          </h2>
-          {dashboardSubjects.length > 1 && (
-            <nav
-              aria-label="Select enrolment"
-              className="mb-6 flex flex-wrap items-center gap-2"
-            >
-              {dashboardSubjects.map((d) => {
-                const active = d.slug === selectedSubject;
-                return (
-                  <Link
-                    key={d.slug}
-                    href={`/teacher/students/${id}?subject=${d.slug}`}
-                    aria-current={active ? "page" : undefined}
-                    className={`inline-flex items-center rounded-pill border px-4 py-[7px] font-heading text-[13px] font-semibold transition-colors ${
-                      active
-                        ? "border-navy bg-navy text-yellow"
-                        : "border-navy/20 bg-white text-navy hover:bg-paper"
-                    }`}
-                  >
-                    {d.name}
-                  </Link>
-                );
-              })}
-            </nav>
-          )}
-          <ChildDashboardBody
-            studentId={id}
-            childDisplayName={displayName}
-            childRegistrationNumber={student.registration_number}
-            selectedSubject={selectedSubject}
-            subjectSlug={selectedSubject}
-            subjectHref={(slug) => `/teacher/students/${id}?subject=${slug}`}
-            variant="teacher"
-          />
-        </section>
-      )}
+      <section className="mt-10">
+        <h2 className="mb-4 font-heading text-[11px] font-bold uppercase tracking-[0.12em] text-g400">
+          Progress dashboard
+        </h2>
+        <ChildDashboardBody
+          studentId={id}
+          childDisplayName={displayName}
+          childRegistrationNumber={student.registration_number}
+          requestedSubject={subjectRaw}
+          subjectHref={(slug) => `/teacher/students/${id}?subject=${slug}`}
+          variant="teacher"
+        />
+      </section>
 
       <section className="mt-10">
         <h2 className="mb-4 font-heading text-[11px] font-bold uppercase tracking-[0.12em] text-g400">

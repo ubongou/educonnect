@@ -15,14 +15,6 @@ export function isSubjectSlug(v: string | undefined): v is SubjectSlug {
   return v === "mathematics" || v === "english" || v === "science";
 }
 
-export function subjectLabel(slug: SubjectSlug): string {
-  return slug === "mathematics"
-    ? "Mathematics"
-    : slug === "english"
-      ? "English"
-      : "Science";
-}
-
 type ReportRow = {
   id: string;
   lesson_date: string;
@@ -42,6 +34,11 @@ type ReportRow = {
 type UpcomingSession = {
   session_date: string;
   subjects: { name: string } | null;
+};
+
+type EnrollmentSubjectRow = {
+  status: string;
+  subjects: { slug: string; name: string } | null;
 };
 
 function averageSkill(ratings: Array<{ rating: number }>): number | null {
@@ -68,110 +65,185 @@ export async function ChildDashboardBody({
   studentId,
   childDisplayName,
   childRegistrationNumber,
-  selectedSubject,
+  requestedSubject,
   subjectHref,
   variant,
-  subjectSlug,
 }: {
   studentId: string;
   childDisplayName: string;
   childRegistrationNumber: string;
-  selectedSubject: SubjectSlug;
-  /** Builds the href for a subject sub-tab (differs parent vs admin). */
+  /**
+   * Raw `?subject=` slug from the URL, if any. The body resolves the actual
+   * selection itself: it validates this against the student's own subjects and
+   * otherwise falls back to the first subject that has report data, so a child
+   * never opens on an empty chart for a subject they aren't studying.
+   */
+  requestedSubject?: string;
+  /** Builds the href for a subject pill (differs per portal). */
   subjectHref: (slug: SubjectSlug) => string;
-  /**
-   * Drives report-link targets and which affordances show. "teacher" also
-   * hides the internal subject sub-tabs — the teacher student page wraps this
-   * in an enrolment switcher instead, so the subject is fixed per dashboard.
-   */
+  /** Drives report-link targets and which parent-only affordances show. */
   variant: "parent" | "admin" | "teacher";
-  /**
-   * When set, scopes the confidence chart to this subject (same filter the
-   * skill chart applies), so multi-subject/multi-teacher confidence scores
-   * aren't blended into one unattributable line. Wire it to `selectedSubject`
-   * to keep both charts in sync with the sub-tabs. Omit to keep the original
-   * behaviour: confidence spans every subject.
-   */
-  subjectSlug?: SubjectSlug;
 }) {
   const supabase = await createClient();
 
-  const [{ data: reports }, { data: upcoming }] = await Promise.all([
-    supabase
-      .from("lesson_reports")
-      .select(
-        `
-        id, lesson_date, lesson_focus, confidence_level, understanding_check,
-        participation, focus_rating, homework,
-        how_to_help_at_home, lesson_highlights,
-        subjects ( slug, name ),
-        uploader:profiles!lesson_reports_uploaded_by_fkey ( full_name ),
-        skill_ratings:lesson_report_skill_ratings ( rating )
-        `,
-      )
-      .eq("student_id", studentId)
-      .is("deleted_at", null)
-      .order("lesson_date", { ascending: true })
-      .order("created_at", { ascending: true })
-      .limit(60),
-    supabase
-      .from("sessions")
-      .select("session_date, subjects ( name )")
-      .eq("student_id", studentId)
-      .eq("status", "scheduled")
-      .gte("session_date", new Date().toISOString().slice(0, 10))
-      .order("session_date", { ascending: true })
-      .limit(1),
-  ]);
+  const [{ data: reports }, { data: upcoming }, { data: enrollmentRows }] =
+    await Promise.all([
+      supabase
+        .from("lesson_reports")
+        .select(
+          `
+          id, lesson_date, lesson_focus, confidence_level, understanding_check,
+          participation, focus_rating, homework,
+          how_to_help_at_home, lesson_highlights,
+          subjects ( slug, name ),
+          uploader:profiles!lesson_reports_uploaded_by_fkey ( full_name ),
+          skill_ratings:lesson_report_skill_ratings ( rating )
+          `,
+        )
+        .eq("student_id", studentId)
+        .is("deleted_at", null)
+        .order("lesson_date", { ascending: true })
+        .order("created_at", { ascending: true })
+        .limit(60),
+      supabase
+        .from("sessions")
+        .select("session_date, subjects ( name )")
+        .eq("student_id", studentId)
+        .eq("status", "scheduled")
+        .gte("session_date", new Date().toISOString().slice(0, 10))
+        .order("session_date", { ascending: true })
+        .limit(1),
+      supabase
+        .from("enrollments")
+        .select("status, subjects ( slug, name )")
+        .eq("student_id", studentId),
+    ]);
 
   const reportRows = (reports ?? []) as unknown as ReportRow[];
 
-  // Confidence line chart — last N reports, raw 1–10 scale. Scoped to the
-  // subject filter when provided, matching the skill chart, so a single line
-  // never blends scores from different subjects/teachers.
-  const confidenceReports = subjectSlug
-    ? reportRows.filter((r) => r.subjects?.slug === subjectSlug)
-    : reportRows;
-  const lastReportsForConfidence = confidenceReports.slice(-CHART_POINTS);
-  const confidenceChart = {
-    points: lastReportsForConfidence.map((r) => r.confidence_level),
-    xLabels: lastReportsForConfidence.map((r) =>
-      new Date(r.lesson_date).toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "short",
-      }),
-    ),
-  };
+  // Which subjects already have report data (canonical slugs only).
+  const subjectsWithData = new Set<SubjectSlug>();
+  for (const r of reportRows) {
+    const slug = r.subjects?.slug;
+    if (slug && isSubjectSlug(slug)) subjectsWithData.add(slug);
+  }
 
-  // Skill chart — average rating per report, filtered to selected subject.
-  const subjectReports = reportRows.filter(
-    (r) => r.subjects?.slug === selectedSubject,
+  // The subject pills. Source = this student's approved enrollments UNION any
+  // subject that already has reports (so data is never hidden). RLS has already
+  // scoped `enrollmentRows` to what the viewer may see — a parent sees their
+  // child's subjects, an admin sees all, a teacher sees only the ones they
+  // teach — so the same component renders the correct set in every portal.
+  const nameBySlug = new Map<SubjectSlug, string>();
+  for (const e of (enrollmentRows ?? []) as unknown as EnrollmentSubjectRow[]) {
+    const slug = e.subjects?.slug;
+    const name = e.subjects?.name;
+    if (slug && name && isSubjectSlug(slug) && e.status === "approved") {
+      if (!nameBySlug.has(slug)) nameBySlug.set(slug, name);
+    }
+  }
+  for (const r of reportRows) {
+    const slug = r.subjects?.slug;
+    const name = r.subjects?.name;
+    if (slug && name && isSubjectSlug(slug) && !nameBySlug.has(slug)) {
+      nameBySlug.set(slug, name);
+    }
+  }
+  const subjects = SUBJECT_SLUGS.filter((s) => nameBySlug.has(s)).map((s) => ({
+    slug: s,
+    name: nameBySlug.get(s)!,
+  }));
+
+  // Resolve the active subject. An explicit, valid `?subject=` wins; otherwise
+  // default to the first subject that actually has data (so the charts open
+  // populated), then to the first subject, then nothing.
+  const requestedValid =
+    isSubjectSlug(requestedSubject) &&
+    subjects.some((s) => s.slug === requestedSubject)
+      ? requestedSubject
+      : undefined;
+  const selectedSubject: SubjectSlug | null =
+    requestedValid ??
+    subjects.find((s) => subjectsWithData.has(s.slug))?.slug ??
+    subjects[0]?.slug ??
+    null;
+  const selectedName =
+    subjects.find((s) => s.slug === selectedSubject)?.name ?? "";
+
+  // Both charts share one subject-scoped slice, so the confidence line and the
+  // skill line always describe the same subject as the selector above them.
+  const selectedReports = selectedSubject
+    ? reportRows.filter((r) => r.subjects?.slug === selectedSubject)
+    : [];
+  const chartReports = selectedReports.slice(-CHART_POINTS);
+  const xLabels = chartReports.map((r) =>
+    new Date(r.lesson_date).toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+    }),
   );
-  const lastSkillReports = subjectReports.slice(-CHART_POINTS);
+  const confidenceChart = {
+    points: chartReports.map((r) => r.confidence_level),
+    xLabels,
+  };
   const skillChart = {
-    points: lastSkillReports.map((r) => averageSkill(r.skill_ratings)),
-    xLabels: lastSkillReports.map((r) =>
-      new Date(r.lesson_date).toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "short",
-      }),
-    ),
+    points: chartReports.map((r) => averageSkill(r.skill_ratings)),
+    xLabels,
   };
 
+  // Confidence badge reflects the latest report *within the selected subject*,
+  // so it agrees with the chart beside it. The latest-lesson card below stays
+  // the most recent lesson overall.
+  const latestInSubject = selectedReports.at(-1);
   const latest = reportRows.at(-1);
   const next = (upcoming ?? [])[0] as UpcomingSession | undefined;
 
   return (
     <>
+      {/* Shared subject selector — governs both charts below. */}
+      {subjects.length > 0 && (
+        <div className="mb-6 flex flex-wrap items-center gap-x-4 gap-y-2">
+          <span className="font-heading text-[11px] font-bold uppercase tracking-[0.12em] text-g400">
+            Subject
+          </span>
+          <nav
+            aria-label="Select subject"
+            className="flex flex-wrap items-center gap-2"
+          >
+            {subjects.map((s) => {
+              const active = s.slug === selectedSubject;
+              return (
+                <Link
+                  key={s.slug}
+                  href={subjectHref(s.slug)}
+                  aria-current={active ? "page" : undefined}
+                  className={`inline-flex items-center rounded-pill border px-4 py-[7px] font-heading text-[13px] font-semibold transition-colors ${
+                    active
+                      ? "border-navy bg-navy text-yellow"
+                      : "border-navy/20 bg-white text-navy hover:bg-paper"
+                  }`}
+                >
+                  {s.name}
+                </Link>
+              );
+            })}
+          </nav>
+          <span className="text-[12px] text-g600">
+            Applies to the confidence and skill charts below
+          </span>
+        </div>
+      )}
+
       {/* Confidence over time */}
       <section className="mb-6 rounded-[28px] border border-line bg-white p-6">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-heading text-[15px] font-semibold text-navy">
             Confidence progression
           </h2>
-          {latest && (
-            <StatusBadge tone={confidenceBadge(latest.confidence_level).tone}>
-              {confidenceBadge(latest.confidence_level).label}
+          {latestInSubject && (
+            <StatusBadge
+              tone={confidenceBadge(latestInSubject.confidence_level).tone}
+            >
+              {confidenceBadge(latestInSubject.confidence_level).label}
             </StatusBadge>
           )}
         </div>
@@ -198,32 +270,12 @@ export async function ChildDashboardBody({
         )}
       </section>
 
-      {/* Skill chart with subject subtabs */}
+      {/* Skill chart — subject controlled by the shared selector above. */}
       <section className="mb-10 rounded-[28px] border border-line bg-white p-6">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-heading text-[15px] font-semibold text-navy">
             Average skill level progression
           </h2>
-          {variant !== "teacher" && (
-            <div className="flex items-center gap-2">
-              {SUBJECT_SLUGS.map((slug) => {
-                const active = slug === selectedSubject;
-                return (
-                  <Link
-                    key={slug}
-                    href={subjectHref(slug)}
-                    className={`inline-flex items-center rounded-pill border px-4 py-[4px] font-heading text-[12px] font-semibold transition-colors ${
-                      active
-                        ? "border-navy bg-navy text-yellow"
-                        : "border-navy/20 bg-white text-navy hover:bg-paper"
-                    }`}
-                  >
-                    {subjectLabel(slug)}
-                  </Link>
-                );
-              })}
-            </div>
-          )}
         </div>
         {skillChart.points.every((p) => p === null) ? (
           <p className="text-[14px] text-g600">
@@ -245,7 +297,7 @@ export async function ChildDashboardBody({
             yMax={10}
             yAxisWidth={32}
             height={120}
-            caption={`Average across all ${subjectLabel(selectedSubject)} skills, last ${CHART_POINTS} sessions`}
+            caption={`Average across all ${selectedName} skills, last ${CHART_POINTS} sessions`}
           />
         )}
       </section>

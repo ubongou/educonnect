@@ -1,10 +1,7 @@
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { ChildTabs, type ChildTabOption } from "@/components/dashboard/ChildTabs";
-import {
-  ChildDashboardBody,
-  isSubjectSlug,
-} from "@/components/dashboard/ChildDashboardBody";
+import { ChildDashboardBody } from "@/components/dashboard/ChildDashboardBody";
 import {
   getParentChildren,
   pickChild,
@@ -45,8 +42,6 @@ export default async function DashboardOverview({
       </Container>
     );
   }
-
-  const selectedSubject = isSubjectSlug(subjectRaw) ? subjectRaw : "mathematics";
 
   const childOptions: ChildTabOption[] = children.map((c, i) => ({
     id: c.id,
@@ -98,8 +93,7 @@ export default async function DashboardOverview({
         studentId={selected.id}
         childDisplayName={displayName}
         childRegistrationNumber={selected.registration_number}
-        selectedSubject={selectedSubject}
-        subjectSlug={selectedSubject}
+        requestedSubject={subjectRaw}
         subjectHref={(slug) => `/dashboard?child=${selected.id}&subject=${slug}`}
         variant="parent"
       />

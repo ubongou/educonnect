@@ -9,10 +9,7 @@ import { TeacherAssign, type TeacherOption } from "@/components/admin/TeacherAss
 import { StudentManageBar } from "@/components/admin/StudentManageBar";
 import { EnrollmentDeleteButton } from "@/components/admin/EnrollmentDeleteButton";
 import type { StudentFieldValues } from "@/components/admin/StudentFormFields";
-import {
-  ChildDashboardBody,
-  isSubjectSlug,
-} from "@/components/dashboard/ChildDashboardBody";
+import { ChildDashboardBody } from "@/components/dashboard/ChildDashboardBody";
 
 type EnrollmentRow = {
   id: string;
@@ -67,7 +64,6 @@ export default async function AdminStudentDetail({
 }) {
   const { id } = await params;
   const { subject: subjectRaw } = await searchParams;
-  const selectedSubject = isSubjectSlug(subjectRaw) ? subjectRaw : "mathematics";
   const supabase = await createClient();
 
   const [{ data: student }, { data: teacherList }] = await Promise.all([
@@ -275,8 +271,7 @@ export default async function AdminStudentDetail({
           studentId={student.id}
           childDisplayName={displayName}
           childRegistrationNumber={student.registration_number}
-          selectedSubject={selectedSubject}
-          subjectSlug={selectedSubject}
+          requestedSubject={subjectRaw}
           subjectHref={(slug) => `/admin/students/${student.id}?subject=${slug}`}
           variant="admin"
         />
