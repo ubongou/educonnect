@@ -1,0 +1,408 @@
+/*
+  Styles specific to the /strategy-session ad landing page. Scoped under
+  `.mkt-root` so they inherit the marketing design tokens (colours, fonts,
+  radii, buttons, .container, .reveal, .faq-*, .testi-*, .pillar-*) defined in
+  src/styles/marketing.css, and never leak into the authed dashboards.
+  Everything here is additionally prefixed `.ss-` to avoid collisions.
+*/
+
+/* ---------- MINIMAL HEADER (no nav links) ---------- */
+.mkt-root .ss-header {
+  padding: 18px 0 6px;
+}
+.mkt-root .ss-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mkt-root .ss-brand-pill {
+  display: inline-flex;
+  align-items: center;
+  background: #3fbefa;
+  border-radius: var(--radius-pill);
+  padding: 9px 22px;
+  box-shadow: 0 8px 28px -16px rgba(4, 19, 28, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.4) inset;
+}
+.mkt-root .ss-brand-pill img {
+  height: 30px;
+  width: auto;
+  display: block;
+}
+
+/* ---------- SECTION RHYTHM ---------- */
+.mkt-root .ss-section {
+  padding: 64px 0;
+}
+.mkt-root .ss-alt {
+  background: var(--paper-2);
+}
+.mkt-root .ss-head {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 44px;
+}
+.mkt-root .ss-head h2 {
+  font-size: clamp(30px, 4vw, 46px);
+  letter-spacing: -0.03em;
+}
+.mkt-root .ss-head p {
+  color: var(--ink-2);
+  margin-top: 14px;
+  font-size: 17px;
+}
+
+/* ---------- HERO TWEAKS + TRUST BAR ---------- */
+/* The hero reuses the shared .hero / .hero-grid / .hero-visual markup. */
+.mkt-root .ss-hero {
+  padding-top: 16px;
+}
+.mkt-root .ss-trustbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin-top: 22px;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+.mkt-root .ss-trust-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+.mkt-root .ss-trust-item svg {
+  color: var(--sky);
+  flex: 0 0 auto;
+}
+.mkt-root .ss-trust-sep {
+  color: var(--ink-3);
+  opacity: 0.5;
+}
+
+/* ---------- REPEATED CTA ---------- */
+.mkt-root .ss-cta {
+  padding: 16px 30px;
+  font-size: 16px;
+  min-height: 52px;
+}
+.mkt-root .ss-cta-block {
+  width: 100%;
+  justify-content: center;
+}
+.mkt-root .ss-cta-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  margin-top: 40px;
+}
+.mkt-root .ss-cta-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--ink-3);
+}
+
+/* ---------- CHECKLISTS (problem + offer) ---------- */
+.mkt-root .ss-checklist {
+  display: grid;
+  gap: 14px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+.mkt-root .ss-check {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.mkt-root .ss-check-ico {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  margin-top: 1px;
+}
+.mkt-root .ss-checklist.ss-problem .ss-check-ico {
+  background: var(--sky-soft);
+  color: var(--sky);
+}
+.mkt-root .ss-checklist.ss-offer .ss-check-ico {
+  background: #e7f9ee;
+  color: #1d9e75;
+}
+.mkt-root .ss-closing {
+  text-align: center;
+  margin-top: 30px;
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: clamp(20px, 2.4vw, 26px);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+/* ---------- WHY (reuses .pillars/.pillar with .ss icons) ---------- */
+.mkt-root .ss-why .pillar .icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* ---------- RISK REVERSAL (given real visual weight) ---------- */
+.mkt-root .ss-guarantees {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  max-width: 920px;
+  margin: 0 auto;
+}
+.mkt-root .ss-guarantee {
+  background: var(--navy);
+  color: #fff;
+  border: 2px solid var(--yellow);
+  border-radius: var(--radius-lg);
+  padding: 34px 30px;
+}
+.mkt-root .ss-g-badge {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: rgba(252, 185, 54, 0.16);
+  color: var(--yellow);
+  display: grid;
+  place-items: center;
+  margin-bottom: 20px;
+}
+.mkt-root .ss-guarantee h3 {
+  color: #fff;
+  font-size: 22px;
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
+}
+.mkt-root .ss-guarantee p {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 15.5px;
+  line-height: 1.6;
+}
+.mkt-root .ss-fineprint {
+  text-align: center;
+  color: var(--ink-3);
+  font-size: 13.5px;
+  margin-top: 22px;
+}
+
+/* ---------- HOW IT WORKS (4 steps) ---------- */
+.mkt-root .ss-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+.mkt-root .ss-step {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 28px 24px 30px;
+}
+.mkt-root .ss-step-num {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--sky);
+  letter-spacing: 0.04em;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mkt-root .ss-step-num::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+.mkt-root .ss-step h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+.mkt-root .ss-step p {
+  color: var(--ink-2);
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+
+/* ---------- FAQ wrapper ---------- */
+.mkt-root .ss-faq .faq-list {
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+/* ---------- FINAL CTA (navy block) ---------- */
+.mkt-root .ss-final {
+  position: relative;
+  overflow: hidden;
+  background: var(--navy);
+  color: #fff;
+  border-radius: 36px;
+  margin: 24px var(--gutter) 0;
+  padding: 76px var(--gutter);
+  text-align: center;
+}
+.mkt-root .ss-final::before {
+  content: "";
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  right: -220px;
+  top: -220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(62, 190, 255, 0.15), transparent 60%);
+  pointer-events: none;
+}
+.mkt-root .ss-final-content {
+  position: relative;
+  z-index: 1;
+}
+.mkt-root .ss-final h2 {
+  color: #fff;
+  font-size: clamp(30px, 4.4vw, 50px);
+  letter-spacing: -0.03em;
+  max-width: 840px;
+  margin: 0 auto 18px;
+}
+.mkt-root .ss-final h2 .accent {
+  position: relative;
+  display: inline-block;
+  isolation: isolate;
+}
+.mkt-root .ss-final h2 .accent::after {
+  content: "";
+  position: absolute;
+  left: -2%;
+  right: -2%;
+  bottom: 0.08em;
+  height: 0.4em;
+  background: var(--yellow);
+  z-index: -1;
+  border-radius: 4px;
+  transform: skewX(-6deg);
+}
+.mkt-root .ss-final p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 18px;
+  max-width: 600px;
+  margin: 0 auto 32px;
+}
+.mkt-root .ss-final .ss-cta-row {
+  margin-top: 0;
+}
+.mkt-root .ss-final .ss-cta-note {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* ---------- MINIMAL FOOTER ---------- */
+.mkt-root .ss-footer {
+  background: var(--navy);
+  color: #fff;
+  padding: 48px 0 40px;
+  margin-top: 56px;
+  text-align: center;
+}
+.mkt-root .ss-foot-brand {
+  display: inline-flex;
+  margin-bottom: 20px;
+}
+.mkt-root .ss-foot-brand img {
+  height: 30px;
+  width: auto;
+}
+.mkt-root .ss-foot-links {
+  display: flex;
+  gap: 22px;
+  justify-content: center;
+  flex-wrap: wrap;
+  font-size: 14px;
+}
+.mkt-root .ss-foot-links a {
+  color: rgba(255, 255, 255, 0.75);
+  transition: color 0.15s ease;
+}
+.mkt-root .ss-foot-links a:hover {
+  color: #fff;
+}
+.mkt-root .ss-foot-copy {
+  margin-top: 20px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ---------- STICKY MOBILE CTA (thumb-reachable) ---------- */
+.mkt-root .ss-sticky {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 80;
+  padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+  background: rgba(251, 249, 244, 0.94);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--line);
+  transform: translateY(120%);
+  transition: transform 0.28s ease;
+}
+.mkt-root .ss-sticky.visible {
+  transform: none;
+}
+.mkt-root .ss-sticky .ss-cta {
+  width: 100%;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 900px) {
+  .mkt-root .ss-steps {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 768px) {
+  .mkt-root .ss-section {
+    padding: 48px 0;
+  }
+  .mkt-root .ss-steps {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .mkt-root .ss-guarantees {
+    grid-template-columns: 1fr;
+  }
+  .mkt-root .ss-trustbar {
+    justify-content: center;
+  }
+  .mkt-root .ss-cta {
+    width: 100%;
+    justify-content: center;
+  }
+  .mkt-root .ss-sticky {
+    display: block;
+  }
+  /* Keep the sticky bar from covering the footer's last line. */
+  .mkt-root .ss-footer {
+    padding-bottom: 96px;
+  }
+  .mkt-root .ss-final {
+    margin: 24px 16px 0;
+    padding: 56px 22px;
+    border-radius: 24px;
+  }
+}
