@@ -2,10 +2,15 @@ import type { Metadata } from "next";
 import "../../styles/strategy-session.css";
 import { MarketingScrollReveal } from "@/components/marketing/MarketingScrollReveal";
 import { bundledAssets } from "@/lib/marketing/defaults";
+import { StrategyBookingProvider } from "./StrategyBooking";
 import { StrategyCTA } from "./StrategyCTA";
 import { StrategyFAQ, type FaqItem } from "./StrategyFAQ";
 import { ScrollDepthTracker } from "./ScrollDepthTracker";
 import { StickyMobileCTA } from "./StickyMobileCTA";
+
+// Warm, on-audience hero: a student engaged in online learning at home.
+// Kept local to this page so it never affects the main-site hero.
+const HERO_IMAGE = "/brand-v2/strategy-hero.jpg";
 
 // -----------------------------------------------------------------------------
 // A/B TEST: swap this single value to change the hero headline. The three
@@ -22,7 +27,7 @@ const HERO_HEADLINES: Record<"A" | "B" | "C", string> = {
 export const metadata: Metadata = {
   title: "Free 15-Minute Strategy Session for Your Child | Masani",
   description:
-    "Book a free 15-minute strategy session and get a personalised academic roadmap for your child, built by an education specialist. One-on-one tutoring for diaspora African families in the UK, US, Canada, and Australia.",
+    "Book a free 15-minute strategy session and get a personalised academic roadmap for your child, built by an education specialist. One-on-one tutoring for diaspora Nigerian families in the UK, US, Canada, and Australia.",
 };
 
 // ---- Copy (kept dash-free per brand rules) ----------------------------------
@@ -91,6 +96,26 @@ const faqItems: FaqItem[] = [
     answer:
       "Top 3% of applicants, an approach backed by MIT, and teachers who understand your cultural background. We place the right teacher for your child rather than handing you a list to browse.",
   },
+  {
+    question: "What subjects and levels do you cover?",
+    answer:
+      "English, mathematics, and science, from primary through secondary school. Tell us your child's needs in the session and we match accordingly.",
+  },
+  {
+    question: "What ages and grades is this for?",
+    answer:
+      "We work with students from around age 5 to 18, across the UK, Nigerian, American, and international curricula.",
+  },
+  {
+    question: "How are the sessions delivered?",
+    answer:
+      "Every session is one-on-one and fully online, so your child learns from home wherever your family is in the world.",
+  },
+  {
+    question: "Can you work around our time zone?",
+    answer:
+      "Yes. We schedule around your family's time zone across the UK, US, Canada, and Australia, including evenings and weekends.",
+  },
 ];
 
 const testimonials = [
@@ -111,6 +136,13 @@ const testimonials = [
     author: "Mrs. Joanne",
     where: "United States",
     initial: "J",
+  },
+  {
+    // Real review from a parent, kept anonymous at her request.
+    body: "My daughter is very happy with her tutor. She looks forward to every English class, and I am really pleased with the quality of what she is getting. I am confident she will keep improving.",
+    author: "Parent",
+    where: "Verified Masani family",
+    initial: "P",
   },
 ];
 
@@ -198,18 +230,18 @@ function GlobeIcon() {
 const whyPoints = [
   {
     icon: <ShieldIcon />,
-    title: "Top 3% of applicants",
-    body: "Fewer than 1 in 10 teachers who apply are accepted.",
+    title: "Top 3% of teachers",
+    body: "Less than 3% of teachers who apply are accepted. We choose each one for their subject mastery, their empathy, and their gift for building real confidence in the students they teach.",
   },
   {
     icon: <CapIcon />,
     title: "Backed by MIT",
-    body: "An educational approach grounded in credible, rigorous standards.",
+    body: "Masani was selected for the MIT Social Innovation Fellowship in 2025, recognition from the university ranked number one in the world. Our teaching is built on the same rigorous, evidence-led standards.",
   },
   {
     icon: <GlobeIcon />,
     title: "Built for diaspora families",
-    body: "Nigerian teachers who understand both academic excellence and cultural context. We select and place the right teacher for each child rather than handing you a list to browse.",
+    body: "The best Nigerian teachers, matched to diaspora Nigerian families who want academic excellence and cultural understanding in one place. We select and place the right teacher for your child, so you never sort through a list.",
   },
 ];
 
@@ -225,6 +257,9 @@ export default function StrategySessionPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
 
+      {/* Every CTA on the page opens the shared booking form in this provider's
+          modal, then reveals the calendar inline on submit. */}
+      <StrategyBookingProvider>
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
@@ -249,10 +284,10 @@ export default function StrategySessionPage() {
               <p className="lead reveal delay-2">
                 Book a free 15-minute strategy session and get a personalised
                 academic roadmap for your child, built by an education
-                specialist, backed by MIT.
+                specialist.
               </p>
               <div className="hero-ctas reveal delay-3">
-                <StrategyCTA source="hero" />
+                <StrategyCTA source="ss-hero" />
               </div>
               <div className="hero-microcopy reveal delay-3">
                 <span className="dot" aria-hidden="true" /> No cost. No
@@ -298,8 +333,11 @@ export default function StrategySessionPage() {
                   <span className="blob-c" />
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={bundledAssets.heroImage}
-                    alt="A Masani student in a one-on-one lesson"
+                    src={HERO_IMAGE}
+                    alt="A young student concentrating on an online lesson at home, writing beside her laptop"
+                    width={573}
+                    height={860}
+                    loading="eager"
                   />
                 </div>
                 <div className="hero-card c1" aria-hidden="true">
@@ -321,6 +359,30 @@ export default function StrategySessionPage() {
                     UK · US · Canada · Australia
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ---------- PROOF BAND (quantified outcomes) ---------- */}
+        <section className="ss-proof" aria-label="Results families see">
+          <div className="container ss-proof-grid">
+            <div className="ss-proof-item reveal">
+              <div className="ss-proof-num">3 years</div>
+              <div className="ss-proof-label">
+                The average time families stay with Masani
+              </div>
+            </div>
+            <div className="ss-proof-item reveal">
+              <div className="ss-proof-num">First month</div>
+              <div className="ss-proof-label">
+                When many families start seeing results
+              </div>
+            </div>
+            <div className="ss-proof-item reveal">
+              <div className="ss-proof-num">Higher grades</div>
+              <div className="ss-proof-label">
+                Students move up as skills and confidence grow
               </div>
             </div>
           </div>
@@ -363,7 +425,7 @@ export default function StrategySessionPage() {
               ))}
             </div>
             <div className="ss-cta-row reveal">
-              <StrategyCTA source="after_offer" />
+              <StrategyCTA source="ss-offer" />
               <span className="ss-cta-note">
                 <span className="dot" aria-hidden="true" /> No cost. No
                 obligation. Booking takes 2 minutes.
@@ -407,7 +469,7 @@ export default function StrategySessionPage() {
                     <span className="av" aria-hidden="true">
                       {t.initial}
                     </span>
-                    <span>
+                    <span className="by-text">
                       <span className="who">{t.author}</span>
                       <span className="where">{t.where}</span>
                     </span>
@@ -416,7 +478,7 @@ export default function StrategySessionPage() {
               ))}
             </div>
             <div className="ss-cta-row reveal">
-              <StrategyCTA source="after_testimonials" />
+              <StrategyCTA source="ss-testimonials" />
               <span className="ss-cta-note">
                 <span className="dot" aria-hidden="true" /> No cost. No
                 obligation. Booking takes 2 minutes.
@@ -454,11 +516,11 @@ export default function StrategySessionPage() {
               </div>
             </div>
             <p className="ss-fineprint reveal">
-              Standard conditions apply (attendance, communicated concerns, and
-              so on).
+              Guarantee conditions apply.{" "}
+              <a href="#guarantee-conditions">See the full conditions below.</a>
             </p>
             <div className="ss-cta-row reveal">
-              <StrategyCTA source="after_guarantee" />
+              <StrategyCTA source="ss-guarantee" />
               <span className="ss-cta-note">
                 <span className="dot" aria-hidden="true" /> No cost. No
                 obligation. Booking takes 2 minutes.
@@ -511,11 +573,39 @@ export default function StrategySessionPage() {
               personalised roadmap for your child, whether or not you enrol.
             </p>
             <div className="ss-cta-row reveal">
-              <StrategyCTA source="final" />
+              <StrategyCTA source="ss-final" />
               <span className="ss-cta-note">
                 No cost. No obligation. Booking takes 2 minutes.
               </span>
             </div>
+          </div>
+        </section>
+
+        {/* ---------- GUARANTEE CONDITIONS (fine print) ---------- */}
+        <section
+          className="ss-conditions"
+          id="guarantee-conditions"
+          aria-label="Guarantee conditions"
+        >
+          <div className="container">
+            <h2 className="ss-conditions-title">Guarantee conditions</h2>
+            <p>
+              Our perfect tutor match and first-month satisfaction guarantees
+              apply when all of the following are met:
+            </p>
+            <ol>
+              <li>The scheduled session is attended in full.</li>
+              <li>
+                Any concerns are shared with us during or directly after the
+                session, so we have a chance to address them.
+              </li>
+              <li>The request is made within 7 days of the session.</li>
+            </ol>
+            <p>
+              One guarantee claim per family. Guarantees cover the Masani
+              service as described and do not cover missed or rescheduled
+              sessions outside these conditions.
+            </p>
           </div>
         </section>
       </main>
@@ -538,6 +628,7 @@ export default function StrategySessionPage() {
       <StickyMobileCTA />
       <MarketingScrollReveal />
       <ScrollDepthTracker />
+      </StrategyBookingProvider>
     </div>
   );
 }

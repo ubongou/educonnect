@@ -1,12 +1,10 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
-import { useSearchParams } from "next/navigation";
+import { useActionState, useEffect, useRef, type ReactNode } from "react";
 import clsx from "clsx";
 import {
   curriculumLabel,
   curriculumValues,
-  normalizeSource,
   performanceLabel,
   performanceValues,
   subjectLabel,
@@ -18,9 +16,38 @@ import {
 } from "@/lib/actions/booking";
 import { trackEvent } from "@/lib/analytics";
 
-export function BookingForm() {
-  const params = useSearchParams();
-  const source = normalizeSource(params.get("source"));
+export type BookingFormProps = {
+  /** Attribution label passed through to the admin email (see sourceLabels). */
+  source: string;
+  /**
+   * Post-submit behaviour. "redirect" (default) navigates to /book/thanks.
+   * "inline" keeps the visitor on-page and fires `onSuccess` instead — the
+   * DB insert + email are identical either way.
+   */
+  afterSubmit?: "redirect" | "inline";
+  /** Called once the submission succeeds in "inline" mode. */
+  onSuccess?: () => void;
+  eyebrow?: string;
+  heading?: string;
+  lead?: string;
+  submitLabel?: string;
+  /** Short reassurance line rendered above the submit button. */
+  reassurance?: ReactNode;
+  /** Drop the outer <section class="contact"> chrome (e.g. inside a modal). */
+  bare?: boolean;
+};
+
+export function BookingForm({
+  source,
+  afterSubmit = "redirect",
+  onSuccess,
+  eyebrow = "Book a free consultation",
+  heading = "Tell us about your child",
+  lead = "This takes less than 2 minutes. We'll reach out within 24 hours to confirm your session.",
+  submitLabel = "Book free trial",
+  reassurance,
+  bare = false,
+}: BookingFormProps) {
   const [state, formAction, pending] = useActionState<
     SubmitBookingRequestState,
     FormData
@@ -33,6 +60,12 @@ export function BookingForm() {
       : ({} as Record<string, string>);
 
   const formRef = useRef<HTMLFormElement>(null);
+
+  // Inline mode: hand control back to the caller once the server confirms.
+  const succeeded = state?.status === "success";
+  useEffect(() => {
+    if (succeeded) onSuccess?.();
+  }, [succeeded, onSuccess]);
 
   // After a failed submit, jump to the first errored field so the user can
   // see what to fix. We re-scroll on every error state change (each action
@@ -51,18 +84,21 @@ export function BookingForm() {
     focusable?.focus({ preventScroll: true });
   }, [state]);
 
+  const Wrapper = bare ? "div" : "section";
+
   return (
-    <section className="contact" aria-labelledby="booking-heading">
-      <div className="container">
+    <Wrapper
+      className={bare ? "booking-embed" : "contact"}
+      aria-labelledby="booking-heading"
+    >
+      <div className={bare ? undefined : "container"}>
         <span className="eyebrow" style={{ marginBottom: 18 }}>
-          Book a free consultation
+          {eyebrow}
         </span>
         <h1 id="booking-heading" style={{ marginTop: 14 }}>
-          Tell us about your child
+          {heading}
         </h1>
-        <p className="lead">
-          This takes less than 2 minutes. We&apos;ll reach out within 24 hours to confirm your session.
-        </p>
+        <p className="lead">{lead}</p>
 
         <form
           ref={formRef}
@@ -74,6 +110,7 @@ export function BookingForm() {
           onSubmit={() => trackEvent("booking_form_submit", { source })}
         >
           <input type="hidden" name="source" value={source} />
+          <input type="hidden" name="after_submit" value={afterSubmit} />
           <input
             type="text"
             name="_hp"
@@ -221,7 +258,7 @@ export function BookingForm() {
             />
           </FormSection>
 
-          {state?.formError && (
+          {state?.status === "error" && state.formError && (
             <div
               role="alert"
               style={{
@@ -237,17 +274,34 @@ export function BookingForm() {
             </div>
           )}
 
+          {reassurance && (
+            <p
+              className="booking-reassurance"
+              style={{
+                fontSize: 13,
+                color: "#6b7680",
+                marginTop: 20,
+                display: "flex",
+                gap: 8,
+                alignItems: "flex-start",
+                lineHeight: 1.5,
+              }}
+            >
+              {reassurance}
+            </p>
+          )}
+
           <button
             type="submit"
             className="btn btn-coral"
             disabled={pending}
-            style={{ marginTop: 24 }}
+            style={{ marginTop: reassurance ? 12 : 24 }}
           >
-            {pending ? "Submitting…" : "Book free trial"}
+            {pending ? "Submitting…" : submitLabel}
           </button>
         </form>
       </div>
-    </section>
+    </Wrapper>
   );
 }
 

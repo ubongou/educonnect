@@ -15,7 +15,10 @@ export type SubmitBookingRequestState =
       fieldErrors: Record<string, string>;
       formError?: string;
       values: Record<string, string>;
-    };
+    }
+  // Returned only in "inline" mode (e.g. /strategy-session), where the caller
+  // reveals the calendar on-page instead of navigating to /book/thanks.
+  | { status: "success" };
 
 /**
  * Public-facing booking submission. Order:
@@ -27,15 +30,23 @@ export type SubmitBookingRequestState =
  *      "public can submit booking requests" permits this).
  *   4. Best-effort email. A failure here is logged but doesn't block
  *      the redirect — the row is already safely persisted.
- *   5. redirect("/book/thanks").
+ *   5. Finish: redirect to /book/thanks, or (inline mode) return a
+ *      success state so the caller can reveal the calendar on-page.
+ *
+ * The email/DB pipeline is identical in both modes; only the final step
+ * differs. Inline mode is opted into with a hidden `after_submit=inline`
+ * field so the default (/book) behaviour is untouched.
  */
 export async function submitBookingRequest(
   _prev: SubmitBookingRequestState,
   formData: FormData,
 ): Promise<SubmitBookingRequestState> {
+  const inline = String(formData.get("after_submit") ?? "") === "inline";
+
   // 1. Honeypot
   const honey = String(formData.get("_hp") ?? "");
   if (honey.length > 0) {
+    if (inline) return { status: "success" };
     redirect("/book/thanks");
   }
 
@@ -106,6 +117,7 @@ export async function submitBookingRequest(
     console.error("[booking] email send threw:", err);
   }
 
-  // 5. Redirect
+  // 5. Finish
+  if (inline) return { status: "success" };
   redirect("/book/thanks");
 }

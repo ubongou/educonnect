@@ -59,6 +59,14 @@ export const sourceIds = [
   "pricing-8",
   "pricing-24",
   "pricing-48",
+  // /strategy-session ad landing page. Each on-page CTA passes its own
+  // ss-* id so the admin email shows exactly which section drove the lead.
+  "ss-hero",
+  "ss-offer",
+  "ss-testimonials",
+  "ss-guarantee",
+  "ss-final",
+  "ss-sticky",
   "direct",
 ] as const;
 export type SourceId = (typeof sourceIds)[number];
@@ -70,6 +78,12 @@ const sourceLabels: Record<SourceId, string> = {
   "pricing-8": "Pricing page · 8 sessions plan",
   "pricing-24": "Pricing page · 24 sessions plan",
   "pricing-48": "Pricing page · 48 sessions plan",
+  "ss-hero": "Strategy session · Hero CTA",
+  "ss-offer": "Strategy session · After the offer",
+  "ss-testimonials": "Strategy session · After testimonials",
+  "ss-guarantee": "Strategy session · After the guarantee",
+  "ss-final": "Strategy session · Final CTA",
+  "ss-sticky": "Strategy session · Sticky mobile bar",
   direct: "Direct visit (no source)",
 };
 

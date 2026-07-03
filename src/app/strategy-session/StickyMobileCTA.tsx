@@ -18,7 +18,7 @@ export function StickyMobileCTA() {
 
   return (
     <div className={clsx("ss-sticky", visible && "visible")} aria-hidden={!visible}>
-      <StrategyCTA source="sticky_mobile" block />
+      <StrategyCTA source="ss-sticky" block />
     </div>
   );
 }

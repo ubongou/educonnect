@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Nav } from "@/components/ui/Nav";
 import { Footer } from "@/components/ui/Footer";
 import { MarketingScrollReveal } from "@/components/marketing/MarketingScrollReveal";
-import { BookingForm } from "@/components/booking/BookingForm";
+import { BookingFormRoute } from "@/components/booking/BookingFormRoute";
 
 export const metadata: Metadata = {
   title: "Book a free trial — Masani",
@@ -20,9 +20,9 @@ export default function BookPage() {
       </a>
       <Nav mode="marketing" activeHref="/book" />
       <main id="main-content">
-        {/* Suspense is required because BookingForm calls useSearchParams. */}
+        {/* Suspense is required because BookingFormRoute calls useSearchParams. */}
         <Suspense fallback={null}>
-          <BookingForm />
+          <BookingFormRoute />
         </Suspense>
       </main>
       <Footer mode="marketing" />

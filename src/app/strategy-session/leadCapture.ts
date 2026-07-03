@@ -14,7 +14,7 @@
 //       (e.g. an Apps Script web app URL). The beacon block will POST to it.
 //
 // To remove entirely: delete this file and the `recordStrategyLead(...)` call
-// inside StrategyCTA.tsx.
+// inside StrategyBooking.tsx (openForm).
 // -----------------------------------------------------------------------------
 
 type LeadPayload = {

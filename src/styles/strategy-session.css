@@ -201,6 +201,13 @@
   font-size: 13.5px;
   margin-top: 22px;
 }
+.mkt-root .ss-fineprint a {
+  color: var(--ink-2);
+  text-decoration: underline;
+}
+.mkt-root .ss-fineprint a:hover {
+  color: var(--ink);
+}
 
 /* ---------- HOW IT WORKS (4 steps) ---------- */
 .mkt-root .ss-steps {
@@ -369,6 +376,169 @@
   width: 100%;
 }
 
+/* ---------- PROOF BAND (quantified outcomes below hero) ---------- */
+.mkt-root .ss-proof {
+  padding: 30px 0;
+  background: var(--navy);
+  color: #fff;
+}
+.mkt-root .ss-proof-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  text-align: center;
+}
+.mkt-root .ss-proof-item {
+  padding: 6px 12px;
+}
+.mkt-root .ss-proof-num {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: clamp(22px, 2.6vw, 28px);
+  letter-spacing: -0.02em;
+  color: var(--yellow);
+}
+.mkt-root .ss-proof-label {
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* ---------- SOCIAL PROOF: 2x2 grid so 4 cards balance ---------- */
+.mkt-root .ss-section .testi-grid {
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.mkt-root .ss-section .testi:nth-child(4) .av {
+  background: #1d9e75;
+  color: #fff;
+}
+
+/* ---------- GUARANTEE CONDITIONS (bank-style fine print) ---------- */
+.mkt-root .ss-conditions {
+  padding: 40px 0 8px;
+}
+.mkt-root .ss-conditions .container {
+  max-width: 820px;
+}
+.mkt-root .ss-conditions-title {
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  color: var(--ink-2);
+  margin-bottom: 12px;
+}
+.mkt-root .ss-conditions p,
+.mkt-root .ss-conditions li {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+.mkt-root .ss-conditions ol {
+  margin: 10px 0 10px 18px;
+  display: grid;
+  gap: 4px;
+}
+.mkt-root .ss-conditions p + p {
+  margin-top: 10px;
+}
+
+/* ---------- BOOKING MODAL (form -> calendar, on-page) ---------- */
+.mkt-root .ss-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  background: rgba(4, 19, 28, 0.55);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 16px;
+  overflow-y: auto;
+  animation: ss-fade 0.18s ease;
+}
+@keyframes ss-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.mkt-root .ss-modal-card {
+  position: relative;
+  background: var(--paper, #fbf9f4);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 620px;
+  margin: auto;
+  padding: 40px 36px 36px;
+  box-shadow: 0 30px 80px -30px rgba(4, 19, 28, 0.6);
+}
+.mkt-root .ss-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 38px;
+  height: 38px;
+  border: none;
+  background: transparent;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--ink-3);
+  cursor: pointer;
+  border-radius: 50%;
+}
+.mkt-root .ss-modal-close:hover {
+  background: rgba(4, 19, 28, 0.06);
+  color: var(--ink);
+}
+/* The shared BookingForm renders "bare" inside the modal: strip its page chrome. */
+.mkt-root .ss-modal-card .booking-embed .eyebrow {
+  margin-bottom: 10px;
+}
+.mkt-root .ss-modal-card .booking-embed h1 {
+  font-size: clamp(24px, 3.4vw, 30px);
+  letter-spacing: -0.02em;
+}
+.mkt-root .ss-modal-card .booking-embed .lead {
+  font-size: 15.5px;
+}
+.mkt-root .ss-modal-card .booking-form {
+  margin-top: 22px !important;
+}
+.mkt-root .booking-reassurance {
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+
+/* ---------- CALENDAR REVEAL ---------- */
+.mkt-root .ss-calendar-title {
+  font-size: clamp(24px, 3.4vw, 30px);
+  letter-spacing: -0.02em;
+  margin-top: 12px;
+}
+.mkt-root .ss-calendar-lead {
+  color: var(--ink-2);
+  font-size: 15.5px;
+  margin: 10px 0 20px;
+}
+.mkt-root .ss-calendar-frame {
+  width: 100%;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+.mkt-root .ss-calendar-frame iframe {
+  display: block;
+  width: 100%;
+  min-height: 600px;
+  border: 0;
+}
+
 /* ---------- RESPONSIVE ---------- */
 @media (max-width: 900px) {
   .mkt-root .ss-steps {
@@ -404,5 +574,26 @@
     margin: 24px 16px 0;
     padding: 56px 22px;
     border-radius: 24px;
+  }
+  /* Stack the proof stats and testimonial cards on small screens. */
+  .mkt-root .ss-proof-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .mkt-root .ss-section .testi-grid {
+    grid-template-columns: 1fr;
+  }
+  /* Full-bleed modal on phones; keep the calendar comfortably tall. */
+  .mkt-root .ss-modal-overlay {
+    padding: 0;
+  }
+  .mkt-root .ss-modal-card {
+    max-width: none;
+    min-height: 100%;
+    border-radius: 0;
+    padding: 56px 20px 32px;
+  }
+  .mkt-root .ss-calendar-frame iframe {
+    min-height: 520px;
   }
 }
