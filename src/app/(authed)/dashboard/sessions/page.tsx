@@ -5,7 +5,10 @@ import {
   LessonReportView,
   type LessonReportViewData,
 } from "@/components/dashboard/LessonReportView";
+import { ReportViewTracker } from "@/components/dashboard/ReportViewTracker";
+import { ReportThread } from "@/components/dashboard/ReportThread";
 import { loadReportFiles } from "@/lib/reports/attachments";
+import { loadReportThread } from "@/lib/reports/messages";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { createClient } from "@/lib/supabase/server";
 import { getParentChildren, pickChild, childTabColor } from "@/lib/dashboard/children";
@@ -49,7 +52,7 @@ export default async function DashboardSessionsPage({
 }) {
   const { child: childIdRaw, report: reportIdRaw } = await searchParams;
   const { children } = await getParentChildren("/dashboard/sessions");
-  const selected = pickChild(children, childIdRaw);
+  let selected = pickChild(children, childIdRaw);
 
   if (!selected) {
     return (
@@ -60,6 +63,23 @@ export default async function DashboardSessionsPage({
   }
 
   const supabase = await createClient();
+
+  // The report email links to /dashboard/sessions?report=<id> with no `?child=`,
+  // so pickChild would default to the first child and the report wouldn't load.
+  // When a report is targeted, switch to the child who actually owns it.
+  if (reportIdRaw && children.length > 1) {
+    const { data: owner } = await supabase
+      .from("lesson_reports")
+      .select("student_id")
+      .eq("id", reportIdRaw)
+      .is("deleted_at", null)
+      .maybeSingle();
+    const ownerId = (owner as { student_id: string } | null)?.student_id;
+    if (ownerId && ownerId !== selected.id) {
+      const ownerChild = children.find((c) => c.id === ownerId);
+      if (ownerChild) selected = ownerChild;
+    }
+  }
 
   const { data: reportList } = await supabase
     .from("lesson_reports")
@@ -132,6 +152,11 @@ export default async function DashboardSessionsPage({
   const reportFiles = full
     ? await loadReportFiles(supabase, full.id)
     : { attachments: [], submissions: [] };
+
+  const messages = full ? await loadReportThread(supabase, full.id) : [];
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <Container>
@@ -207,13 +232,21 @@ export default async function DashboardSessionsPage({
           </aside>
 
           <div className="w-full min-w-0">
-            {view ? (
-              <LessonReportView
-                report={view}
-                attachments={reportFiles.attachments}
-                submissions={reportFiles.submissions}
-                submitContext={{ studentId: selected.id }}
-              />
+            {view && full ? (
+              <>
+                <ReportViewTracker reportId={full.id} />
+                <LessonReportView
+                  report={view}
+                  attachments={reportFiles.attachments}
+                  submissions={reportFiles.submissions}
+                  submitContext={{ studentId: selected.id }}
+                />
+                <ReportThread
+                  reportId={full.id}
+                  messages={messages}
+                  viewerId={user?.id ?? ""}
+                />
+              </>
             ) : (
               <p className="text-[14px] text-g600">Pick a lesson to view the report.</p>
             )}

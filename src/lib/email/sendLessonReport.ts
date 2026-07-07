@@ -98,7 +98,9 @@ export async function sendLessonReportEmail(
   const teacherName = teacherRow?.full_name ?? null;
 
   const appUrl = getAppUrl().replace(/\/$/, "");
-  const reportUrl = `${appUrl}/dashboard/sessions?report=${report.id}`;
+  // Include the child so multi-child parents land on the right tab and the
+  // report loads directly (the Sessions page also resolves this defensively).
+  const reportUrl = `${appUrl}/dashboard/sessions?child=${report.student_id}&report=${report.id}`;
 
   // Files attached to this report (homework workbooks, resources). Only
   // promoted (ready) rows are included — staged composer files that were never
