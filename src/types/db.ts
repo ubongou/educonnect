@@ -204,6 +204,45 @@ export type Database = {
           },
         ]
       }
+      lesson_report_messages: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          id: string
+          lesson_report_id: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          id?: string
+          lesson_report_id: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          lesson_report_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_report_messages_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lesson_report_messages_lesson_report_id_fkey"
+            columns: ["lesson_report_id"]
+            isOneToOne: false
+            referencedRelation: "lesson_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lesson_report_skill_ratings: {
         Row: {
           lesson_report_id: string

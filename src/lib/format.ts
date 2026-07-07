@@ -19,6 +19,17 @@ export function formatDate(iso: string | Date): string {
   });
 }
 
+export function formatDateTime(iso: string | Date): string {
+  const d = typeof iso === "string" ? new Date(iso) : iso;
+  return d.toLocaleString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 export function formatSkillRating(rating: number): string {
   if (!Number.isFinite(rating)) return "—";
   const clamped = Math.max(0, Math.min(5, Math.round(rating)));

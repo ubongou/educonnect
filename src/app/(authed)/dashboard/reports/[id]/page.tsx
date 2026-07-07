@@ -5,7 +5,10 @@ import {
   LessonReportView,
   type LessonReportViewData,
 } from "@/components/dashboard/LessonReportView";
+import { ReportViewTracker } from "@/components/dashboard/ReportViewTracker";
+import { ReportThread } from "@/components/dashboard/ReportThread";
 import { loadReportFiles } from "@/lib/reports/attachments";
+import { loadReportThread } from "@/lib/reports/messages";
 import { requireParent } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -41,7 +44,7 @@ export default async function ParentReportDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireParent("/dashboard");
+  const parent = await requireParent("/dashboard");
   const { id } = await params;
   const supabase = await createClient();
 
@@ -96,9 +99,11 @@ export default async function ParentReportDetailPage({
     report.students?.preferred_name?.trim() || report.students?.full_name || "—";
 
   const { attachments, submissions } = await loadReportFiles(supabase, id);
+  const messages = await loadReportThread(supabase, id);
 
   return (
     <Container>
+      <ReportViewTracker reportId={report.id} />
       <div className="mb-6 text-[13px] text-g600">
         <Link href="/dashboard" className="hover:text-navy">
           Dashboard
@@ -132,6 +137,8 @@ export default async function ParentReportDetailPage({
           report.students?.id ? { studentId: report.students.id } : null
         }
       />
+
+      <ReportThread reportId={report.id} messages={messages} viewerId={parent.id} />
     </Container>
   );
 }

@@ -7,7 +7,9 @@ import {
   LessonReportView,
   type LessonReportViewData,
 } from "@/components/dashboard/LessonReportView";
+import { ReportThread } from "@/components/dashboard/ReportThread";
 import { loadReportFiles } from "@/lib/reports/attachments";
+import { loadReportThread } from "@/lib/reports/messages";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/format";
@@ -27,6 +29,7 @@ type FullReport = {
   how_to_help_at_home: string | null;
   recording_url: string | null;
   emailed_at: string | null;
+  first_viewed_at: string | null;
   students: {
     id: string;
     full_name: string;
@@ -47,7 +50,7 @@ export default async function AdminReportDetailPage({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ saved?: string }>;
 }) {
-  await requireAdmin();
+  const admin = await requireAdmin();
   const { id } = await params;
   const { saved } = await searchParams;
   const supabase = await createClient();
@@ -59,7 +62,7 @@ export default async function AdminReportDetailPage({
       id, lesson_date, duration_minutes, lesson_focus,
       understanding_check, confidence_level, lesson_highlights,
       participation, focus_rating, homework,
-      next_focus, how_to_help_at_home, recording_url, emailed_at,
+      next_focus, how_to_help_at_home, recording_url, emailed_at, first_viewed_at,
       students ( id, full_name, preferred_name ),
       subjects ( name ),
       uploader:profiles!lesson_reports_uploaded_by_fkey ( full_name ),
@@ -100,6 +103,7 @@ export default async function AdminReportDetailPage({
     report.students?.preferred_name?.trim() || report.students?.full_name || "—";
 
   const { attachments, submissions } = await loadReportFiles(supabase, id);
+  const messages = await loadReportThread(supabase, id);
 
   return (
     <Container>
@@ -140,6 +144,11 @@ export default async function AdminReportDetailPage({
               ? `Email sent ${formatDate(report.emailed_at)}`
               : "Email not sent"}
           </StatusBadge>
+          <StatusBadge tone={report.first_viewed_at ? "blue" : "gray"}>
+            {report.first_viewed_at
+              ? `Viewed by parent ${formatDate(report.first_viewed_at)}`
+              : "Not viewed yet"}
+          </StatusBadge>
           <div className="flex items-center gap-2">
             <Link
               href={`/admin/reports/${id}/edit`}
@@ -167,6 +176,8 @@ export default async function AdminReportDetailPage({
         attachments={attachments}
         submissions={submissions}
       />
+
+      <ReportThread reportId={report.id} messages={messages} viewerId={admin.id} />
     </Container>
   );
 }

@@ -6,9 +6,13 @@ import {
   type LessonReportViewData,
 } from "@/components/dashboard/LessonReportView";
 import { ReportAttachmentsManager } from "@/components/teacher/ReportAttachmentsManager";
+import { ReportThread } from "@/components/dashboard/ReportThread";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 import { loadReportFiles } from "@/lib/reports/attachments";
+import { loadReportThread } from "@/lib/reports/messages";
 import { requireTeacher } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { formatDate } from "@/lib/format";
 
 type FullReport = {
   id: string;
@@ -25,6 +29,7 @@ type FullReport = {
   next_focus: string | null;
   how_to_help_at_home: string | null;
   recording_url: string | null;
+  first_viewed_at: string | null;
   students: {
     id: string;
     full_name: string;
@@ -43,7 +48,7 @@ export default async function TeacherReportDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireTeacher();
+  const teacher = await requireTeacher();
   const { id } = await params;
   const supabase = await createClient();
 
@@ -54,7 +59,7 @@ export default async function TeacherReportDetailPage({
       id, uploaded_by, lesson_date, duration_minutes, lesson_focus,
       understanding_check, confidence_level, lesson_highlights,
       participation, focus_rating, homework,
-      next_focus, how_to_help_at_home, recording_url,
+      next_focus, how_to_help_at_home, recording_url, first_viewed_at,
       students ( id, full_name, preferred_name ),
       subjects ( name ),
       uploader:profiles!lesson_reports_uploaded_by_fkey ( full_name ),
@@ -101,6 +106,7 @@ export default async function TeacherReportDetailPage({
   const studentId = report.students?.id;
 
   const { attachments, submissions } = await loadReportFiles(supabase, id);
+  const messages = await loadReportThread(supabase, id);
 
   return (
     <Container>
@@ -132,6 +138,13 @@ export default async function TeacherReportDetailPage({
           {studentName} ·{" "}
           <span className="text-g600">{report.subjects?.name ?? "Subject"}</span>
         </h1>
+        <div className="mt-3">
+          <StatusBadge tone={report.first_viewed_at ? "blue" : "gray"}>
+            {report.first_viewed_at
+              ? `Viewed by parent ${formatDate(report.first_viewed_at)}`
+              : "Not viewed yet"}
+          </StatusBadge>
+        </div>
       </div>
 
       <LessonReportView
@@ -146,6 +159,8 @@ export default async function TeacherReportDetailPage({
           <ReportAttachmentsManager reportId={report.id} studentId={studentId} />
         </div>
       )}
+
+      <ReportThread reportId={report.id} messages={messages} viewerId={teacher.id} />
     </Container>
   );
 }
