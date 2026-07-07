@@ -81,9 +81,19 @@ export function LineChart({
             ))}
           </div>
 
+          {/*
+            Two overlaid SVGs. The line uses a 0..100 × 0..height viewBox with
+            preserveAspectRatio="none" so it stretches to the responsive width
+            (SVG <polyline points> can't use "%" units — that was the source of
+            the "Expected number" console error). The dots live in a separate
+            pixel-space SVG using cx="…%" so they stay perfectly round rather
+            than being stretched by the non-uniform viewBox scale.
+          */}
           <svg
             className="absolute inset-0"
             style={{ width: "100%", height }}
+            viewBox={`0 0 100 ${height}`}
+            preserveAspectRatio="none"
             aria-hidden="true"
           >
             {series.map((s, ci) => {
@@ -100,19 +110,40 @@ export function LineChart({
                   const x = ((i + 0.5) / n) * 100;
                   const norm = (v - min) / span;
                   const y = (1 - norm) * height;
-                  return `${x.toFixed(2)}%,${y.toFixed(2)}`;
+                  return `${x.toFixed(2)},${y.toFixed(2)}`;
                 })
                 .join(" ");
 
               return (
+                <polyline
+                  key={ci}
+                  points={pts}
+                  fill="none"
+                  stroke={s.color}
+                  strokeWidth={2}
+                  strokeLinejoin="round"
+                  vectorEffect="non-scaling-stroke"
+                  opacity={0.9}
+                />
+              );
+            })}
+          </svg>
+          <svg
+            className="absolute inset-0"
+            style={{ width: "100%", height }}
+            aria-hidden="true"
+          >
+            {series.map((s, ci) => {
+              const entries = s.points
+                .map((v, i) => ({ v, i }))
+                .filter(
+                  (e): e is { v: number; i: number } =>
+                    typeof e.v === "number" && Number.isFinite(e.v),
+                );
+              if (entries.length === 0) return null;
+
+              return (
                 <g key={ci} opacity={0.9}>
-                  <polyline
-                    points={pts}
-                    fill="none"
-                    stroke={s.color}
-                    strokeWidth={2}
-                    strokeLinejoin="round"
-                  />
                   {entries.map(({ v, i }) => {
                     const cx = `${(((i + 0.5) / n) * 100).toFixed(2)}%`;
                     const norm = (v - min) / span;

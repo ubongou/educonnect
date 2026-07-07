@@ -39,8 +39,14 @@ describe("formatDate", () => {
     expect(formatDate("2026-04-10")).toBe("10 Apr 2026");
   });
 
+  it("keeps a date-only string on the same calendar day regardless of timezone", () => {
+    // Parsed as UTC midnight; must not roll back to 30 Nov for viewers west of UTC.
+    expect(formatDate("2026-12-01")).toBe("01 Dec 2026");
+  });
+
   it("accepts a Date instance", () => {
-    expect(formatDate(new Date("2026-12-01"))).toBe("01 Dec 2026");
+    // Local-midnight Date so the assertion is timezone-independent.
+    expect(formatDate(new Date(2026, 11, 1))).toBe("01 Dec 2026");
   });
 });
 
