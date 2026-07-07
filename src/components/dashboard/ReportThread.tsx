@@ -25,7 +25,7 @@ export function ReportThread({
   viewerId: string;
 }) {
   return (
-    <section className="mt-6 rounded-[28px] border border-line bg-white p-6">
+    <section className="rounded-[28px] border border-line bg-white p-6">
       <h3 className="font-heading text-[14px] font-semibold text-navy">
         Messages
       </h3>

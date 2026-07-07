@@ -136,9 +136,14 @@ export default async function ParentReportDetailPage({
         submitContext={
           report.students?.id ? { studentId: report.students.id } : null
         }
+        thread={
+          <ReportThread
+            reportId={report.id}
+            messages={messages}
+            viewerId={parent.id}
+          />
+        }
       />
-
-      <ReportThread reportId={report.id} messages={messages} viewerId={parent.id} />
     </Container>
   );
 }

@@ -152,6 +152,13 @@ export default async function TeacherReportDetailPage({
         attachments={attachments}
         submissions={submissions}
         reviewable
+        thread={
+          <ReportThread
+            reportId={report.id}
+            messages={messages}
+            viewerId={teacher.id}
+          />
+        }
       />
 
       {studentId && (
@@ -159,8 +166,6 @@ export default async function TeacherReportDetailPage({
           <ReportAttachmentsManager reportId={report.id} studentId={studentId} />
         </div>
       )}
-
-      <ReportThread reportId={report.id} messages={messages} viewerId={teacher.id} />
     </Container>
   );
 }

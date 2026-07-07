@@ -240,11 +240,13 @@ export default async function DashboardSessionsPage({
                   attachments={reportFiles.attachments}
                   submissions={reportFiles.submissions}
                   submitContext={{ studentId: selected.id }}
-                />
-                <ReportThread
-                  reportId={full.id}
-                  messages={messages}
-                  viewerId={user?.id ?? ""}
+                  thread={
+                    <ReportThread
+                      reportId={full.id}
+                      messages={messages}
+                      viewerId={user?.id ?? ""}
+                    />
+                  }
                 />
               </>
             ) : (

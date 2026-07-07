@@ -207,6 +207,8 @@ export type Database = {
       lesson_report_messages: {
         Row: {
           author_id: string
+          author_name: string | null
+          author_role: string | null
           body: string
           created_at: string
           id: string
@@ -214,6 +216,8 @@ export type Database = {
         }
         Insert: {
           author_id: string
+          author_name?: string | null
+          author_role?: string | null
           body: string
           created_at?: string
           id?: string
@@ -221,6 +225,8 @@ export type Database = {
         }
         Update: {
           author_id?: string
+          author_name?: string | null
+          author_role?: string | null
           body?: string
           created_at?: string
           id?: string

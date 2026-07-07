@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { BatteryBars } from "@/components/ui/BatteryBars";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { formatDate, formatDuration } from "@/lib/format";
@@ -46,6 +47,7 @@ export function LessonReportView({
   submissions = [],
   submitContext = null,
   reviewable = false,
+  thread = null,
 }: {
   report: LessonReportViewData;
   /** Files the teacher attached (homework workbooks, resources). */
@@ -56,6 +58,8 @@ export function LessonReportView({
   submitContext?: { studentId: string } | null;
   /** When true (teacher view), shows a "Mark reviewed" toggle per submission. */
   reviewable?: boolean;
+  /** Optional message thread, rendered directly under the key metrics. */
+  thread?: ReactNode;
 }) {
   const u = understandingBadge(report.understanding_check);
   const c = confidenceBadge(report.confidence_level);
@@ -250,6 +254,9 @@ export function LessonReportView({
           </div>
         </div>
       </div>
+
+      {/* Message thread — sits directly under Understanding / Confidence */}
+      {thread}
 
       {/* Behaviours */}
       <div className="rounded-[28px] border border-line bg-white p-6">

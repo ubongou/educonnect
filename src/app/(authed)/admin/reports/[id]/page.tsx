@@ -175,9 +175,14 @@ export default async function AdminReportDetailPage({
         report={view}
         attachments={attachments}
         submissions={submissions}
+        thread={
+          <ReportThread
+            reportId={report.id}
+            messages={messages}
+            viewerId={admin.id}
+          />
+        }
       />
-
-      <ReportThread reportId={report.id} messages={messages} viewerId={admin.id} />
     </Container>
   );
 }
