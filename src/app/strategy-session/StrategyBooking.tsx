@@ -14,7 +14,7 @@ import { trackEvent, trackPixel } from "@/lib/analytics";
 import { recordStrategyLead } from "./leadCapture";
 
 // The single, canonical CTA label. Do not vary this anywhere on the page.
-export const CTA_LABEL = "Book My Free Strategy Session";
+export const CTA_LABEL = "Book Your FREE Strategy Session";
 
 // Google Calendar appointment scheduler shown in-page after the form is sent.
 // The visitor never leaves joinmasani.com.
