@@ -170,9 +170,9 @@ const testimonials = [
   {
     // Real review from a parent, kept anonymous at her request.
     body: "My daughter is very happy with her tutor. She looks forward to every English class, and I am really pleased with the quality of what she is getting. I am confident she will keep improving.",
-    author: "Parent",
-    where: "Verified Masani family",
-    initial: "P",
+    author: "Mrs. Keisha",
+    where: "United Kingdom",
+    initial: "K",
   },
 ];
 
