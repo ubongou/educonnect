@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  startTransition,
   useActionState,
   useEffect,
   useRef,
@@ -40,6 +41,33 @@ export type StrategyLeadFormProps = {
   reassurance?: ReactNode;
 };
 
+// Every scalar field is held in React state so a submit / re-render / React 19
+// auto-reset can never drop what the visitor typed. (Subjects is its own array
+// state below.) This is deliberately fully controlled — do not switch these
+// back to uncontrolled defaultValue inputs.
+type ScalarField =
+  | "child_age_range"
+  | "school_level"
+  | "parent_name"
+  | "tutored_before"
+  | "timeline"
+  | "country"
+  | "parent_phone"
+  | "subject_other"
+  | "parent_email";
+
+const EMPTY_FORM: Record<ScalarField, string> = {
+  child_age_range: "",
+  school_level: "",
+  parent_name: "",
+  tutored_before: "",
+  timeline: "",
+  country: "",
+  parent_phone: "",
+  subject_other: "",
+  parent_email: "",
+};
+
 export function StrategyLeadForm({
   source,
   onSuccess,
@@ -54,14 +82,15 @@ export function StrategyLeadForm({
   >(submitStrategyLead, null);
 
   const errs = state?.status === "error" ? state.fieldErrors : {};
-  const values =
-    state?.status === "error" ? state.values : ({} as Record<string, string>);
 
   const formRef = useRef<HTMLFormElement>(null);
 
-  // Subjects multi-select + the conditional "Other" specify box live in React
-  // state so they persist across server-action re-renders (the server only
-  // echoes scalar values back).
+  // Controlled values. State survives every re-render (the component never
+  // unmounts between submits), so validation errors re-show what was typed.
+  const [form, setForm] = useState<Record<ScalarField, string>>(EMPTY_FORM);
+  const setField = (name: ScalarField) => (value: string) =>
+    setForm((prev) => ({ ...prev, [name]: value }));
+
   const [subjects, setSubjects] = useState<StrategySubject[]>([]);
   const toggleSubject = (value: StrategySubject) =>
     setSubjects((prev) =>
@@ -99,12 +128,22 @@ export function StrategyLeadForm({
 
       <form
         ref={formRef}
-        action={formAction}
         className="contact-form booking-form"
         aria-label="Strategy session request form"
         noValidate
         style={{ display: "block", marginTop: 32 }}
-        onSubmit={() => trackEvent("booking_form_submit", { source })}
+        // We dispatch the action manually instead of via `action={formAction}`.
+        // React 19 auto-resets a form submitted through `action=`, and that
+        // reset mutates <select>/checkbox/radio DOM out from under React so
+        // their controlled values are lost on a validation-error re-render.
+        // Snapshotting FormData here and dispatching in a transition avoids the
+        // auto-reset entirely, so every field survives a failed submit.
+        onSubmit={(e) => {
+          e.preventDefault();
+          trackEvent("booking_form_submit", { source });
+          const fd = new FormData(e.currentTarget);
+          startTransition(() => formAction(fd));
+        }}
       >
         <input type="hidden" name="source" value={source} />
         <input
@@ -127,7 +166,8 @@ export function StrategyLeadForm({
           name="child_age_range"
           placeholder="Select an age range"
           options={ageRangeValues.map((v) => [v, ageRangeLabel[v]] as const)}
-          defaultValue={values.child_age_range}
+          value={form.child_age_range}
+          onChange={setField("child_age_range")}
           error={errs.child_age_range}
           required
         />
@@ -139,7 +179,8 @@ export function StrategyLeadForm({
           options={schoolLevelValues.map(
             (v) => [v, schoolLevelLabel[v]] as const,
           )}
-          defaultValue={values.school_level}
+          value={form.school_level}
+          onChange={setField("school_level")}
           error={errs.school_level}
           required
         />
@@ -148,7 +189,8 @@ export function StrategyLeadForm({
           label="Full name"
           name="parent_name"
           autoComplete="name"
-          defaultValue={values.parent_name}
+          value={form.parent_name}
+          onChange={setField("parent_name")}
           error={errs.parent_name}
           required
         />
@@ -159,7 +201,8 @@ export function StrategyLeadForm({
           options={tutoredBeforeValues.map(
             (v) => [v, tutoredBeforeLabel[v]] as const,
           )}
-          defaultValue={values.tutored_before}
+          value={form.tutored_before}
+          onChange={setField("tutored_before")}
           error={errs.tutored_before}
           required
         />
@@ -169,7 +212,8 @@ export function StrategyLeadForm({
           name="timeline"
           placeholder="Select a timeframe"
           options={timelineValues.map((v) => [v, timelineLabel[v]] as const)}
-          defaultValue={values.timeline}
+          value={form.timeline}
+          onChange={setField("timeline")}
           error={errs.timeline}
           required
         />
@@ -179,7 +223,8 @@ export function StrategyLeadForm({
           name="country"
           placeholder="Select your country"
           options={COUNTRIES.map((c) => [c, c] as const)}
-          defaultValue={values.country}
+          value={form.country}
+          onChange={setField("country")}
           error={errs.country}
           required
         />
@@ -189,7 +234,8 @@ export function StrategyLeadForm({
           name="parent_phone"
           type="tel"
           autoComplete="tel"
-          defaultValue={values.parent_phone}
+          value={form.parent_phone}
+          onChange={setField("parent_phone")}
           error={errs.parent_phone}
           required
         />
@@ -210,7 +256,8 @@ export function StrategyLeadForm({
           <TextField
             label="Please specify the other subject(s)"
             name="subject_other"
-            defaultValue={values.subject_other}
+            value={form.subject_other}
+            onChange={setField("subject_other")}
             error={errs.subject_other}
             required
           />
@@ -221,7 +268,8 @@ export function StrategyLeadForm({
           name="parent_email"
           type="email"
           autoComplete="email"
-          defaultValue={values.parent_email}
+          value={form.parent_email}
+          onChange={setField("parent_email")}
           error={errs.parent_email}
           required
         />
@@ -274,6 +322,7 @@ export function StrategyLeadForm({
 
 // -----------------------------------------------------------------------------
 // Local UI primitives — strategy-form specific, styled with the shared classes.
+// All controlled: value + onChange, so nothing is ever lost on re-render.
 // -----------------------------------------------------------------------------
 
 const labelStyle: React.CSSProperties = {
@@ -298,7 +347,8 @@ function TextField({
   name,
   type = "text",
   autoComplete,
-  defaultValue,
+  value,
+  onChange,
   error,
   required,
 }: {
@@ -306,7 +356,8 @@ function TextField({
   name: string;
   type?: string;
   autoComplete?: string;
-  defaultValue?: string;
+  value: string;
+  onChange: (value: string) => void;
   error?: string;
   required?: boolean;
 }) {
@@ -323,7 +374,8 @@ function TextField({
         name={name}
         type={type}
         autoComplete={autoComplete}
-        defaultValue={defaultValue ?? ""}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
         aria-required={required ? true : undefined}
         aria-invalid={error ? true : undefined}
         aria-describedby={errId}
@@ -338,7 +390,8 @@ function SelectField({
   name,
   placeholder,
   options,
-  defaultValue,
+  value,
+  onChange,
   error,
   required,
 }: {
@@ -346,7 +399,8 @@ function SelectField({
   name: string;
   placeholder: string;
   options: ReadonlyArray<readonly [string, string]>;
-  defaultValue?: string;
+  value: string;
+  onChange: (value: string) => void;
   error?: string;
   required?: boolean;
 }) {
@@ -361,7 +415,8 @@ function SelectField({
       <select
         id={id}
         name={name}
-        defaultValue={defaultValue ?? ""}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
         aria-required={required ? true : undefined}
         aria-invalid={error ? true : undefined}
         aria-describedby={errId}
@@ -369,8 +424,8 @@ function SelectField({
         <option value="" disabled>
           {placeholder}
         </option>
-        {options.map(([value, text]) => (
-          <option key={value} value={value}>
+        {options.map(([optionValue, text]) => (
+          <option key={optionValue} value={optionValue}>
             {text}
           </option>
         ))}
@@ -384,14 +439,16 @@ function RadioGroup({
   label,
   name,
   options,
-  defaultValue,
+  value,
+  onChange,
   error,
   required,
 }: {
   label: string;
   name: string;
   options: ReadonlyArray<readonly [string, string]>;
-  defaultValue?: string;
+  value: string;
+  onChange: (value: string) => void;
   error?: string;
   required?: boolean;
 }) {
@@ -406,13 +463,14 @@ function RadioGroup({
         aria-label={label}
         style={{ display: "flex", flexWrap: "wrap", gap: 12 }}
       >
-        {options.map(([value, text]) => (
-          <label key={value} style={chipStyle}>
+        {options.map(([optionValue, text]) => (
+          <label key={optionValue} style={chipStyle}>
             <input
               type="radio"
               name={name}
-              value={value}
-              defaultChecked={defaultValue === value}
+              value={optionValue}
+              checked={value === optionValue}
+              onChange={() => onChange(optionValue)}
             />
             <span>{text}</span>
           </label>
