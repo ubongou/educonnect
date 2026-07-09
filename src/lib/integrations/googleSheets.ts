@@ -68,6 +68,23 @@ export async function appendToGoogleSheet(
         error: `Sheets webhook HTTP ${res.status}${body ? `: ${body.slice(0, 200)}` : ""}`,
       };
     }
+    // Apps Script always returns HTTP 200, so inspect the JSON body it returns:
+    // { ok: false, error } means the script ran but refused the row (e.g. a
+    // mismatched secret). Treat that as a real failure so the fallback fires.
+    // Non-JSON or { ok: true } is treated as success (backward compatible).
+    const text = await res.text().catch(() => "");
+    let parsed: { ok?: boolean; error?: string } | null = null;
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      parsed = null;
+    }
+    if (parsed && parsed.ok === false) {
+      return {
+        ok: false,
+        error: `Sheets webhook rejected: ${parsed.error ?? "unknown error"}`,
+      };
+    }
     return { ok: true, skipped: false };
   } catch (err) {
     return {
