@@ -9,7 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { BookingForm } from "@/components/booking/BookingForm";
+import { StrategyLeadForm } from "@/components/strategy/StrategyLeadForm";
 import { trackEvent, trackPixel } from "@/lib/analytics";
 import { recordStrategyLead } from "./leadCapture";
 
@@ -102,12 +102,9 @@ export function StrategyBookingProvider({ children }: { children: ReactNode }) {
             </button>
 
             {mode === "form" ? (
-              <BookingForm
-                bare
+              <StrategyLeadForm
                 source={source}
-                afterSubmit="inline"
                 onSuccess={() => setMode("calendar")}
-                eyebrow="Free 15-minute strategy session"
                 heading="Tell us about your child"
                 lead="Two minutes now. Next, you'll pick a time that works for your family."
                 submitLabel={CTA_LABEL}
@@ -123,9 +120,6 @@ export function StrategyBookingProvider({ children }: { children: ReactNode }) {
               />
             ) : (
               <div className="ss-calendar" ref={calendarRef}>
-                <span className="eyebrow" style={{ marginBottom: 14 }}>
-                  Almost there
-                </span>
                 <h2 className="ss-calendar-title">
                   Pick a time for your free session
                 </h2>
