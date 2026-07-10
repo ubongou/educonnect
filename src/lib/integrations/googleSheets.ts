@@ -5,6 +5,7 @@ import {
   schoolLevelLabel,
   tutoredBeforeLabel,
   timelineLabel,
+  contactMethodLabel,
   type StrategyLeadInput,
 } from "@/lib/strategy/schema";
 
@@ -44,6 +45,7 @@ export async function appendToGoogleSheet(
     tutored_before: tutoredBeforeLabel[input.tutored_before],
     timeline: timelineLabel[input.timeline],
     subjects: formatSubjects(input),
+    contact_method: contactMethodLabel[input.contact_method],
   };
 
   const controller = new AbortController();

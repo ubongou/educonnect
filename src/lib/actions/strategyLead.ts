@@ -7,7 +7,7 @@ import {
   type StrategySubject,
 } from "@/lib/strategy/schema";
 import { appendToGoogleSheet } from "@/lib/integrations/googleSheets";
-import { createZohoLead } from "@/lib/integrations/zohoCrm";
+import { addToZohoCampaigns } from "@/lib/integrations/zohoCampaigns";
 import { sendStrategyLeadFailureEmail } from "@/lib/email/sendStrategyLeadFailure";
 
 export type SubmitStrategyLeadState =
@@ -29,7 +29,7 @@ const isSubject = (v: string): v is StrategySubject =>
  * (which serves /book). Order:
  *   1. Honeypot — silent success for bots.
  *   2. Zod parse. Failure => field errors + typed values for re-render.
- *   3. Best-effort fan-out to Google Sheets + Zoho CRM (never blocks the user).
+ *   3. Best-effort fan-out to Google Sheets + Zoho Campaigns (never blocks the user).
  *   4. If BOTH exports fail, email the admin so the lead isn't lost.
  *   5. Always return success so the caller reveals the inline calendar.
  *
@@ -62,6 +62,7 @@ export async function submitStrategyLead(
     subjects,
     subject_other: String(formData.get("subject_other") ?? ""),
     parent_email: String(formData.get("parent_email") ?? ""),
+    contact_method: String(formData.get("contact_method") ?? ""),
     source: normalizeSource(formData.get("source")),
   };
 
@@ -83,6 +84,7 @@ export async function submitStrategyLead(
       parent_phone: raw.parent_phone,
       subject_other: raw.subject_other,
       parent_email: raw.parent_email,
+      contact_method: raw.contact_method,
     };
     return { status: "error", fieldErrors, values };
   }
@@ -90,7 +92,7 @@ export async function submitStrategyLead(
   // 3. Best-effort fan-out. Neither export blocks the visitor.
   const [sheet, zoho] = await Promise.allSettled([
     appendToGoogleSheet(parsed.data),
-    createZohoLead(parsed.data),
+    addToZohoCampaigns(parsed.data),
   ]);
 
   const errors: string[] = [];

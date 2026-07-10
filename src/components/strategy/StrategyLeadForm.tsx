@@ -20,6 +20,8 @@ import {
   timelineLabel,
   strategySubjectValues,
   strategySubjectLabel,
+  contactMethodValues,
+  contactMethodLabel,
   type StrategySubject,
 } from "@/lib/strategy/schema";
 import { COUNTRIES } from "@/lib/strategy/countries";
@@ -54,7 +56,8 @@ type ScalarField =
   | "country"
   | "parent_phone"
   | "subject_other"
-  | "parent_email";
+  | "parent_email"
+  | "contact_method";
 
 const EMPTY_FORM: Record<ScalarField, string> = {
   child_age_range: "",
@@ -66,6 +69,7 @@ const EMPTY_FORM: Record<ScalarField, string> = {
   parent_phone: "",
   subject_other: "",
   parent_email: "",
+  contact_method: "",
 };
 
 export function StrategyLeadForm({
@@ -271,6 +275,18 @@ export function StrategyLeadForm({
           value={form.parent_email}
           onChange={setField("parent_email")}
           error={errs.parent_email}
+          required
+        />
+
+        <RadioGroup
+          label="How would you prefer to be contacted?"
+          name="contact_method"
+          options={contactMethodValues.map(
+            (v) => [v, contactMethodLabel[v]] as const,
+          )}
+          value={form.contact_method}
+          onChange={setField("contact_method")}
+          error={errs.contact_method}
           required
         />
 

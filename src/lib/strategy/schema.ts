@@ -94,6 +94,24 @@ export const strategySubjectLabel: Record<StrategySubject, string> = {
   other: "Other",
 };
 
+// --- Preferred contact method -----------------------------------------------
+export const contactMethodValues = [
+  "whatsapp",
+  "phone_call",
+  "text_message",
+  "email",
+  "facebook_messenger",
+] as const;
+export type ContactMethod = (typeof contactMethodValues)[number];
+
+export const contactMethodLabel: Record<ContactMethod, string> = {
+  whatsapp: "WhatsApp",
+  phone_call: "Phone call",
+  text_message: "Text message",
+  email: "Email",
+  facebook_messenger: "Facebook Messenger",
+};
+
 // -----------------------------------------------------------------------------
 // Schema. Used as the server-action validation gate and to type the client.
 // -----------------------------------------------------------------------------
@@ -122,6 +140,9 @@ export const strategyLeadSchema = z
       .min(1, "Pick at least one subject"),
     subject_other: z.string().trim().max(120).default(""),
     parent_email: z.string().trim().email("Enter a valid email address").max(200),
+    contact_method: z.enum(contactMethodValues, {
+      message: "Pick how you'd like to be contacted",
+    }),
     source: z.string().default("direct"),
   })
   .refine(

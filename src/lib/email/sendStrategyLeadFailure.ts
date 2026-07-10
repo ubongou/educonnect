@@ -7,6 +7,7 @@ import {
   schoolLevelLabel,
   tutoredBeforeLabel,
   timelineLabel,
+  contactMethodLabel,
   type StrategyLeadInput,
 } from "@/lib/strategy/schema";
 
@@ -17,7 +18,7 @@ export type SendStrategyLeadFailureResult =
 
 /**
  * Safety net for the strategy-session form: only called when BOTH exports
- * (Google Sheets + Zoho CRM) failed for a submission. Emails the admin the
+ * (Google Sheets + Zoho Campaigns) failed for a submission. Emails the admin the
  * full lead so it isn't lost. RESEND_API_KEY absent => skipped (nothing else
  * we can do — this path only runs when the other sinks already failed).
  */
@@ -46,6 +47,7 @@ export async function sendStrategyLeadFailureEmail(
     ["Tutored before", tutoredBeforeLabel[input.tutored_before]],
     ["Timeline", timelineLabel[input.timeline]],
     ["Subjects", formatSubjects(input)],
+    ["Preferred contact", contactMethodLabel[input.contact_method]],
   ];
 
   const rows = fields
@@ -62,7 +64,7 @@ export async function sendStrategyLeadFailureEmail(
         <div style="max-width:620px;margin:0 auto;background:#fff;border:1px solid #f5b7b1;border-radius:18px;padding:32px;">
           <p style="margin:0 0 4px;font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#a83a2a;">Strategy session lead — export failed</p>
           <h1 style="margin:0 0 12px;font-size:20px;line-height:1.2;color:#04131C;">${esc(input.parent_name)}</h1>
-          <p style="margin:0 0 20px;font-size:13px;color:#a83a2a;">Both Google Sheets and Zoho CRM writes failed for this submission — logged here so the lead isn't lost. Please add it manually.</p>
+          <p style="margin:0 0 20px;font-size:13px;color:#a83a2a;">Both Google Sheets and Zoho Campaigns writes failed for this submission — logged here so the lead isn't lost. Please add it manually.</p>
           <table style="border-collapse:collapse;font-size:14px;color:#3a4750;">${rows}</table>
           <hr style="border:none;border-top:1px solid #e8e3d6;margin:24px 0 16px;" />
           <p style="margin:0;font-size:12px;color:#6b7680;">Export errors:<br />${errors.map((e) => esc(e)).join("<br />")}</p>
@@ -73,7 +75,7 @@ export async function sendStrategyLeadFailureEmail(
 
   const text = [
     "Strategy session lead — export failed",
-    "Both Google Sheets and Zoho CRM writes failed. Add this lead manually.",
+    "Both Google Sheets and Zoho Campaigns writes failed. Add this lead manually.",
     "",
     ...fields.map(([k, v]) => `${k}: ${v}`),
     "",

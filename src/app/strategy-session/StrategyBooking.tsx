@@ -50,6 +50,15 @@ export function StrategyBookingProvider({ children }: { children: ReactNode }) {
     recordStrategyLead(src);
   }, []);
 
+  // Fired once the form submits successfully (validation passed on the server).
+  // This is the real "lead captured" moment — it's the Meta `Lead` conversion
+  // Ads Manager should optimise toward, not the earlier form-open `Schedule`.
+  const onFormSuccess = useCallback(() => {
+    trackPixel("Lead", { content_name: "strategy_session", source });
+    trackEvent("booking_complete", {});
+    setMode("calendar");
+  }, [source]);
+
   const close = useCallback(() => setMode("idle"), []);
 
   const open = mode !== "idle";
@@ -104,7 +113,7 @@ export function StrategyBookingProvider({ children }: { children: ReactNode }) {
             {mode === "form" ? (
               <StrategyLeadForm
                 source={source}
-                onSuccess={() => setMode("calendar")}
+                onSuccess={onFormSuccess}
                 heading="Tell us about your child"
                 lead="Two minutes now. Next, you'll pick a time that works for your family."
                 submitLabel={CTA_LABEL}
