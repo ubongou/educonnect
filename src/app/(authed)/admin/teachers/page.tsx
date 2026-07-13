@@ -2,10 +2,13 @@ import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { createClient } from "@/lib/supabase/server";
+import { getProfileCascade } from "@/lib/actions/users";
+import type { ProfileCascade } from "@/lib/admin/profileCascade";
 import {
   DeactivateToggle,
   StatusPill,
 } from "@/components/admin/DeactivateToggle";
+import { DeleteProfileButton } from "@/components/admin/DeleteProfileButton";
 
 type TeacherRow = {
   id: string;
@@ -75,6 +78,10 @@ export default async function AdminTeachersPage() {
     upcoming: upcomingByTeacher.get(p.id) ?? 0,
   }));
 
+  const activeRows = rows.filter((r) => r.deactivated_at == null);
+  const inactiveRows = rows.filter((r) => r.deactivated_at != null);
+  const cascades = await getProfileCascade(inactiveRows.map((r) => r.id));
+
   return (
     <Container>
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
@@ -98,58 +105,124 @@ export default async function AdminTeachersPage() {
           </p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-line bg-white">
-          <table className="w-full text-[14px]">
-            <thead className="bg-paper text-left font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
-              <tr>
-                <th className="px-5 py-3">Name</th>
-                <th className="px-5 py-3">Email</th>
-                <th className="px-5 py-3 text-right">Students</th>
-                <th className="px-5 py-3 text-right">Upcoming</th>
-                <th className="px-5 py-3">Status</th>
-                <th className="px-5 py-3 text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => {
-                const active = r.deactivated_at == null;
-                return (
-                  <tr
-                    key={r.id}
-                    className={`border-t border-line transition-colors hover:bg-paper ${
-                      active ? "" : "bg-paper/50"
-                    }`}
-                  >
-                    <td className="px-5 py-3 font-heading font-bold">
-                      <Link
-                        href={`/admin/teachers/${r.id}`}
-                        className={`underline-offset-4 hover:underline ${
-                          active ? "text-navy" : "text-g600"
-                        }`}
-                      >
-                        {r.full_name ?? "Unnamed teacher"}
-                      </Link>
-                    </td>
-                    <td className="px-5 py-3 text-g600">{r.email ?? "—"}</td>
-                    <td className="px-5 py-3 text-right tabular-nums text-navy">
-                      {r.students}
-                    </td>
-                    <td className="px-5 py-3 text-right tabular-nums text-navy">
-                      {r.upcoming}
-                    </td>
-                    <td className="px-5 py-3">
-                      <StatusPill active={active} />
-                    </td>
-                    <td className="px-5 py-3 text-right">
-                      <DeactivateToggle profileId={r.id} active={active} />
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <div className="flex flex-col gap-6">
+          {activeRows.length > 0 ? (
+            <TeacherTable rows={activeRows} />
+          ) : (
+            <div className="rounded-2xl border border-dashed border-line bg-white p-8 text-center">
+              <p className="text-[14px] text-g600">No active teachers.</p>
+            </div>
+          )}
+
+          {inactiveRows.length > 0 && (
+            <details className="group overflow-hidden rounded-2xl border border-line bg-white">
+              <summary className="flex cursor-pointer items-center justify-between gap-3 px-5 py-3 font-heading text-[13px] font-bold text-g600 marker:content-none hover:bg-paper">
+                <span>
+                  Deactivated teachers ({inactiveRows.length})
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="text-g400 transition-transform group-open:rotate-180"
+                >
+                  ▾
+                </span>
+              </summary>
+              <TeacherTable rows={inactiveRows} cascades={cascades} bare />
+            </details>
+          )}
         </div>
       )}
     </Container>
+  );
+}
+
+function TeacherTable({
+  rows,
+  cascades,
+  bare = false,
+}: {
+  rows: TeacherRow[];
+  cascades?: Record<string, ProfileCascade>;
+  bare?: boolean;
+}) {
+  const showDelete = cascades != null;
+  return (
+    <div
+      className={
+        bare
+          ? "border-t border-line"
+          : "overflow-hidden rounded-2xl border border-line bg-white"
+      }
+    >
+      <table className="w-full text-[14px]">
+        <thead className="bg-paper text-left font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
+          <tr>
+            <th className="px-5 py-3">Name</th>
+            <th className="px-5 py-3">Email</th>
+            <th className="px-5 py-3 text-right">Students</th>
+            <th className="px-5 py-3 text-right">Upcoming</th>
+            <th className="px-5 py-3">Status</th>
+            <th className="px-5 py-3 text-right">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => {
+            const active = r.deactivated_at == null;
+            return (
+              <tr
+                key={r.id}
+                className={`border-t border-line transition-colors hover:bg-paper ${
+                  active ? "" : "bg-paper/50"
+                }`}
+              >
+                <td className="px-5 py-3 font-heading font-bold">
+                  <Link
+                    href={`/admin/teachers/${r.id}`}
+                    className={`underline-offset-4 hover:underline ${
+                      active ? "text-navy" : "text-g600"
+                    }`}
+                  >
+                    {r.full_name ?? "Unnamed teacher"}
+                  </Link>
+                </td>
+                <td className="px-5 py-3 text-g600">{r.email ?? "—"}</td>
+                <td className="px-5 py-3 text-right tabular-nums text-navy">
+                  {r.students}
+                </td>
+                <td className="px-5 py-3 text-right tabular-nums text-navy">
+                  {r.upcoming}
+                </td>
+                <td className="px-5 py-3">
+                  <StatusPill active={active} />
+                </td>
+                <td className="px-5 py-3">
+                  <div className="flex items-center justify-end gap-4">
+                    <DeactivateToggle profileId={r.id} active={active} />
+                    {showDelete && (
+                      <DeleteProfileButton
+                        profileId={r.id}
+                        fullName={r.full_name ?? "this teacher"}
+                        email={r.email ?? ""}
+                        cascade={
+                          cascades[r.id] ?? {
+                            sessions: 0,
+                            reports: 0,
+                            materials: 0,
+                            messages: 0,
+                            enrollmentsAssigned: 0,
+                            enrollmentsRequested: 0,
+                            documents: 0,
+                          }
+                        }
+                      />
+                    )}
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 }

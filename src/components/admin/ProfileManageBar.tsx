@@ -6,13 +6,32 @@ import { ActionMenu, ActionMenuItem } from "@/components/ui/ActionMenu";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { StatusPill } from "@/components/admin/DeactivateToggle";
 import { AdminProfileEditForm } from "@/components/admin/AdminProfileEditForm";
-import { reassignTeacher, setProfileActive } from "@/lib/actions/users";
+import {
+  deleteProfile,
+  reassignTeacher,
+  setProfileActive,
+} from "@/lib/actions/users";
+import {
+  profileCascadeLines,
+  profileCascadeTotal,
+  type ProfileCascade,
+} from "@/lib/admin/profileCascade";
 
 export type ReassignInfo = {
   /** Other active teachers this teacher's workload can move to. */
   targets: { id: string; name: string }[];
   enrollmentCount: number;
   sessionCount: number;
+};
+
+const EMPTY_CASCADE: ProfileCascade = {
+  sessions: 0,
+  reports: 0,
+  materials: 0,
+  messages: 0,
+  enrollmentsAssigned: 0,
+  enrollmentsRequested: 0,
+  documents: 0,
 };
 
 /**
@@ -30,6 +49,8 @@ export function ProfileManageBar({
   email,
   active,
   reassign,
+  cascade = EMPTY_CASCADE,
+  listHref,
 }: {
   profileId: string;
   fullName: string;
@@ -37,13 +58,21 @@ export function ProfileManageBar({
   email: string;
   active: boolean;
   reassign?: ReassignInfo;
+  /** What a permanent delete would remove — drives safe-vs-force. */
+  cascade?: ProfileCascade;
+  /** Where to send the admin after a successful delete (the list page). */
+  listHref: string;
 }) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [reassignTo, setReassignTo] = useState("");
   // Dialog state lives here (not inside ActionMenu) so it survives the menu
   // closing on click.
-  const [dialog, setDialog] = useState<"deactivate" | "reactivate" | null>(null);
+  const [dialog, setDialog] = useState<
+    "deactivate" | "reactivate" | "delete" | null
+  >(null);
+
+  const hasHistory = profileCascadeTotal(cascade) > 0;
 
   const liveLoad = reassign
     ? reassign.enrollmentCount + reassign.sessionCount
@@ -71,9 +100,14 @@ export function ProfileManageBar({
               Deactivate
             </ActionMenuItem>
           ) : (
-            <ActionMenuItem onClick={() => setDialog("reactivate")}>
-              Reactivate
-            </ActionMenuItem>
+            <>
+              <ActionMenuItem onClick={() => setDialog("reactivate")}>
+                Reactivate
+              </ActionMenuItem>
+              <ActionMenuItem tone="danger" onClick={() => setDialog("delete")}>
+                Delete permanently
+              </ActionMenuItem>
+            </>
           )}
         </ActionMenu>
       </div>
@@ -135,6 +169,22 @@ export function ProfileManageBar({
         confirmLabel="Reactivate"
         description="They'll be able to sign in again."
         onConfirm={() => setProfileActive(profileId, true)}
+      />
+
+      <ConfirmDialog
+        open={dialog === "delete"}
+        onOpenChange={(o) => setDialog(o ? "delete" : null)}
+        title={`Delete ${fullName}`}
+        confirmLabel="Delete permanently"
+        cascade={hasHistory ? profileCascadeLines(cascade) : undefined}
+        confirmWord={hasHistory ? email : undefined}
+        description={
+          hasHistory
+            ? "This permanently removes the account, its login, and everything below. It cannot be undone."
+            : "This account has no linked records. It and its login will be permanently removed. This cannot be undone."
+        }
+        onConfirm={() => deleteProfile(profileId, hasHistory)}
+        onSuccess={() => router.push(listHref)}
       />
 
       {editing && (

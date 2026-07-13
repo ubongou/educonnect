@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate, formatRegistrationNumber } from "@/lib/format";
+import { getProfileCascade } from "@/lib/actions/users";
 import { ProfileManageBar } from "@/components/admin/ProfileManageBar";
 
 type ChildLink = {
@@ -47,6 +48,11 @@ export default async function AdminParentDetail({
     .map((l) => l.students)
     .filter((s): s is NonNullable<ChildLink["students"]> => s !== null);
 
+  // Only deactivated parents are deletable, so only they need cascade counts.
+  const cascade = parent.deactivated_at
+    ? (await getProfileCascade([parent.id]))[parent.id]
+    : undefined;
+
   return (
     <Container>
       <div className="mb-4 text-[13px] text-g600">
@@ -78,6 +84,8 @@ export default async function AdminParentDetail({
           phone={parent.phone ?? ""}
           email={parent.email ?? ""}
           active={parent.deactivated_at == null}
+          cascade={cascade}
+          listHref="/admin/parents"
         />
       </div>
 

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate, formatRegistrationNumber } from "@/lib/format";
+import { getProfileCascade } from "@/lib/actions/users";
 import { ProfileManageBar } from "@/components/admin/ProfileManageBar";
 
 type EnrollmentRow = {
@@ -88,6 +89,11 @@ export default async function AdminTeacherDetail({
   const activeEnrollmentCount = enr.filter((e) => e.status === "approved").length;
   const upcomingSessionCount = sess.filter((s) => s.status === "scheduled").length;
 
+  // Only deactivated teachers are deletable, so only they need cascade counts.
+  const cascade = teacher.deactivated_at
+    ? (await getProfileCascade([teacher.id]))[teacher.id]
+    : undefined;
+
   return (
     <Container>
       <div className="mb-4 text-[13px] text-g600">
@@ -122,6 +128,8 @@ export default async function AdminTeacherDetail({
             enrollmentCount: activeEnrollmentCount,
             sessionCount: upcomingSessionCount,
           }}
+          cascade={cascade}
+          listHref="/admin/teachers"
         />
       </div>
 
