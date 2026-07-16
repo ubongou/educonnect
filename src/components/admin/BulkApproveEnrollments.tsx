@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { DecisionButtons, type TeacherOption } from "@/components/admin/DecisionButtons";
 import { approveEnrollmentsBulk } from "@/lib/actions/enrollments";
 import { inputBase } from "@/components/ui/FormField";
+import { TableScroll } from "@/components/ui/TableScroll";
 
 export type PendingRow = {
   id: string;
@@ -108,7 +109,7 @@ export function BulkApproveEnrollments({
         </p>
       )}
 
-      <div className="overflow-hidden rounded-2xl border border-line bg-white">
+      <TableScroll minWidth={780}>
         <table className="w-full text-[14px]">
           <thead className="bg-paper text-left font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
             <tr>
@@ -174,7 +175,7 @@ export function BulkApproveEnrollments({
             ))}
           </tbody>
         </table>
-      </div>
+      </TableScroll>
     </div>
   );
 }

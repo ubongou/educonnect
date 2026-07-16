@@ -15,6 +15,7 @@ import {
 } from "@/components/admin/ParentStudentLinks";
 import type { StudentFieldValues } from "@/components/admin/StudentFormFields";
 import { ChildDashboardBody } from "@/components/dashboard/ChildDashboardBody";
+import { TableScroll } from "@/components/ui/TableScroll";
 
 type EnrollmentRow = {
   id: string;
@@ -326,7 +327,7 @@ export default async function AdminStudentDetail({
             No lesson reports submitted yet.
           </div>
         ) : (
-          <div className="overflow-hidden rounded-2xl border border-line bg-white">
+          <TableScroll minWidth={720}>
             <table className="w-full text-[14px]">
               <thead className="bg-paper text-left font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
                 <tr>
@@ -362,7 +363,7 @@ export default async function AdminStudentDetail({
                 ))}
               </tbody>
             </table>
-          </div>
+          </TableScroll>
         )}
       </section>
 

@@ -9,6 +9,7 @@ import {
   StatusPill,
 } from "@/components/admin/DeactivateToggle";
 import { DeleteProfileButton } from "@/components/admin/DeleteProfileButton";
+import { TableScroll } from "@/components/ui/TableScroll";
 
 type TeacherRow = {
   id: string;
@@ -147,7 +148,8 @@ function TeacherTable({
 }) {
   const showDelete = cascades != null;
   return (
-    <div
+    <TableScroll
+      minWidth={760}
       className={
         bare
           ? "border-t border-line"
@@ -223,6 +225,6 @@ function TeacherTable({
           })}
         </tbody>
       </table>
-    </div>
+    </TableScroll>
   );
 }

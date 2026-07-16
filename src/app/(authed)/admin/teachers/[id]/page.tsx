@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatDate, formatRegistrationNumber } from "@/lib/format";
 import { getProfileCascade } from "@/lib/actions/users";
 import { ProfileManageBar } from "@/components/admin/ProfileManageBar";
+import { TableScroll } from "@/components/ui/TableScroll";
 
 type EnrollmentRow = {
   id: string;
@@ -198,7 +199,7 @@ export default async function AdminTeacherDetail({
             to create one.
           </div>
         ) : (
-          <div className="overflow-hidden rounded-2xl border border-line bg-white">
+          <TableScroll minWidth={680}>
             <table className="w-full text-[14px]">
               <thead className="bg-paper text-left font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
                 <tr>
@@ -230,7 +231,7 @@ export default async function AdminTeacherDetail({
                 ))}
               </tbody>
             </table>
-          </div>
+          </TableScroll>
         )}
       </section>
     </Container>

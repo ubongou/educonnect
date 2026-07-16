@@ -14,6 +14,7 @@ import { confidenceBadge, understandingBadge } from "@/lib/scales";
 import { StudentTabsNav } from "@/components/teacher/StudentTabsNav";
 import { isViewableMime } from "@/lib/uploads/viewable";
 import { ChildDashboardBody } from "@/components/dashboard/ChildDashboardBody";
+import { TableScroll } from "@/components/ui/TableScroll";
 
 type ReportRow = {
   id: string;
@@ -245,7 +246,7 @@ export default async function TeacherStudentDetail({
             No reports for this student yet.
           </div>
         ) : (
-          <div className="overflow-hidden rounded-2xl border border-line bg-white">
+          <TableScroll minWidth={720}>
             <table className="w-full text-[14px]">
               <thead className="bg-paper text-left font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
                 <tr>
@@ -295,7 +296,7 @@ export default async function TeacherStudentDetail({
                 })}
               </tbody>
             </table>
-          </div>
+          </TableScroll>
         )}
       </section>
 

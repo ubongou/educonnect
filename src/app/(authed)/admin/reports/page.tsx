@@ -3,6 +3,7 @@ import { Container } from "@/components/ui/Container";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { ResendReportButton } from "@/components/admin/ResendReportButton";
 import { ReportDeleteRestore } from "@/components/admin/ReportDeleteRestore";
+import { TableScroll } from "@/components/ui/TableScroll";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { confidenceBadge, understandingBadge } from "@/lib/scales";
@@ -74,7 +75,7 @@ export default async function AdminReportsPage() {
           </p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-line bg-white">
+        <TableScroll minWidth={980}>
           <table className="w-full text-[14px]">
             <thead className="bg-paper text-left font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
               <tr>
@@ -160,7 +161,7 @@ export default async function AdminReportsPage() {
               })}
             </tbody>
           </table>
-        </div>
+        </TableScroll>
       )}
 
       {deletedRows.length > 0 && (
@@ -172,7 +173,7 @@ export default async function AdminReportsPage() {
             Hidden from parents, teachers, and the charts. Restore to bring a
             report back exactly as it was.
           </p>
-          <div className="overflow-hidden rounded-2xl border border-line bg-white">
+          <TableScroll minWidth={720}>
             <table className="w-full text-[14px]">
               <thead className="bg-paper text-left font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
                 <tr>
@@ -207,7 +208,7 @@ export default async function AdminReportsPage() {
                 })}
               </tbody>
             </table>
-          </div>
+          </TableScroll>
         </section>
       )}
     </Container>

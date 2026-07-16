@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { importPastSessions } from "@/lib/actions/sessions";
 import { inputBase } from "@/components/ui/FormField";
 import type { SchedulableEnrollment } from "@/components/admin/SessionScheduler";
+import { TableScroll } from "@/components/ui/TableScroll";
 
 // Column order parents paste in. Optional trailing columns may be omitted.
 const COLUMNS = [
@@ -235,36 +236,38 @@ export function ImportSessionsForm({
               {validRows.length} of {parsed.length} row{parsed.length === 1 ? "" : "s"} valid
             </span>
           </div>
-          <table className="w-full text-[13px]">
-            <thead className="bg-paper text-left font-heading text-[11px] font-bold uppercase tracking-[0.08em] text-g400">
-              <tr>
-                <th className="px-3 py-2">#</th>
-                <th className="px-3 py-2">Date</th>
-                <th className="px-3 py-2">Focus</th>
-                <th className="px-3 py-2 text-right">Mins</th>
-                <th className="px-3 py-2">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {parsed.map((r) => (
-                <tr key={r.line} className="border-t border-line">
-                  <td className="px-3 py-2 tabular-nums text-g400">{r.line}</td>
-                  <td className="px-3 py-2 text-navy">{r.cells[0] ?? "—"}</td>
-                  <td className="px-3 py-2 text-g600">{r.cells[2] ?? "—"}</td>
-                  <td className="px-3 py-2 text-right tabular-nums text-g600">
-                    {r.cells[1] ?? "—"}
-                  </td>
-                  <td className="px-3 py-2">
-                    {r.ok ? (
-                      <span className="font-semibold text-blue">valid</span>
-                    ) : (
-                      <span className="font-semibold text-coral">{r.error}</span>
-                    )}
-                  </td>
+          <TableScroll minWidth={620} className="">
+            <table className="w-full text-[13px]">
+              <thead className="bg-paper text-left font-heading text-[11px] font-bold uppercase tracking-[0.08em] text-g400">
+                <tr>
+                  <th className="px-3 py-2">#</th>
+                  <th className="px-3 py-2">Date</th>
+                  <th className="px-3 py-2">Focus</th>
+                  <th className="px-3 py-2 text-right">Mins</th>
+                  <th className="px-3 py-2">Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {parsed.map((r) => (
+                  <tr key={r.line} className="border-t border-line">
+                    <td className="px-3 py-2 tabular-nums text-g400">{r.line}</td>
+                    <td className="px-3 py-2 text-navy">{r.cells[0] ?? "—"}</td>
+                    <td className="px-3 py-2 text-g600">{r.cells[2] ?? "—"}</td>
+                    <td className="px-3 py-2 text-right tabular-nums text-g600">
+                      {r.cells[1] ?? "—"}
+                    </td>
+                    <td className="px-3 py-2">
+                      {r.ok ? (
+                        <span className="font-semibold text-blue">valid</span>
+                      ) : (
+                        <span className="font-semibold text-coral">{r.error}</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </TableScroll>
         </div>
       )}
 

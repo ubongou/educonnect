@@ -6,6 +6,7 @@ import {
   type SchedulableEnrollment,
 } from "@/components/admin/SessionScheduler";
 import { RecurringSessionForm } from "@/components/admin/RecurringSessionForm";
+import { TableScroll } from "@/components/ui/TableScroll";
 import {
   SessionRowActions,
   type SessionTeacherOption,
@@ -158,7 +159,7 @@ export default async function AdminSchedulePage() {
             <p className="text-[14px] text-g600">No sessions scheduled.</p>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-2xl border border-line bg-white">
+          <TableScroll minWidth={880}>
             <table className="w-full text-[14px]">
               <thead className="bg-paper text-left font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
                 <tr>
@@ -218,7 +219,7 @@ export default async function AdminSchedulePage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </TableScroll>
         )}
       </section>
     </Container>

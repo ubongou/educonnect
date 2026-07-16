@@ -8,6 +8,7 @@ import {
   StatusPill,
 } from "@/components/admin/DeactivateToggle";
 import { DeleteProfileButton } from "@/components/admin/DeleteProfileButton";
+import { TableScroll } from "@/components/ui/TableScroll";
 
 type ParentProfile = {
   id: string;
@@ -97,7 +98,8 @@ function ParentTable({
 }) {
   const showDelete = cascades != null;
   return (
-    <div
+    <TableScroll
+      minWidth={760}
       className={
         bare
           ? "border-t border-line"
@@ -190,6 +192,6 @@ function ParentTable({
           })}
         </tbody>
       </table>
-    </div>
+    </TableScroll>
   );
 }

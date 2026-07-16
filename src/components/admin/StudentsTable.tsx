@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { formatRegistrationNumber, formatDate } from "@/lib/format";
 import { inputBase } from "@/components/ui/FormField";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { TableScroll } from "@/components/ui/TableScroll";
 import { deleteStudent, setStudentArchived } from "@/lib/actions/students";
 
 export type StudentRow = {
@@ -67,7 +68,10 @@ export function StudentsTable({ rows }: { rows: StudentRow[] }) {
       ) : (
         <div className="flex flex-col gap-6">
           {activeRows.length > 0 && (
-            <div className="overflow-hidden rounded-lg border border-line bg-white">
+            <TableScroll
+              minWidth={880}
+              className="overflow-hidden rounded-lg border border-line bg-white"
+            >
               <table className="w-full text-[14px]">
                 <Head />
                 <tbody>
@@ -76,7 +80,7 @@ export function StudentsTable({ rows }: { rows: StudentRow[] }) {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </TableScroll>
           )}
 
           {archivedRows.length > 0 && (
@@ -90,7 +94,7 @@ export function StudentsTable({ rows }: { rows: StudentRow[] }) {
                   ▾
                 </span>
               </summary>
-              <div className="border-t border-line">
+              <TableScroll minWidth={880} className="border-t border-line">
                 <table className="w-full text-[14px]">
                   <Head withAction />
                   <tbody>
@@ -99,7 +103,7 @@ export function StudentsTable({ rows }: { rows: StudentRow[] }) {
                     ))}
                   </tbody>
                 </table>
-              </div>
+              </TableScroll>
             </details>
           )}
         </div>
