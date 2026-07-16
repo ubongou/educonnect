@@ -1211,6 +1211,10 @@
   border: 2px solid var(--yellow);
   background: var(--yellow-soft);
 }
+.mkt-root .pricing-card.economical {
+  border: 2px solid var(--sky);
+  background: var(--sky-soft);
+}
 .mkt-root .pricing-header {
   display: flex;
   align-items: flex-start;
@@ -1232,6 +1236,9 @@
   text-transform: uppercase;
   white-space: nowrap;
   align-self: flex-start;
+}
+.mkt-root .pricing-badge.economical {
+  background: var(--sky);
 }
 .mkt-root .pricing-sessions {
   font-family: var(--f-display);

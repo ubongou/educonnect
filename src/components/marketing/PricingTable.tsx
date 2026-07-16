@@ -7,8 +7,14 @@ import { CurrencyToggle, currencySymbols, type Currency } from "./CurrencyToggle
 import type {
   PricingIntroContent,
   PricingTiersContent,
+  TierBadge,
 } from "@/lib/marketing/schemas";
 import { trackEvent } from "@/lib/analytics";
+
+const badgeLabels: Record<TierBadge, string> = {
+  popular: "Most popular",
+  economical: "Most economical",
+};
 
 function fmt(value: number, currency: Currency): string {
   const symbol = currencySymbols[currency];
@@ -65,14 +71,16 @@ export function PricingTable({
             return (
               <div
                 key={tier.sessions}
-                className={clsx("pricing-card", tier.popular && "popular")}
+                className={clsx("pricing-card", tier.badge && tier.badge)}
               >
                 <div className="pricing-header">
                   <div className="pricing-sessions">
                     {tier.sessions} sessions
                   </div>
-                  {tier.popular && (
-                    <div className="pricing-badge">Most popular</div>
+                  {tier.badge && (
+                    <div className={clsx("pricing-badge", tier.badge)}>
+                      {badgeLabels[tier.badge]}
+                    </div>
                   )}
                 </div>
                 <div className="pricing-duration">{tier.duration}</div>

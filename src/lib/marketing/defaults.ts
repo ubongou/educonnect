@@ -178,7 +178,7 @@ export const defaultPricingTiers: PricingTiersContent = {
     {
       sessions: 8,
       duration: "~1 month at 2x/week",
-      popular: false,
+      badge: "popular",
       noCommitmentMessage: "Standard rate — no commitment",
       prices: {
         NGN: { perSession: 20000, total: 160000, saving: 0, free: 0 },
@@ -190,7 +190,7 @@ export const defaultPricingTiers: PricingTiersContent = {
     {
       sessions: 24,
       duration: "~3 months at 2x/week",
-      popular: true,
+      badge: null,
       noCommitmentMessage: "Standard rate — no commitment",
       prices: {
         NGN: { perSession: 18333, total: 440000, saving: 40000, free: 2 },
@@ -202,7 +202,7 @@ export const defaultPricingTiers: PricingTiersContent = {
     {
       sessions: 48,
       duration: "~6 months at 2x/week",
-      popular: false,
+      badge: "economical",
       noCommitmentMessage: "Standard rate — no commitment",
       prices: {
         NGN: { perSession: 17500, total: 840000, saving: 120000, free: 6 },

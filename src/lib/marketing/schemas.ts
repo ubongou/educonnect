@@ -145,10 +145,12 @@ export type Price = {
   free: number;
 };
 
+export type TierBadge = "popular" | "economical";
+
 export type Tier = {
   sessions: number;
   duration: string;
-  popular: boolean;
+  badge: TierBadge | null;
   noCommitmentMessage: string;
   prices: Record<CurrencyCode, Price>;
 };
