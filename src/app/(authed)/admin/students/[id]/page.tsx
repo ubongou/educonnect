@@ -8,6 +8,11 @@ import { IntakeSummary } from "@/components/dashboard/IntakeSummary";
 import { TeacherAssign, type TeacherOption } from "@/components/admin/TeacherAssign";
 import { StudentManageBar } from "@/components/admin/StudentManageBar";
 import { EnrollmentDeleteButton } from "@/components/admin/EnrollmentDeleteButton";
+import {
+  LinkParentToStudentForm,
+  UnlinkButton,
+  type LinkOption,
+} from "@/components/admin/ParentStudentLinks";
 import type { StudentFieldValues } from "@/components/admin/StudentFormFields";
 import { ChildDashboardBody } from "@/components/dashboard/ChildDashboardBody";
 
@@ -66,11 +71,12 @@ export default async function AdminStudentDetail({
   const { subject: subjectRaw } = await searchParams;
   const supabase = await createClient();
 
-  const [{ data: student }, { data: teacherList }] = await Promise.all([
-    supabase
-      .from("students")
-      .select(
-        `
+  const [{ data: student }, { data: teacherList }, { data: parentList }] =
+    await Promise.all([
+      supabase
+        .from("students")
+        .select(
+          `
         id, registration_number, full_name, preferred_name, age, gender,
         current_school, curriculum, curriculum_other, intake, intake_submitted_at,
         archived_at,
@@ -84,19 +90,25 @@ export default async function AdminStudentDetail({
         sessions (id),
         intake_files (id, kind, original_filename, size_bytes, uploaded_at)
         `,
-      )
-      .eq("id", id)
-      // Hide soft-deleted reports from the embedded list (filter on the
-      // embedded resource keeps the student row but drops deleted reports).
-      .is("lesson_reports.deleted_at", null)
-      .maybeSingle(),
-    supabase
-      .from("profiles")
-      .select("id, full_name")
-      .eq("role", "teacher")
-      .is("deactivated_at", null)
-      .order("full_name"),
-  ]);
+        )
+        .eq("id", id)
+        // Hide soft-deleted reports from the embedded list (filter on the
+        // embedded resource keeps the student row but drops deleted reports).
+        .is("lesson_reports.deleted_at", null)
+        .maybeSingle(),
+      supabase
+        .from("profiles")
+        .select("id, full_name")
+        .eq("role", "teacher")
+        .is("deactivated_at", null)
+        .order("full_name"),
+      supabase
+        .from("profiles")
+        .select("id, full_name, email")
+        .eq("role", "parent")
+        .is("deactivated_at", null)
+        .order("full_name"),
+    ]);
 
   if (!student) notFound();
 
@@ -106,6 +118,20 @@ export default async function AdminStudentDetail({
   const parents = ((student.parent_students ?? []) as unknown as ParentLink[])
     .map((p) => p.profiles)
     .filter((p): p is NonNullable<ParentLink["profiles"]> => p !== null);
+
+  // Offer only parents who aren't linked yet — re-linking is a no-op server
+  // side, but showing them would imply otherwise.
+  const linkedParentIds = new Set(parents.map((p) => p.id));
+  const linkableParents: LinkOption[] = (
+    (parentList ?? []) as { id: string; full_name: string | null; email: string | null }[]
+  )
+    .filter((p) => !linkedParentIds.has(p.id))
+    .map((p) => ({
+      id: p.id,
+      label: p.full_name
+        ? `${p.full_name}${p.email ? ` · ${p.email}` : ""}`
+        : (p.email ?? "Unnamed parent"),
+    }));
 
   const enrollments = ((student.enrollments ?? []) as unknown as EnrollmentRow[]).slice().sort(
     (a, b) => b.created_at.localeCompare(a.created_at),
@@ -202,18 +228,32 @@ export default async function AdminStudentDetail({
                     {p.phone && ` · ${p.phone}`}
                   </p>
                 </div>
-                {p.email && (
-                  <a
-                    href={`mailto:${p.email}`}
-                    className="font-heading text-[13px] font-semibold text-blue underline-offset-4 hover:underline"
-                  >
-                    Email
-                  </a>
-                )}
+                <div className="flex items-center gap-4">
+                  {p.email && (
+                    <a
+                      href={`mailto:${p.email}`}
+                      className="font-heading text-[13px] font-semibold text-blue underline-offset-4 hover:underline"
+                    >
+                      Email
+                    </a>
+                  )}
+                  <UnlinkButton
+                    studentId={student.id}
+                    parentId={p.id}
+                    parentName={p.full_name ?? "This parent"}
+                    studentName={displayName}
+                  />
+                </div>
               </li>
             ))}
           </ul>
         )}
+        <div className="mt-4">
+          <LinkParentToStudentForm
+            studentId={student.id}
+            parents={linkableParents}
+          />
+        </div>
       </section>
 
       <section className="mt-10">

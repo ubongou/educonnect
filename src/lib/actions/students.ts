@@ -113,6 +113,76 @@ export async function setStudentArchived(
 }
 
 /**
+ * Admin-only: link an existing parent account to an existing student. Students
+ * are only linked to a parent at creation time (create_student_with_intake for
+ * the parent self-serve path, admin_create_student's p_parent_id for the admin
+ * one), so this is the after-the-fact repair path — and the only way to give a
+ * student a second parent.
+ *
+ * Writes straight to parent_students through the parent_students_admin_write
+ * policy; no RPC needed. Re-linking an already-linked parent is a no-op rather
+ * than a primary-key error.
+ */
+export async function linkParentToStudent(
+  studentId: string,
+  parentId: string,
+): Promise<SimpleStudentResult> {
+  await requireAdmin();
+
+  const supabase = await createClient();
+
+  // The picker only lists parents, but the id arrives from the client — guard
+  // against linking a teacher or admin profile, which every downstream RLS
+  // policy would then treat as this student's parent.
+  const { data: parent } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("id", parentId)
+    .eq("role", "parent")
+    .maybeSingle();
+
+  if (!parent) return { ok: false, error: "No parent account with that id" };
+
+  const { error } = await supabase
+    .from("parent_students")
+    .upsert(
+      { parent_id: parentId, student_id: studentId },
+      { onConflict: "parent_id,student_id", ignoreDuplicates: true },
+    );
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath(`/admin/students/${studentId}`);
+  revalidatePath(`/admin/parents/${parentId}`);
+  return { ok: true };
+}
+
+/**
+ * Admin-only: remove a parent's link to a student. This revokes the parent's
+ * access to the child's reports, sessions, and documents — every parent-facing
+ * RLS policy keys off parent_students — but destroys no records itself.
+ */
+export async function unlinkParentFromStudent(
+  studentId: string,
+  parentId: string,
+): Promise<SimpleStudentResult> {
+  await requireAdmin();
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("parent_students")
+    .delete()
+    .eq("student_id", studentId)
+    .eq("parent_id", parentId);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath(`/admin/students/${studentId}`);
+  revalidatePath(`/admin/parents/${parentId}`);
+  return { ok: true };
+}
+
+/**
  * Admin-only: permanently delete a student and everything that hangs off them.
  * The students FKs are ON DELETE CASCADE, so this also removes parent links,
  * intake files, enrollments, sessions, lesson reports (+ skill ratings), and

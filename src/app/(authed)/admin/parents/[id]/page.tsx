@@ -5,6 +5,11 @@ import { createClient } from "@/lib/supabase/server";
 import { formatDate, formatRegistrationNumber } from "@/lib/format";
 import { getProfileCascade } from "@/lib/actions/users";
 import { ProfileManageBar } from "@/components/admin/ProfileManageBar";
+import {
+  LinkStudentToParentForm,
+  UnlinkButton,
+  type LinkOption,
+} from "@/components/admin/ParentStudentLinks";
 
 type ChildLink = {
   students: {
@@ -33,20 +38,44 @@ export default async function AdminParentDetail({
 
   if (!parent) notFound();
 
-  const { data: links } = await supabase
-    .from("parent_students")
-    .select(
-      `
+  const [{ data: links }, { data: studentList }] = await Promise.all([
+    supabase
+      .from("parent_students")
+      .select(
+        `
       students (
         id, full_name, preferred_name, registration_number, current_school
       )
       `,
-    )
-    .eq("parent_id", id);
+      )
+      .eq("parent_id", id),
+    supabase
+      .from("students")
+      .select("id, full_name, preferred_name, registration_number")
+      .is("archived_at", null)
+      .order("full_name"),
+  ]);
 
   const children = ((links ?? []) as unknown as ChildLink[])
     .map((l) => l.students)
     .filter((s): s is NonNullable<ChildLink["students"]> => s !== null);
+
+  // Archived students are excluded above — linking one would put a child the
+  // admin has already retired back onto this parent's dashboard.
+  const linkedChildIds = new Set(children.map((c) => c.id));
+  const linkableStudents: LinkOption[] = (
+    (studentList ?? []) as {
+      id: string;
+      full_name: string | null;
+      preferred_name: string | null;
+      registration_number: string;
+    }[]
+  )
+    .filter((s) => !linkedChildIds.has(s.id))
+    .map((s) => ({
+      id: s.id,
+      label: `${s.preferred_name ?? s.full_name ?? "Unnamed student"} · ${formatRegistrationNumber(s.registration_number)}`,
+    }));
 
   // Only deactivated parents are deletable, so only they need cascade counts.
   const cascade = parent.deactivated_at
@@ -113,16 +142,30 @@ export default async function AdminParentDetail({
                     {c.current_school && ` · ${c.current_school}`}
                   </p>
                 </div>
-                <Link
-                  href={`/admin/students/${c.id}`}
-                  className="font-heading text-[13px] font-semibold text-blue underline-offset-4 hover:underline"
-                >
-                  Student detail →
-                </Link>
+                <div className="flex items-center gap-4">
+                  <Link
+                    href={`/admin/students/${c.id}`}
+                    className="font-heading text-[13px] font-semibold text-blue underline-offset-4 hover:underline"
+                  >
+                    Student detail →
+                  </Link>
+                  <UnlinkButton
+                    studentId={c.id}
+                    parentId={parent.id}
+                    parentName={parent.full_name ?? "This parent"}
+                    studentName={c.preferred_name ?? c.full_name}
+                  />
+                </div>
               </li>
             ))}
           </ul>
         )}
+        <div className="mt-4">
+          <LinkStudentToParentForm
+            parentId={parent.id}
+            students={linkableStudents}
+          />
+        </div>
       </section>
     </Container>
   );
