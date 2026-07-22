@@ -7,11 +7,7 @@ import { formatRegistrationNumber, formatDate } from "@/lib/format";
 import { inputBase } from "@/components/ui/FormField";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { TableScroll } from "@/components/ui/TableScroll";
-import {
-  deleteStudent,
-  setStudentArchived,
-  setStudentTest,
-} from "@/lib/actions/students";
+import { deleteStudent, setStudentArchived } from "@/lib/actions/students";
 
 export type StudentRow = {
   id: string;
@@ -78,7 +74,7 @@ export function StudentsTable({ rows }: { rows: StudentRow[] }) {
               className="overflow-hidden rounded-lg border border-line bg-white"
             >
               <table className="w-full text-[14px]">
-                <Head withAction />
+                <Head />
                 <tbody>
                   {activeRows.map((s) => (
                     <StudentTr key={s.id} s={s} variant="active" />
@@ -176,43 +172,19 @@ function StudentTr({
       <td className="px-5 py-3 text-g600">
         {s.intake_submitted_at ? formatDate(s.intake_submitted_at) : "—"}
       </td>
-      <td className="px-5 py-3">
-        <div className="flex items-center justify-end gap-4">
-          {archived ? (
-            <>
-              <RestoreButton id={s.id} />
-              <DeleteStudentButton
-                id={s.id}
-                registrationNumber={s.registration_number}
-                fullName={s.full_name}
-              />
-            </>
-          ) : (
-            <TestToggleButton id={s.id} isTest={s.is_test} />
-          )}
-        </div>
-      </td>
+      {archived && (
+        <td className="px-5 py-3">
+          <div className="flex items-center justify-end gap-4">
+            <RestoreButton id={s.id} />
+            <DeleteStudentButton
+              id={s.id}
+              registrationNumber={s.registration_number}
+              fullName={s.full_name}
+            />
+          </div>
+        </td>
+      )}
     </tr>
-  );
-}
-
-function TestToggleButton({ id, isTest }: { id: string; isTest: boolean }) {
-  const router = useRouter();
-  const [pending, start] = useTransition();
-  return (
-    <button
-      type="button"
-      disabled={pending}
-      onClick={() =>
-        start(async () => {
-          const res = await setStudentTest(id, !isTest);
-          if (res.ok) router.refresh();
-        })
-      }
-      className="font-heading text-[13px] font-semibold text-g600 underline-offset-4 hover:text-navy hover:underline disabled:opacity-50"
-    >
-      {pending ? "Saving…" : isTest ? "Unmark test" : "Mark as test"}
-    </button>
   );
 }
 

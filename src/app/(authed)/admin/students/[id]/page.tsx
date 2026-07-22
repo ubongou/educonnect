@@ -80,7 +80,7 @@ export default async function AdminStudentDetail({
           `
         id, registration_number, full_name, preferred_name, age, gender,
         current_school, curriculum, curriculum_other, intake, intake_submitted_at,
-        archived_at,
+        archived_at, is_test,
         parent_students ( profiles ( id, full_name, email, phone ) ),
         enrollments (
           id, status, decided_at, created_at, teacher_id,
@@ -143,6 +143,7 @@ export default async function AdminStudentDetail({
   const intake = (student.intake ?? null) as IntakeJson | null;
 
   const archived = student.archived_at != null;
+  const isTest = student.is_test === true;
   const sessionCount = ((student.sessions ?? []) as { id: string }[]).length;
   const intakeFileCount = ((student.intake_files ?? []) as { id: string }[]).length;
   const deleteCascade = [
@@ -186,6 +187,11 @@ export default async function AdminStudentDetail({
                 Archived
               </span>
             )}
+            {isTest && (
+              <span className="inline-flex items-center rounded-pill border border-blue/40 bg-blue/10 px-3 py-1 font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-blue">
+                Test
+              </span>
+            )}
           </div>
           <h1 className="mt-3 font-heading text-[clamp(28px,3.4vw,40px)] font-semibold leading-tight text-navy">
             {displayName}
@@ -200,6 +206,7 @@ export default async function AdminStudentDetail({
           studentId={student.id}
           registrationNumber={student.registration_number}
           archived={archived}
+          isTest={isTest}
           initial={editInitial}
           cascade={deleteCascade}
         />
