@@ -34,6 +34,9 @@ export async function signedDownloadResponse(
 
   if (!file) return new NextResponse("Not found", { status: 404 });
 
+  // Link-only attachments (e.g. an online quiz) have no stored file to sign.
+  if (!file.storage_key) return new NextResponse("Not a file", { status: 404 });
+
   const disposition =
     req.nextUrl.searchParams.get("disposition") === "attachment"
       ? "attachment"
@@ -44,7 +47,7 @@ export async function signedDownloadResponse(
       ttlSeconds: 60,
       contentDisposition: contentDispositionFor(
         disposition,
-        file.original_filename,
+        file.original_filename ?? "download",
       ),
       contentType: file.mime_type ?? undefined,
     });

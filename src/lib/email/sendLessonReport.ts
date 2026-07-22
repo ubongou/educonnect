@@ -107,7 +107,7 @@ export async function sendLessonReportEmail(
   // sent are excluded.
   const { data: attachmentRows } = await supabase
     .from("teacher_materials")
-    .select("id, kind, original_filename")
+    .select("id, kind, original_filename, link_url")
     .eq("lesson_report_id", report.id)
     .eq("status", "ready")
     .order("uploaded_at", { ascending: true });
@@ -117,11 +117,16 @@ export async function sendLessonReportEmail(
       id: string;
       kind: string;
       original_filename: string;
+      link_url: string | null;
     }[]
   ).map((a) => ({
     filename: a.original_filename,
     kindLabel: materialKindLabel(a.kind),
-    url: `${appUrl}/api/teacher-materials/${a.id}/download?disposition=attachment`,
+    // Link attachments point straight at the quiz; files go through the
+    // authenticated download endpoint.
+    url:
+      a.link_url ??
+      `${appUrl}/api/teacher-materials/${a.id}/download?disposition=attachment`,
     isHomework: a.kind === "homework",
   }));
 

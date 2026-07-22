@@ -55,7 +55,7 @@ export async function sendExtraHomeworkEmail(
 
   const { data: mats } = await supabase
     .from("teacher_materials")
-    .select("id, kind, original_filename")
+    .select("id, kind, original_filename, link_url")
     .in("id", materialIds)
     .eq("lesson_report_id", reportId)
     .eq("status", "ready");
@@ -64,6 +64,7 @@ export async function sendExtraHomeworkEmail(
     id: string;
     kind: string;
     original_filename: string;
+    link_url: string | null;
   }[];
   if (files.length === 0) {
     return { ok: true, recipients: [], skipped: true, reason: "No files" };
@@ -114,13 +115,18 @@ export async function sendExtraHomeworkEmail(
 
   const appUrl = getAppUrl().replace(/\/$/, "");
   const reportUrl = `${appUrl}/dashboard/sessions?report=${reportId}`;
+  // Link attachments point straight at the quiz; files go through the
+  // authenticated download endpoint.
+  const hrefFor = (f: (typeof files)[number]) =>
+    f.link_url ??
+    `${appUrl}/api/teacher-materials/${f.id}/download?disposition=attachment`;
 
   const fileListHtml = files
     .map(
       (f) =>
         `<tr><td style="padding:8px 0;border-top:1px solid #EEF1F4;">
            <span style="display:inline-block;padding:3px 9px;border-radius:99px;background:#FAEEDA;color:#854F0B;font:700 10px Arial,sans-serif;">${escapeHtml(materialKindLabel(f.kind))}</span>
-           <a href="${appUrl}/api/teacher-materials/${f.id}/download?disposition=attachment" style="margin-left:8px;font:700 14px Arial,sans-serif;color:#0C7CC4;text-decoration:underline;">${escapeHtml(f.original_filename)}</a>
+           <a href="${escapeHtml(hrefFor(f))}" style="margin-left:8px;font:700 14px Arial,sans-serif;color:#0C7CC4;text-decoration:underline;">${escapeHtml(f.original_filename)}</a>
          </td></tr>`,
     )
     .join("");
@@ -156,8 +162,7 @@ export async function sendExtraHomeworkEmail(
       "",
       `${teacher} added more homework to ${studentName}'s ${fmtDate(report.lesson_date)} lesson report:`,
       ...files.map(
-        (f) =>
-          `  • ${f.original_filename} (${materialKindLabel(f.kind)}) — ${appUrl}/api/teacher-materials/${f.id}/download?disposition=attachment`,
+        (f) => `  • ${f.original_filename} (${materialKindLabel(f.kind)}) — ${hrefFor(f)}`,
       ),
       "",
       `Open the report: ${reportUrl}`,

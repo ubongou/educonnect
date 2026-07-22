@@ -21,13 +21,13 @@ export async function loadReportFiles(
   const [{ data: att }, { data: subs }] = await Promise.all([
     supabase
       .from("teacher_materials")
-      .select("id, kind, original_filename, mime_type")
+      .select("id, kind, original_filename, mime_type, link_url")
       .eq("lesson_report_id", reportId)
       .eq("status", "ready")
       .order("uploaded_at", { ascending: true }),
     supabase
       .from("student_documents")
-      .select("id, original_filename, mime_type, reviewed_at")
+      .select("id, original_filename, mime_type, submission_text, reviewed_at")
       .eq("lesson_report_id", reportId)
       .eq("status", "ready")
       .order("uploaded_at", { ascending: true }),

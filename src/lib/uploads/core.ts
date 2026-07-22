@@ -62,7 +62,7 @@ export type RequestUploadResult =
 export type SimpleResult = { ok: true } | { ok: false; error: string };
 
 /** Caller's id + role, or null when signed out / profile missing. */
-async function getCurrentUserRole(
+export async function getCurrentUserRole(
   supabase: Client,
 ): Promise<{ userId: string; role: string } | null> {
   const {
