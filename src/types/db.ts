@@ -544,12 +544,13 @@ export type Database = {
           kind: string
           lesson_report_id: string | null
           mime_type: string | null
-          original_filename: string
+          original_filename: string | null
           reviewed_at: string | null
           size_bytes: number | null
           status: string
-          storage_key: string
+          storage_key: string | null
           student_id: string
+          submission_text: string | null
           uploaded_at: string
           uploaded_by: string
         }
@@ -559,12 +560,13 @@ export type Database = {
           kind: string
           lesson_report_id?: string | null
           mime_type?: string | null
-          original_filename: string
+          original_filename?: string | null
           reviewed_at?: string | null
           size_bytes?: number | null
           status?: string
-          storage_key: string
+          storage_key?: string | null
           student_id: string
+          submission_text?: string | null
           uploaded_at?: string
           uploaded_by: string
         }
@@ -574,12 +576,13 @@ export type Database = {
           kind?: string
           lesson_report_id?: string | null
           mime_type?: string | null
-          original_filename?: string
+          original_filename?: string | null
           reviewed_at?: string | null
           size_bytes?: number | null
           status?: string
-          storage_key?: string
+          storage_key?: string | null
           student_id?: string
+          submission_text?: string | null
           uploaded_at?: string
           uploaded_by?: string
         }
@@ -728,12 +731,13 @@ export type Database = {
           id: string
           kind: string
           lesson_report_id: string | null
+          link_url: string | null
           mime_type: string | null
           note: string | null
           original_filename: string
           size_bytes: number | null
           status: string
-          storage_key: string
+          storage_key: string | null
           student_id: string
           uploaded_at: string
           uploaded_by: string
@@ -743,12 +747,13 @@ export type Database = {
           id?: string
           kind: string
           lesson_report_id?: string | null
+          link_url?: string | null
           mime_type?: string | null
           note?: string | null
           original_filename: string
           size_bytes?: number | null
           status?: string
-          storage_key: string
+          storage_key?: string | null
           student_id: string
           uploaded_at?: string
           uploaded_by: string
@@ -758,12 +763,13 @@ export type Database = {
           id?: string
           kind?: string
           lesson_report_id?: string | null
+          link_url?: string | null
           mime_type?: string | null
           note?: string | null
           original_filename?: string
           size_bytes?: number | null
           status?: string
-          storage_key?: string
+          storage_key?: string | null
           student_id?: string
           uploaded_at?: string
           uploaded_by?: string

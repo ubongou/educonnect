@@ -13,12 +13,16 @@ export type ReportAttachmentItem = {
   kind: string;
   original_filename: string;
   mime_type: string | null;
+  /** Set when the attachment is a pasted link (online quiz) rather than a file. */
+  link_url: string | null;
 };
 
 export type HomeworkSubmissionItem = {
   id: string;
-  original_filename: string;
+  original_filename: string | null;
   mime_type: string | null;
+  /** Set when the parent typed a written answer instead of uploading a file. */
+  submission_text: string | null;
   reviewed_at: string | null;
 };
 
@@ -155,22 +159,35 @@ export function LessonReportView({
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
-                      {isViewableMime(a.mime_type) && (
+                      {a.link_url ? (
                         <a
-                          href={`/api/teacher-materials/${a.id}/download`}
+                          href={a.link_url}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
                         >
-                          View
+                          Open link
                         </a>
+                      ) : (
+                        <>
+                          {isViewableMime(a.mime_type) && (
+                            <a
+                              href={`/api/teacher-materials/${a.id}/download`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
+                            >
+                              View
+                            </a>
+                          )}
+                          <a
+                            href={`/api/teacher-materials/${a.id}/download?disposition=attachment`}
+                            className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
+                          >
+                            Download
+                          </a>
+                        </>
                       )}
-                      <a
-                        href={`/api/teacher-materials/${a.id}/download?disposition=attachment`}
-                        className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
-                      >
-                        Download
-                      </a>
                     </div>
                   </li>
                 );
@@ -189,18 +206,24 @@ export function LessonReportView({
                   {submissions.map((s) => (
                     <li
                       key={s.id}
-                      className="flex flex-wrap items-center justify-between gap-2"
+                      className="flex flex-wrap items-start justify-between gap-2"
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-start gap-2">
                         <StatusBadge tone={s.reviewed_at ? "green" : "blue"}>
                           {s.reviewed_at ? "Reviewed" : "Submitted"}
                         </StatusBadge>
-                        <a
-                          href={`/api/student-documents/${s.id}/download?disposition=attachment`}
-                          className="font-heading text-[13px] font-semibold text-navy underline-offset-4 hover:underline"
-                        >
-                          {s.original_filename}
-                        </a>
+                        {s.submission_text ? (
+                          <p className="whitespace-pre-wrap font-heading text-[13px] font-semibold text-navy">
+                            {s.submission_text}
+                          </p>
+                        ) : (
+                          <a
+                            href={`/api/student-documents/${s.id}/download?disposition=attachment`}
+                            className="font-heading text-[13px] font-semibold text-navy underline-offset-4 hover:underline"
+                          >
+                            {s.original_filename}
+                          </a>
+                        )}
                       </div>
                       {reviewable && (
                         <ReviewButton

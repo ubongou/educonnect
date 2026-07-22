@@ -89,7 +89,7 @@ export default async function DashboardDocumentsPage({
     supabase
       .from("teacher_materials")
       .select(
-        "id, original_filename, mime_type, lesson_report_id, lesson_reports ( lesson_date, subjects ( name ) )",
+        "id, original_filename, mime_type, link_url, lesson_report_id, lesson_reports ( lesson_date, subjects ( name ) )",
       )
       .eq("student_id", selected.id)
       .eq("kind", "homework")
@@ -147,6 +147,7 @@ export default async function DashboardDocumentsPage({
     id: string;
     original_filename: string;
     mime_type: string | null;
+    link_url: string | null;
     lesson_report_id: string | null;
     lesson_reports: {
       lesson_date: string;
@@ -187,6 +188,7 @@ export default async function DashboardDocumentsPage({
       id: h.id,
       original_filename: h.original_filename,
       mime_type: h.mime_type,
+      link_url: h.link_url,
       reportId: h.lesson_report_id,
       lessonDate: h.lesson_reports?.lesson_date ?? null,
       subjectName: h.lesson_reports?.subjects?.name ?? null,
@@ -264,22 +266,35 @@ export default async function DashboardDocumentsPage({
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    {isViewableMime(h.mime_type) && (
+                    {h.link_url ? (
                       <a
-                        href={`/api/teacher-materials/${h.id}/download`}
+                        href={h.link_url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
                       >
-                        View
+                        Open link
                       </a>
+                    ) : (
+                      <>
+                        {isViewableMime(h.mime_type) && (
+                          <a
+                            href={`/api/teacher-materials/${h.id}/download`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
+                          >
+                            View
+                          </a>
+                        )}
+                        <a
+                          href={`/api/teacher-materials/${h.id}/download?disposition=attachment`}
+                          className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
+                        >
+                          Download
+                        </a>
+                      </>
                     )}
-                    <a
-                      href={`/api/teacher-materials/${h.id}/download?disposition=attachment`}
-                      className="font-heading text-[13px] font-bold text-blue underline-offset-4 hover:underline"
-                    >
-                      Download
-                    </a>
                     {h.reportId && (
                       <a
                         href={`/dashboard/sessions?child=${selected.id}&report=${h.reportId}`}

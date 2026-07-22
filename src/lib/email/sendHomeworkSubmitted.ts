@@ -31,7 +31,7 @@ export async function sendHomeworkSubmittedEmail(
     .from("student_documents")
     .select(
       `
-      id, original_filename, student_id, lesson_report_id,
+      id, original_filename, submission_text, student_id, lesson_report_id,
       students ( full_name, preferred_name ),
       enrollments ( teacher:profiles!enrollments_teacher_id_fkey ( full_name, email ) )
       `,
@@ -71,6 +71,14 @@ export async function sendHomeworkSubmittedEmail(
     ? `${appUrl}/teacher/reports/${doc.lesson_report_id}`
     : `${appUrl}/teacher/students/${doc.student_id}`;
 
+  // A submission is either an uploaded file or a typed answer. Describe whichever
+  // it is (trimming a long written answer to a preview).
+  const descriptor = doc.submission_text
+    ? `a written answer — "${doc.submission_text.slice(0, 140)}${
+        doc.submission_text.length > 140 ? "…" : ""
+      }"`
+    : (doc.original_filename ?? "completed homework");
+
   const greeting = teacher.full_name
     ? `Hi ${escapeHtml(teacher.full_name.split(/\s+/)[0])},`
     : "Hi,";
@@ -83,7 +91,7 @@ export async function sendHomeworkSubmittedEmail(
           <p style="margin:0 0 12px;font:400 15px Arial,sans-serif;">${greeting}</p>
           <p style="margin:0 0 16px;font:400 15px Arial,sans-serif;line-height:1.6;color:#3A4750;">
             ${escapeHtml(studentName)}'s parent just submitted completed homework:
-            <strong>${escapeHtml(doc.original_filename)}</strong>.
+            <strong>${escapeHtml(descriptor)}</strong>.
           </p>
           <table role="presentation" cellpadding="0" cellspacing="0"><tr><td>
             <a href="${link}" style="display:inline-block;background:${BRAND_BLUE};color:${BRAND_NAVY};font:800 13px Arial,sans-serif;text-decoration:none;padding:12px 22px;border-radius:99px;border:2px solid ${BRAND_NAVY};">Review it</a>
@@ -95,7 +103,7 @@ export async function sendHomeworkSubmittedEmail(
   const text = [
     greeting,
     "",
-    `${studentName}'s parent just submitted completed homework: ${doc.original_filename}.`,
+    `${studentName}'s parent just submitted completed homework: ${descriptor}.`,
     "",
     `Review it: ${link}`,
     "",
