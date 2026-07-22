@@ -8,7 +8,7 @@ export default async function AdminStudentsPage() {
   const { data } = await supabase
     .from("students")
     .select(
-      "id, registration_number, full_name, preferred_name, age, current_school, curriculum, intake_submitted_at, archived_at",
+      "id, registration_number, full_name, preferred_name, age, current_school, curriculum, intake_submitted_at, archived_at, is_test",
     )
     // Active first, then archived; newest within each group.
     .order("archived_at", { ascending: true, nullsFirst: true })

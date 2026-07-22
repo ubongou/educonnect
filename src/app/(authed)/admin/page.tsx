@@ -17,7 +17,12 @@ export default async function AdminOverview() {
   const sevenDaysAgo = sevenDaysAgoDate.toISOString();
 
   const [students, pendingEnrollments, recentReports] = await Promise.all([
-    supabase.from("students").select("*", { count: "exact", head: true }),
+    // Active, real students only — exclude archived (soft-deleted) and test accounts.
+    supabase
+      .from("students")
+      .select("*", { count: "exact", head: true })
+      .is("archived_at", null)
+      .eq("is_test", false),
     supabase
       .from("enrollments")
       .select("*", { count: "exact", head: true })

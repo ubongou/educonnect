@@ -24,6 +24,7 @@ const teacherLinks: SidebarLink[] = [
 const adminLinks: SidebarLink[] = [
   { href: "/admin", label: "Overview", icon: <IconGrid /> },
   { href: "/admin/students", label: "Students", icon: <IconUsers /> },
+  { href: "/admin/reports", label: "Reports", icon: <IconFile /> },
   { href: "/admin/parents", label: "Parents", icon: <IconFamily /> },
   { href: "/admin/teachers", label: "Teachers", icon: <IconGrad /> },
   { href: "/admin/enrollments", label: "Enrollments", icon: <IconClipboard /> },

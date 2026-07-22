@@ -113,6 +113,31 @@ export async function setStudentArchived(
 }
 
 /**
+ * Admin-only: mark a student as a test account (or unmark it). Test students
+ * stay fully usable — they just drop out of the "active real students" count on
+ * the admin overview, so a QA/demo account doesn't inflate the real numbers.
+ */
+export async function setStudentTest(
+  studentId: string,
+  isTest: boolean,
+): Promise<SimpleStudentResult> {
+  await requireAdmin();
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("students")
+    .update({ is_test: isTest })
+    .eq("id", studentId);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath(`/admin/students/${studentId}`);
+  revalidatePath("/admin/students");
+  revalidatePath("/admin");
+  return { ok: true };
+}
+
+/**
  * Admin-only: link an existing parent account to an existing student. Students
  * are only linked to a parent at creation time (create_student_with_intake for
  * the parent self-serve path, admin_create_student's p_parent_id for the admin

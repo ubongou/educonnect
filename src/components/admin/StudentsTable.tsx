@@ -7,7 +7,11 @@ import { formatRegistrationNumber, formatDate } from "@/lib/format";
 import { inputBase } from "@/components/ui/FormField";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { TableScroll } from "@/components/ui/TableScroll";
-import { deleteStudent, setStudentArchived } from "@/lib/actions/students";
+import {
+  deleteStudent,
+  setStudentArchived,
+  setStudentTest,
+} from "@/lib/actions/students";
 
 export type StudentRow = {
   id: string;
@@ -19,6 +23,7 @@ export type StudentRow = {
   curriculum: string | null;
   intake_submitted_at: string | null;
   archived_at: string | null;
+  is_test: boolean;
 };
 
 function matches(s: StudentRow, q: string): boolean {
@@ -73,10 +78,10 @@ export function StudentsTable({ rows }: { rows: StudentRow[] }) {
               className="overflow-hidden rounded-lg border border-line bg-white"
             >
               <table className="w-full text-[14px]">
-                <Head />
+                <Head withAction />
                 <tbody>
                   {activeRows.map((s) => (
-                    <StudentTr key={s.id} s={s} />
+                    <StudentTr key={s.id} s={s} variant="active" />
                   ))}
                 </tbody>
               </table>
@@ -99,7 +104,7 @@ export function StudentsTable({ rows }: { rows: StudentRow[] }) {
                   <Head withAction />
                   <tbody>
                     {archivedRows.map((s) => (
-                      <StudentTr key={s.id} s={s} withAction />
+                      <StudentTr key={s.id} s={s} variant="archived" />
                     ))}
                   </tbody>
                 </table>
@@ -128,8 +133,14 @@ function Head({ withAction = false }: { withAction?: boolean }) {
   );
 }
 
-function StudentTr({ s, withAction = false }: { s: StudentRow; withAction?: boolean }) {
-  const archived = s.archived_at != null;
+function StudentTr({
+  s,
+  variant,
+}: {
+  s: StudentRow;
+  variant: "active" | "archived";
+}) {
+  const archived = variant === "archived";
   return (
     <tr
       className={`border-t border-line transition-colors hover:bg-paper ${
@@ -145,12 +156,19 @@ function StudentTr({ s, withAction = false }: { s: StudentRow; withAction?: bool
         </Link>
       </td>
       <td className="px-5 py-3 text-navy">
-        <Link
-          href={`/admin/students/${s.id}`}
-          className="underline-offset-4 hover:underline"
-        >
-          {s.full_name}
-        </Link>
+        <span className="flex items-center gap-2">
+          <Link
+            href={`/admin/students/${s.id}`}
+            className="underline-offset-4 hover:underline"
+          >
+            {s.full_name}
+          </Link>
+          {s.is_test && (
+            <span className="inline-block rounded-pill bg-blue/10 px-2 py-[2px] font-heading text-[10px] font-bold uppercase tracking-[0.06em] text-blue">
+              Test
+            </span>
+          )}
+        </span>
       </td>
       <td className="px-5 py-3 text-g600">{s.preferred_name ?? "—"}</td>
       <td className="px-5 py-3 text-g600">{s.current_school ?? "—"}</td>
@@ -158,19 +176,43 @@ function StudentTr({ s, withAction = false }: { s: StudentRow; withAction?: bool
       <td className="px-5 py-3 text-g600">
         {s.intake_submitted_at ? formatDate(s.intake_submitted_at) : "—"}
       </td>
-      {withAction && (
-        <td className="px-5 py-3">
-          <div className="flex items-center justify-end gap-4">
-            <RestoreButton id={s.id} />
-            <DeleteStudentButton
-              id={s.id}
-              registrationNumber={s.registration_number}
-              fullName={s.full_name}
-            />
-          </div>
-        </td>
-      )}
+      <td className="px-5 py-3">
+        <div className="flex items-center justify-end gap-4">
+          {archived ? (
+            <>
+              <RestoreButton id={s.id} />
+              <DeleteStudentButton
+                id={s.id}
+                registrationNumber={s.registration_number}
+                fullName={s.full_name}
+              />
+            </>
+          ) : (
+            <TestToggleButton id={s.id} isTest={s.is_test} />
+          )}
+        </div>
+      </td>
     </tr>
+  );
+}
+
+function TestToggleButton({ id, isTest }: { id: string; isTest: boolean }) {
+  const router = useRouter();
+  const [pending, start] = useTransition();
+  return (
+    <button
+      type="button"
+      disabled={pending}
+      onClick={() =>
+        start(async () => {
+          const res = await setStudentTest(id, !isTest);
+          if (res.ok) router.refresh();
+        })
+      }
+      className="font-heading text-[13px] font-semibold text-g600 underline-offset-4 hover:text-navy hover:underline disabled:opacity-50"
+    >
+      {pending ? "Saving…" : isTest ? "Unmark test" : "Mark as test"}
+    </button>
   );
 }
 

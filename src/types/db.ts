@@ -624,6 +624,7 @@ export type Database = {
           id: string
           intake: Json
           intake_submitted_at: string | null
+          is_test: boolean
           preferred_name: string | null
           registration_number: string
         }
@@ -640,6 +641,7 @@ export type Database = {
           id?: string
           intake?: Json
           intake_submitted_at?: string | null
+          is_test?: boolean
           preferred_name?: string | null
           registration_number: string
         }
@@ -656,6 +658,7 @@ export type Database = {
           id?: string
           intake?: Json
           intake_submitted_at?: string | null
+          is_test?: boolean
           preferred_name?: string | null
           registration_number?: string
         }
