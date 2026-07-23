@@ -18,6 +18,11 @@ export type FileTable =
  * Shared implementation for `GET /api/<pipeline>/[id]/download`. Resolves the
  * RLS-gated row, then 302-redirects to a 60s presigned GET URL. Pass
  * `?disposition=attachment` to force a download instead of inline view.
+ *
+ * These URLs go out in emails, so they're often opened by someone who isn't
+ * signed in on that device — RLS then hides the row and the lookup comes back
+ * empty. That's a login problem, not a missing file, so we bounce to /login
+ * carrying the original URL rather than showing a bare "Not found".
  */
 export async function signedDownloadResponse(
   table: FileTable,
@@ -32,7 +37,29 @@ export async function signedDownloadResponse(
     .eq("id", id)
     .single();
 
-  if (!file) return new NextResponse("Not found", { status: 404 });
+  if (!file) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      const loginUrl = req.nextUrl.clone();
+      loginUrl.pathname = "/login";
+      loginUrl.search = "";
+      loginUrl.searchParams.set(
+        "from",
+        `${req.nextUrl.pathname}${req.nextUrl.search}`,
+      );
+      return NextResponse.redirect(loginUrl);
+    }
+
+    // Signed in and still nothing: the row is gone (removed from the report)
+    // or belongs to somebody else's child.
+    return new NextResponse(
+      "This file is no longer available. It may have been removed from the report — ask your teacher to re-send it.",
+      { status: 404, headers: { "content-type": "text/plain; charset=utf-8" } },
+    );
+  }
 
   // Link-only attachments (e.g. an online quiz) have no stored file to sign.
   if (!file.storage_key) return new NextResponse("Not a file", { status: 404 });

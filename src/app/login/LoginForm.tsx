@@ -5,7 +5,14 @@ import { Button } from "@/components/ui/Button";
 import { FormField, inputBase } from "@/components/ui/FormField";
 import { login, type AuthActionState } from "@/lib/actions/profile";
 
-export function LoginForm({ defaultEmail }: { defaultEmail?: string }) {
+export function LoginForm({
+  defaultEmail,
+  from,
+}: {
+  defaultEmail?: string;
+  /** Path the visitor was trying to reach — returned to after sign-in. */
+  from?: string;
+}) {
   const [state, formAction, isPending] = useActionState<AuthActionState, FormData>(
     login,
     null,
@@ -13,6 +20,7 @@ export function LoginForm({ defaultEmail }: { defaultEmail?: string }) {
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
+      {from && <input type="hidden" name="from" value={from} />}
       <FormField label="Email" required>
         <input
           type="email"

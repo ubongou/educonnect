@@ -59,7 +59,10 @@ export async function middleware(request: NextRequest) {
   if (!user && isProtected(pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
-    url.searchParams.set("from", pathname);
+    // Keep the query string in `from` (not on /login itself) so an emailed
+    // deep link like /dashboard/sessions?child=…&report=… survives sign-in.
+    url.search = "";
+    url.searchParams.set("from", `${pathname}${request.nextUrl.search}`);
     return NextResponse.redirect(url);
   }
 

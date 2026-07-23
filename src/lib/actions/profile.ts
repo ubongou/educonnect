@@ -16,6 +16,19 @@ async function requestOrigin(): Promise<string> {
 
 export type AuthActionState = { ok: boolean; error?: string } | null;
 
+/**
+ * Where to land after sign-in. Accepts only a same-site absolute path, so a
+ * crafted `?from=` can't bounce someone to another origin. Everything else
+ * falls back to the role's home.
+ */
+function safeRedirectTarget(raw: FormDataEntryValue | null): string | null {
+  if (typeof raw !== "string" || raw.length === 0) return null;
+  if (!raw.startsWith("/") || raw.startsWith("//") || raw.startsWith("/\\")) {
+    return null;
+  }
+  return raw;
+}
+
 export async function login(
   _prev: AuthActionState,
   formData: FormData,
@@ -49,13 +62,12 @@ export async function login(
   }
 
   const role = profile?.role as Role | undefined;
-  redirect(
-    role === "admin"
-      ? "/admin"
-      : role === "teacher"
-        ? "/teacher"
-        : "/dashboard",
-  );
+  const home =
+    role === "admin" ? "/admin" : role === "teacher" ? "/teacher" : "/dashboard";
+
+  // A parent who followed a homework link from an email lands back on the file
+  // (or the report) instead of a bare dashboard.
+  redirect(safeRedirectTarget(formData.get("from")) ?? home);
 }
 
 export async function logout() {

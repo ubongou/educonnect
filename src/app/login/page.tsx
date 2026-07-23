@@ -7,7 +7,7 @@ export default async function LoginPage({
 }: {
   searchParams: Promise<{ from?: string; email?: string; reset?: string }>;
 }) {
-  const { email, reset } = await searchParams;
+  const { email, reset, from } = await searchParams;
 
   return (
     <AuthShell
@@ -30,7 +30,7 @@ export default async function LoginPage({
           Password updated. Sign in with your new password.
         </p>
       )}
-      <LoginForm defaultEmail={email} />
+      <LoginForm defaultEmail={email} from={from} />
       <p className="mt-5 text-center text-[13px]">
         <Link href="/forgot-password" className="text-g600 underline-offset-4 hover:underline">
           Forgot your password?
