@@ -6,6 +6,7 @@ import { confidenceBadge, understandingBadge } from "@/lib/scales";
 import { isViewableMime } from "@/lib/uploads/viewable";
 import { materialKindLabel } from "@/lib/uploads/labels";
 import { HomeworkSubmit } from "@/components/dashboard/HomeworkSubmit";
+import { RemoveReportFileButton } from "@/components/dashboard/RemoveReportFileButton";
 import { ReviewButton } from "@/components/teacher/ReviewButton";
 
 export type ReportAttachmentItem = {
@@ -51,6 +52,7 @@ export function LessonReportView({
   submissions = [],
   submitContext = null,
   reviewable = false,
+  canManageAttachments = false,
   thread = null,
 }: {
   report: LessonReportViewData;
@@ -62,6 +64,11 @@ export function LessonReportView({
   submitContext?: { studentId: string } | null;
   /** When true (teacher view), shows a "Mark reviewed" toggle per submission. */
   reviewable?: boolean;
+  /**
+   * When true (teacher/admin view), shows a "Remove" control per attachment —
+   * the fix for attaching the wrong file to an already-sent report.
+   */
+  canManageAttachments?: boolean;
   /** Optional message thread, rendered directly under the key metrics. */
   thread?: ReactNode;
 }) {
@@ -188,6 +195,13 @@ export function LessonReportView({
                           </a>
                         </>
                       )}
+                      {canManageAttachments && (
+                        <RemoveReportFileButton
+                          id={a.id}
+                          target="attachment"
+                          label={a.original_filename}
+                        />
+                      )}
                     </div>
                   </li>
                 );
@@ -225,12 +239,26 @@ export function LessonReportView({
                           </a>
                         )}
                       </div>
-                      {reviewable && (
-                        <ReviewButton
-                          documentId={s.id}
-                          reviewed={Boolean(s.reviewed_at)}
-                        />
-                      )}
+                      <div className="flex items-center gap-3">
+                        {reviewable && (
+                          <ReviewButton
+                            documentId={s.id}
+                            reviewed={Boolean(s.reviewed_at)}
+                          />
+                        )}
+                        {/* Parents can retract their own work until it's reviewed. */}
+                        {submitContext && !s.reviewed_at && (
+                          <RemoveReportFileButton
+                            id={s.id}
+                            target="submission"
+                            label={
+                              s.original_filename ??
+                              s.submission_text?.slice(0, 60) ??
+                              "your answer"
+                            }
+                          />
+                        )}
+                      </div>
                     </li>
                   ))}
                 </ul>

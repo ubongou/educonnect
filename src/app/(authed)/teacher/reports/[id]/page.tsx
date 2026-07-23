@@ -152,6 +152,7 @@ export default async function TeacherReportDetailPage({
         attachments={attachments}
         submissions={submissions}
         reviewable
+        canManageAttachments
         thread={
           <ReportThread
             reportId={report.id}

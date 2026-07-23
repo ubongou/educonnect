@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { createClient } from "@/lib/supabase/server";
 import { studentDocumentPolicy } from "@/lib/uploads/policies";
 import {
   studentDocumentUploadSchema,
@@ -77,6 +78,27 @@ export async function cancelStudentDocumentUpload(
   return cancelUpload(config, documentId);
 }
 
+/**
+ * Deletes a parent-uploaded document. RLS already scopes this to the uploading
+ * parent (or an admin). One extra business rule on top: once a teacher has
+ * reviewed a homework submission, the parent can't pull it out from under them
+ * — they have to ask for it to be un-reviewed first.
+ */
 export async function deleteStudentDocument(id: string): Promise<SimpleResult> {
+  const supabase = await createClient();
+  const { data: row } = await supabase
+    .from("student_documents")
+    .select("reviewed_at")
+    .eq("id", id)
+    .maybeSingle<{ reviewed_at: string | null }>();
+
+  if (row?.reviewed_at) {
+    return {
+      ok: false,
+      error:
+        "Your teacher has already reviewed this. Ask them to un-review it before removing.",
+    };
+  }
+
   return deleteUpload(config, id);
 }

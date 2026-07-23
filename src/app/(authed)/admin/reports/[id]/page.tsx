@@ -175,6 +175,7 @@ export default async function AdminReportDetailPage({
         report={view}
         attachments={attachments}
         submissions={submissions}
+        canManageAttachments
         thread={
           <ReportThread
             reportId={report.id}

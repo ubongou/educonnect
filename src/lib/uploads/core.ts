@@ -214,7 +214,7 @@ export async function cancelUpload<T extends BaseUploadInput>(
     .from(config.table)
     .select("storage_key, status")
     .eq("id", id)
-    .maybeSingle<{ storage_key: string; status: string }>();
+    .maybeSingle<{ storage_key: string | null; status: string }>();
 
   if (!row) return { ok: true }; // nothing to clean — treat as success
   if (row.status !== "pending") {
@@ -227,7 +227,8 @@ export async function cancelUpload<T extends BaseUploadInput>(
     .eq("id", id);
   if (delRowErr) return { ok: false, error: delRowErr.message };
 
-  await deleteR2Object(row.storage_key); // best-effort
+  // Link/text rows carry no stored object.
+  if (row.storage_key) await deleteR2Object(row.storage_key); // best-effort
   return { ok: true };
 }
 
@@ -243,7 +244,7 @@ export async function deleteUpload<T extends BaseUploadInput>(
     .from(config.table)
     .select("student_id, storage_key")
     .eq("id", id)
-    .maybeSingle<{ student_id: string; storage_key: string }>();
+    .maybeSingle<{ student_id: string; storage_key: string | null }>();
 
   if (!row) return { ok: false, error: "File not found" };
 
@@ -253,7 +254,8 @@ export async function deleteUpload<T extends BaseUploadInput>(
     .eq("id", id);
   if (delRowErr) return { ok: false, error: delRowErr.message };
 
-  await deleteR2Object(row.storage_key); // best-effort
+  // Link/text rows carry no stored object.
+  if (row.storage_key) await deleteR2Object(row.storage_key); // best-effort
 
   config.revalidate(row.student_id);
   return { ok: true };
