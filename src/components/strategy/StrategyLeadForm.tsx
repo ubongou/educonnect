@@ -29,13 +29,16 @@ import {
   submitStrategyLead,
   type SubmitStrategyLeadState,
 } from "@/lib/actions/strategyLead";
-import { trackEvent } from "@/lib/analytics";
+import { trackEvent, type PixelUserData } from "@/lib/analytics";
 
 export type StrategyLeadFormProps = {
   /** Attribution label passed through to Sheets/Zoho (see sourceLabels). */
   source: string;
-  /** Called once the submission succeeds (modal reveals the calendar). */
-  onSuccess?: () => void;
+  /**
+   * Called once the submission succeeds (modal reveals the calendar). Receives
+   * the customer info the visitor entered, for Meta Advanced Matching.
+   */
+  onSuccess?: (userData: PixelUserData) => void;
   heading?: string;
   lead?: string;
   submitLabel?: string;
@@ -103,11 +106,17 @@ export function StrategyLeadForm({
         : [...prev, value],
     );
 
-  // Hand control back to the caller once the server confirms.
+  // Hand control back to the caller once the server confirms, passing along the
+  // customer info for Advanced Matching (the pixel hashes it before sending).
   const succeeded = state?.status === "success";
   useEffect(() => {
-    if (succeeded) onSuccess?.();
-  }, [succeeded, onSuccess]);
+    if (!succeeded) return;
+    onSuccess?.({
+      email: form.parent_email,
+      phone: form.parent_phone,
+      name: form.parent_name,
+    });
+  }, [succeeded, onSuccess, form.parent_email, form.parent_phone, form.parent_name]);
 
   // After a failed submit, jump to the first errored field.
   useEffect(() => {

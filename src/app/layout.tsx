@@ -3,8 +3,8 @@ import { Nunito, Nunito_Sans, Outfit, Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import "../styles/marketing.css";
+import { META_PIXEL_ID } from "@/lib/analytics";
 
-const META_PIXEL_ID = "2654550048294305";
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 const GA4_ID = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
 

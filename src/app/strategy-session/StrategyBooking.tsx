@@ -10,7 +10,12 @@ import {
   type ReactNode,
 } from "react";
 import { StrategyLeadForm } from "@/components/strategy/StrategyLeadForm";
-import { trackEvent, trackPixel } from "@/lib/analytics";
+import {
+  setPixelUserData,
+  trackEvent,
+  trackPixel,
+  type PixelUserData,
+} from "@/lib/analytics";
 import { recordStrategyLead } from "./leadCapture";
 
 // The single, canonical CTA label. Do not vary this anywhere on the page.
@@ -53,11 +58,16 @@ export function StrategyBookingProvider({ children }: { children: ReactNode }) {
   // Fired once the form submits successfully (validation passed on the server).
   // This is the real "lead captured" moment — it's the Meta `Lead` conversion
   // Ads Manager should optimise toward, not the earlier form-open `Schedule`.
-  const onFormSuccess = useCallback(() => {
-    trackPixel("Lead", { content_name: "strategy_session", source });
-    trackEvent("booking_complete", {});
-    setMode("calendar");
-  }, [source]);
+  const onFormSuccess = useCallback(
+    (userData: PixelUserData) => {
+      // Attach Advanced Matching first so the Lead event carries it.
+      setPixelUserData(userData);
+      trackPixel("Lead", { content_name: "strategy_session", source });
+      trackEvent("booking_complete", {});
+      setMode("calendar");
+    },
+    [source],
+  );
 
   const close = useCallback(() => setMode("idle"), []);
 
