@@ -7,7 +7,7 @@
  * the receipt, so all three can never drift apart.
  */
 export const BANK_DETAILS = {
-  accountName: "EduConnect Innovation Nigeria Ltd",
+  accountName: "Masani Tutors Ltd",
   bankName: "Moniepoint MFB",
   accountNumber: "6729326185",
 } as const;
