@@ -10,6 +10,11 @@ declare global {
 // Advanced Matching (see below).
 export const META_PIXEL_ID = "2654550048294305";
 
+// Microsoft Clarity project ID. Session recordings and heatmaps, loaded
+// site-wide from app/layout.tsx. Clarity must be initialised exactly once per
+// page: a second copy on any route causes conflicting recordings.
+export const CLARITY_PROJECT_ID = "xx6pbi4wnv";
+
 type TrackEventMap = {
   click_book_session: { source: "nav" | "hero" | "pricing"; tier?: string };
   booking_form_submit: { source: string };
