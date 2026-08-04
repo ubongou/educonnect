@@ -1,5 +1,5 @@
 import { createServiceRoleClient } from "@/lib/supabase/server";
-import { getAppUrl, getFromAddress, getResend } from "./client";
+import { getAppUrl, getFromAddress, getReplyToAddress, getResend } from "./client";
 
 export type SendHomeworkSubmittedResult =
   | { ok: true; recipient: string | null; skipped: boolean; reason?: string }
@@ -112,6 +112,7 @@ export async function sendHomeworkSubmittedEmail(
 
   const { error: sendErr } = await resend.emails.send({
     from: getFromAddress(),
+    replyTo: getReplyToAddress(),
     to: teacher.email,
     subject,
     html,

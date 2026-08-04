@@ -14,6 +14,11 @@ export type GlobalsContent = {
   websiteUrl: string;
   instagramUrl: string;
   facebookUrl: string;
+  /**
+   * Digits only, international format, no `+` or spaces — that's the shape
+   * wa.me links require. Display formatting is applied at the call site.
+   */
+  whatsappNumber: string;
 };
 
 // -----------------------------------------------------------------------------

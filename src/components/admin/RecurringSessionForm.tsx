@@ -94,7 +94,12 @@ export function RecurringSessionForm({
         })),
       });
       if (res.ok) {
-        setSuccess(`${res.created} session${res.created === 1 ? "" : "s"} scheduled.`);
+        const base = `${res.created} session${res.created === 1 ? "" : "s"} scheduled.`;
+        setSuccess(
+          res.unfunded
+            ? `${base} ${res.unfunded} of them exceed the paid plan's credits and are unfunded — add or mark a plan paid on the Payments page.`
+            : base,
+        );
         router.refresh();
       } else {
         setError(res.error);

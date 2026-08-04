@@ -1,0 +1,385 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
+import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/auth";
+import { sendPaymentReceiptEmail } from "@/lib/email/sendPaymentEmails";
+import { runReminderSweep } from "@/lib/payments/reminders";
+import {
+  ADJUSTMENT_OPTIONS,
+  adjustmentOption,
+  resolveAdjustmentAmount,
+  type AdjustmentMode,
+} from "@/lib/payments/adjustments";
+
+export type PaymentResult = { ok: true } | { ok: false; error: string };
+export type PlanCreateResult =
+  | { ok: true; planId: string; referenceCode: string; attached: number }
+  | { ok: false; error: string };
+
+const adjustmentInput = z.object({
+  option_id: z.string().refine((v) => ADJUSTMENT_OPTIONS.some((o) => o.id === v), {
+    message: "Unknown adjustment type.",
+  }),
+  mode: z.enum(["naira", "percent"]),
+  value: z.coerce.number().min(0, "Adjustment can't be negative."),
+});
+
+const planCreateSchema = z.object({
+  student_id: z.string().uuid(),
+  payer_id: z.string().uuid().nullable().optional(),
+  sessions_total: z.coerce.number().int().min(1).max(200),
+  // Ceiling chosen so the worst case (200 × rate) stays well inside the
+  // numeric(14,2) columns rather than failing at insert time.
+  rate_per_session: z.coerce.number().min(0).max(10_000_000),
+  notes: z.string().max(2000).optional(),
+  adjustments: z.array(adjustmentInput).max(20).optional(),
+  /**
+   * Sweep this student's existing unfunded sessions onto the new plan. This is
+   * how legacy students get onto plans — the same form future parents use, with
+   * one box ticked.
+   */
+  attach_existing: z.boolean().optional(),
+});
+
+function revalidatePayments(studentId?: string) {
+  revalidatePath("/admin/payments");
+  revalidatePath("/admin/sessions");
+  revalidatePath("/dashboard");
+  if (studentId) revalidatePath(`/admin/students/${studentId}`);
+}
+
+/**
+ * Admin issues a plan. Created 'unpaid' — it becomes payable runway only once
+ * the transfer lands and an admin marks it paid, because we don't teach ahead
+ * of payment.
+ *
+ * The reference code is generated database-side (`next_plan_reference`), which
+ * owns the per-student sequence and the collision loop.
+ */
+export async function createPaymentPlan(input: unknown): Promise<PlanCreateResult> {
+  await requireAdmin();
+
+  const parsed = planCreateSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+  const data = parsed.data;
+
+  const supabase = await createClient();
+
+  const { data: reference, error: refErr } = await supabase.rpc(
+    "next_plan_reference",
+    { p_student_id: data.student_id },
+  );
+  if (refErr || !reference) {
+    return { ok: false, error: refErr?.message ?? "Couldn't generate a reference code." };
+  }
+
+  const { data: plan, error: planErr } = await supabase
+    .from("payment_plans")
+    .insert({
+      student_id: data.student_id,
+      payer_id: data.payer_id ?? null,
+      sessions_total: data.sessions_total,
+      rate_per_session: data.rate_per_session,
+      reference_code: reference as string,
+      notes: data.notes?.trim() || null,
+    })
+    .select("id, reference_code, subtotal_ngn")
+    .single();
+
+  if (planErr || !plan) {
+    return { ok: false, error: planErr?.message ?? "Couldn't create the plan." };
+  }
+
+  // Percentages resolve against the subtotal the database just computed, so
+  // the stored amounts always agree with the row they hang off.
+  const subtotal = Number(plan.subtotal_ngn);
+  const rows = (data.adjustments ?? []).flatMap((a, i) => {
+    const option = adjustmentOption(a.option_id);
+    if (!option) return [];
+    return [
+      {
+        plan_id: plan.id,
+        label: option.label,
+        amount_ngn: resolveAdjustmentAmount({
+          kind: option.kind,
+          mode: a.mode as AdjustmentMode,
+          value: a.value,
+          subtotalNgn: subtotal,
+        }),
+        sort_order: i,
+      },
+    ];
+  });
+
+  if (rows.length > 0) {
+    const { error: adjErr } = await supabase
+      .from("payment_plan_adjustments")
+      .insert(rows);
+    if (adjErr) {
+      // Don't leave a plan priced at list when the admin asked for a discount.
+      await supabase.from("payment_plans").delete().eq("id", plan.id);
+      return { ok: false, error: adjErr.message };
+    }
+  }
+
+  let attached = 0;
+  if (data.attach_existing) {
+    const res = await attachUnfundedSessions(data.student_id, plan.id, data.sessions_total);
+    if (!res.ok) return res;
+    attached = res.attached;
+  }
+
+  revalidatePayments(data.student_id);
+  return {
+    ok: true,
+    planId: plan.id,
+    referenceCode: plan.reference_code,
+    attached,
+  };
+}
+
+/**
+ * Links a student's plan-less sessions to a plan, oldest first, up to the
+ * plan's capacity. Used by the "attach existing sessions" box on plan creation
+ * and by the manual attach action.
+ */
+async function attachUnfundedSessions(
+  studentId: string,
+  planId: string,
+  capacity: number,
+): Promise<{ ok: true; attached: number } | { ok: false; error: string }> {
+  const supabase = await createClient();
+
+  const { data: loose, error } = await supabase
+    .from("sessions")
+    .select("id")
+    .eq("student_id", studentId)
+    .is("payment_plan_id", null)
+    .neq("status", "cancelled")
+    .order("session_date", { ascending: true })
+    .limit(capacity);
+
+  if (error) return { ok: false, error: error.message };
+  const ids = (loose ?? []).map((s) => s.id);
+  if (ids.length === 0) return { ok: true, attached: 0 };
+
+  const { error: linkErr } = await supabase
+    .from("sessions")
+    .update({ payment_plan_id: planId })
+    .in("id", ids);
+
+  if (linkErr) return { ok: false, error: linkErr.message };
+  return { ok: true, attached: ids.length };
+}
+
+export type AttachResult =
+  | { ok: true; attached: number }
+  | { ok: false; error: string };
+
+/** Admin action: sweep a student's unfunded sessions onto an existing plan. */
+export async function attachSessionsToPlan(
+  studentId: string,
+  planId: string,
+): Promise<AttachResult> {
+  await requireAdmin();
+
+  const supabase = await createClient();
+  const { data: plan, error } = await supabase
+    .from("payment_plans")
+    .select("id, sessions_total, student_id")
+    .eq("id", planId)
+    .maybeSingle();
+
+  if (error || !plan) return { ok: false, error: error?.message ?? "Plan not found." };
+  if (plan.student_id !== studentId) {
+    return { ok: false, error: "That plan belongs to a different student." };
+  }
+
+  const { count } = await supabase
+    .from("sessions")
+    .select("*", { count: "exact", head: true })
+    .eq("payment_plan_id", planId)
+    .neq("status", "cancelled");
+
+  const room = Math.max(0, plan.sessions_total - (count ?? 0));
+  if (room === 0) {
+    return { ok: false, error: "That plan has no credits left to attach to." };
+  }
+
+  const res = await attachUnfundedSessions(studentId, planId, room);
+  if (!res.ok) return res;
+
+  revalidatePayments(studentId);
+  return res;
+}
+
+const markPaidSchema = z.object({
+  plan_id: z.string().uuid(),
+  payment_reference: z.string().max(200).optional(),
+  paid_on: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Expected a YYYY-MM-DD date")
+    .optional(),
+});
+
+/**
+ * Admin confirms the transfer landed. This is the moment the plan becomes
+ * schedulable runway, so it's deliberately a separate, explicit action rather
+ * than something a parent can trigger by uploading a screenshot.
+ *
+ * The receipt email is sent by the caller (the server action wrapper in slice
+ * 5) once this returns — a failed send must not roll back a real payment.
+ */
+export async function markPlanPaid(input: unknown): Promise<PaymentResult> {
+  const admin = await requireAdmin();
+
+  const parsed = markPaidSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+  const { plan_id, payment_reference, paid_on } = parsed.data;
+
+  const supabase = await createClient();
+  const { data: plan, error: readErr } = await supabase
+    .from("payment_plans")
+    .select("id, status, student_id")
+    .eq("id", plan_id)
+    .maybeSingle();
+
+  if (readErr || !plan) return { ok: false, error: readErr?.message ?? "Plan not found." };
+  if (plan.status === "paid") return { ok: false, error: "That plan is already paid." };
+  if (plan.status === "void") return { ok: false, error: "That plan was voided." };
+
+  const { error } = await supabase
+    .from("payment_plans")
+    .update({
+      status: "paid",
+      // A date-only input means the transfer's value date; noon UTC keeps the
+      // stored timestamp on that calendar day for readers either side of UTC.
+      paid_at: paid_on ? `${paid_on}T12:00:00Z` : new Date().toISOString(),
+      payment_reference: payment_reference?.trim() || null,
+      verified_by: admin.id,
+    })
+    .eq("id", plan_id);
+
+  if (error) return { ok: false, error: error.message };
+
+  // Receipt is best-effort and deliberately after the write: neither a Resend
+  // outage nor a missing service-role key may roll back a payment that
+  // genuinely landed. Idempotent on receipt_sent_at, so a plan whose receipt
+  // failed can be retried without double-sending.
+  try {
+    await sendPaymentReceiptEmail(plan_id);
+  } catch {
+    // Swallowed on purpose — the money is recorded, which is what matters.
+  }
+
+  revalidatePayments(plan.student_id);
+  return { ok: true };
+}
+
+export type ReminderRunResult =
+  | { ok: true; sent: number; skipped: string[] }
+  | { ok: false; error: string };
+
+/**
+ * Admin-triggered version of the nightly sweep. Same code path and the same
+ * idempotency, so pressing it is safe: plans already nudged for a reason are
+ * skipped rather than emailed twice.
+ */
+export async function runPaymentRemindersNow(): Promise<ReminderRunResult> {
+  await requireAdmin();
+
+  try {
+    const result = await runReminderSweep();
+    revalidatePayments();
+    return {
+      ok: true,
+      sent: result.sent.filter((s) => s.sent).length,
+      skipped: result.sent
+        .filter((s) => !s.sent)
+        .map((s) => `${s.referenceCode}: ${s.reason ?? "not sent"}`),
+    };
+  } catch (err) {
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "Reminder sweep failed",
+    };
+  }
+}
+
+/**
+ * Voids a plan. Kept rather than deleted so the reference code stays reserved
+ * and the history of a mistaken or refunded plan is auditable. Sessions
+ * attached to it keep their link — ON DELETE SET NULL only fires on a real
+ * delete, and unpicking delivered teaching would rewrite history.
+ */
+export async function voidPaymentPlan(planId: string): Promise<PaymentResult> {
+  await requireAdmin();
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("payment_plans")
+    .update({ status: "void" })
+    .eq("id", planId)
+    .select("student_id")
+    .maybeSingle();
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePayments((data as { student_id: string } | null)?.student_id);
+  return { ok: true };
+}
+
+/** Admin edits a plan's price or size. The total_ngn trigger keeps up. */
+export async function updatePaymentPlan(
+  planId: string,
+  patch: { sessions_total?: number; rate_per_session?: number; notes?: string },
+): Promise<PaymentResult> {
+  await requireAdmin();
+
+  const update: {
+    sessions_total?: number;
+    rate_per_session?: number;
+    notes?: string | null;
+  } = {};
+
+  if (patch.sessions_total !== undefined) {
+    if (!Number.isInteger(patch.sessions_total) || patch.sessions_total < 1 || patch.sessions_total > 200) {
+      return { ok: false, error: "Sessions must be a whole number between 1 and 200." };
+    }
+    update.sessions_total = patch.sessions_total;
+  }
+  if (patch.rate_per_session !== undefined) {
+    if (
+      !Number.isFinite(patch.rate_per_session) ||
+      patch.rate_per_session < 0 ||
+      patch.rate_per_session > 10_000_000
+    ) {
+      return { ok: false, error: "Rate must be between ₦0 and ₦10,000,000." };
+    }
+    update.rate_per_session = patch.rate_per_session;
+  }
+  if (patch.notes !== undefined) update.notes = patch.notes.trim() || null;
+
+  if (Object.keys(update).length === 0) {
+    return { ok: false, error: "Nothing to update." };
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("payment_plans")
+    .update(update)
+    .eq("id", planId)
+    .select("student_id")
+    .maybeSingle();
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePayments((data as { student_id: string } | null)?.student_id);
+  return { ok: true };
+}

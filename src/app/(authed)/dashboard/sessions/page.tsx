@@ -45,12 +45,28 @@ type FullReport = {
   }>;
 };
 
+type UpcomingRow = {
+  id: string;
+  session_date: string;
+  duration_minutes: number;
+  status: string;
+  subjects: { name: string } | null;
+  teacher: { full_name: string | null } | null;
+};
+
 export default async function DashboardSessionsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ child?: string; report?: string }>;
+  searchParams: Promise<{ child?: string; report?: string; view?: string }>;
 }) {
-  const { child: childIdRaw, report: reportIdRaw } = await searchParams;
+  const {
+    child: childIdRaw,
+    report: reportIdRaw,
+    view: viewRaw,
+  } = await searchParams;
+  // Reports stay the default view: the lesson-report emails deep-link here with
+  // `?report=`, and that has to keep landing on the report itself.
+  const tab = viewRaw === "upcoming" ? "upcoming" : "reports";
   const { children } = await getParentChildren("/dashboard/sessions");
   let selected = pickChild(children, childIdRaw);
 
@@ -80,6 +96,26 @@ export default async function DashboardSessionsPage({
       if (ownerChild) selected = ownerChild;
     }
   }
+
+  // Every future session for this child — uncapped. Parents previously saw only
+  // the single next session (on the overview card) and a bare count on their
+  // account page, so the rest of a scheduled run was invisible to them.
+  const today = new Date().toISOString().slice(0, 10);
+  const { data: upcomingList } = await supabase
+    .from("sessions")
+    .select(
+      `
+      id, session_date, duration_minutes, status,
+      subjects ( name ),
+      teacher:profiles!sessions_teacher_id_fkey ( full_name )
+      `,
+    )
+    .eq("student_id", selected.id)
+    .gte("session_date", today)
+    .neq("status", "completed")
+    .order("session_date", { ascending: true });
+
+  const upcoming = (upcomingList ?? []) as unknown as UpcomingRow[];
 
   const { data: reportList } = await supabase
     .from("lesson_reports")
@@ -168,7 +204,8 @@ export default async function DashboardSessionsPage({
           Sessions
         </h1>
         <p className="mt-2 text-[14px] text-g600">
-          Every lesson report for {selected.preferred_name ?? selected.full_name}.
+          Lesson reports and the upcoming schedule for{" "}
+          {selected.preferred_name ?? selected.full_name}.
         </p>
       </div>
 
@@ -178,7 +215,68 @@ export default async function DashboardSessionsPage({
         activeId={selected.id}
       />
 
-      {reports.length === 0 ? (
+      <nav aria-label="Select view" className="mb-6 flex flex-wrap items-center gap-2">
+        <ViewTab
+          href={`/dashboard/sessions?child=${selected.id}`}
+          active={tab === "reports"}
+        >
+          Lesson reports ({reports.length})
+        </ViewTab>
+        <ViewTab
+          href={`/dashboard/sessions?child=${selected.id}&view=upcoming`}
+          active={tab === "upcoming"}
+        >
+          Upcoming sessions ({upcoming.length})
+        </ViewTab>
+      </nav>
+
+      {tab === "upcoming" ? (
+        upcoming.length === 0 ? (
+          <div className="rounded-[28px] border border-dashed border-line bg-white p-10 text-center">
+            <p className="text-[14px] text-g600">
+              No sessions are scheduled for{" "}
+              {selected.preferred_name ?? selected.full_name} right now.
+            </p>
+          </div>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {upcoming.map((s) => (
+              <li
+                key={s.id}
+                className={`flex flex-wrap items-center justify-between gap-4 rounded-[28px] border border-line bg-white px-5 py-4 ${
+                  s.status === "cancelled" ? "opacity-60" : ""
+                }`}
+              >
+                <div>
+                  <p className="font-heading text-[15px] font-semibold text-navy">
+                    {new Date(s.session_date).toLocaleDateString("en-GB", {
+                      weekday: "long",
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </p>
+                  <p className="mt-1 text-[13px] text-g600">
+                    {s.subjects?.name ?? "Subject"} · {s.duration_minutes} min
+                    {s.teacher?.full_name && ` · ${s.teacher.full_name}`}
+                  </p>
+                </div>
+                <StatusBadge
+                  tone={
+                    s.status === "cancelled"
+                      ? "gray"
+                      : s.status === "no_show"
+                        ? "coral"
+                        : "blue"
+                  }
+                >
+                  {s.status === "scheduled" ? "Scheduled" : s.status.replace("_", " ")}
+                </StatusBadge>
+              </li>
+            ))}
+          </ul>
+        )
+      ) : reports.length === 0 ? (
         <div className="rounded-[28px] border border-dashed border-line bg-white p-10 text-center">
           <p className="text-[14px] text-g600">
             No lesson reports submitted for this child yet.
@@ -240,6 +338,7 @@ export default async function DashboardSessionsPage({
                   attachments={reportFiles.attachments}
                   submissions={reportFiles.submissions}
                   submitContext={{ studentId: selected.id }}
+                  showReferralOffer
                   thread={
                     <ReportThread
                       reportId={full.id}
@@ -256,5 +355,29 @@ export default async function DashboardSessionsPage({
         </div>
       )}
     </Container>
+  );
+}
+
+function ViewTab({
+  href,
+  active,
+  children,
+}: {
+  href: string;
+  active: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      aria-current={active ? "page" : undefined}
+      className={`inline-flex items-center rounded-pill border px-4 py-[7px] font-heading text-[13px] font-semibold transition-colors ${
+        active
+          ? "border-navy bg-navy text-yellow"
+          : "border-navy/20 bg-white text-navy hover:bg-paper"
+      }`}
+    >
+      {children}
+    </Link>
   );
 }

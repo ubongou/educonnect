@@ -50,6 +50,22 @@ export const teacherMaterialPolicy: UploadPolicy = {
   prefix: "teacher-materials",
 };
 
+/**
+ * Proof of a bank transfer: a screenshot from a banking app, or a PDF receipt.
+ * Small by nature, so the cap is far below the media pipelines' — a 200 MB
+ * "receipt" is a mistake, not a receipt.
+ */
+export const paymentProofPolicy: UploadPolicy = {
+  allowedMime: new Set([
+    "application/pdf",
+    "image/png",
+    "image/jpeg",
+    "image/webp",
+  ]),
+  maxBytes: 15 * 1024 * 1024,
+  prefix: "payment-proofs",
+};
+
 export type ValidateUploadInput = {
   mimeType: string;
   sizeBytes: number;

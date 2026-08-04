@@ -1,4 +1,10 @@
 import { confidenceBadge, understandingBadge } from "@/lib/scales";
+import {
+  REFERRAL_OFFER,
+  referralText,
+  whatsappDisplayNumber,
+  whatsappReferralUrl,
+} from "@/lib/payments/referral";
 
 export type LessonReportEmailData = {
   parentFirstName: string | null;
@@ -19,6 +25,11 @@ export type LessonReportEmailData = {
   reportUrl: string;
   /** Files attached to this report (homework workbooks, resources). */
   attachments?: ReportAttachment[];
+  /**
+   * Whether to include the referral offer. Decided by the caller from how many
+   * reports this child has — see `shouldShowReferral`.
+   */
+  showReferral?: boolean;
 };
 
 export type ReportAttachment = {
@@ -111,6 +122,31 @@ export function renderLessonReportEmail(data: LessonReportEmailData): {
   const greeting = data.parentFirstName
     ? `Hi ${escapeHtml(data.parentFirstName)},`
     : "Hi,";
+
+  // Solid brand yellow with a navy button — this is an offer, so it should read
+  // as one rather than as another muted panel among the report's own sections.
+  // Shown only on every Nth report (see shouldShowReferral) so it stays an
+  // invitation rather than a drumbeat.
+  const referralBlock = data.showReferral
+    ? `<tr>
+              <td style="padding:8px 28px 26px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${BRAND_YELLOW};border-radius:14px;">
+                  <tr>
+                    <td style="padding:22px 24px;" align="center">
+                      <p style="margin:0 0 6px;font:800 19px Arial,sans-serif;line-height:1.25;color:${BRAND_NAVY};">${escapeHtml(REFERRAL_OFFER.headline)}</p>
+                      <p style="margin:0 0 16px;font:400 14px Arial,sans-serif;line-height:1.5;color:${BRAND_NAVY};opacity:0.85;">
+                        ${escapeHtml(REFERRAL_OFFER.body)}
+                      </p>
+                      <a href="${escapeHtml(whatsappReferralUrl())}" style="display:inline-block;background:#25D366;color:#ffffff;font:800 13px Arial,sans-serif;text-decoration:none;padding:13px 26px;border-radius:99px;border:2px solid ${BRAND_NAVY};">${escapeHtml(REFERRAL_OFFER.cta)}</a>
+                      <p style="margin:12px 0 0;font:400 12px Arial,sans-serif;line-height:1.5;color:${BRAND_NAVY};opacity:0.7;">
+                        ${escapeHtml(REFERRAL_OFFER.fallback)} ${escapeHtml(whatsappDisplayNumber())}
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>`
+    : "";
 
   const keyTakeaways = [
     data.lessonHighlights
@@ -209,6 +245,7 @@ export function renderLessonReportEmail(data: LessonReportEmailData): {
                 </table>
               </td>
             </tr>
+            ${referralBlock}
             <tr>
               <td style="padding:18px 28px;background:#F6F7F9;border-top:1px solid #EEF1F4;">
                 <p style="margin:0;font:400 12px Arial,sans-serif;color:#7A8690;line-height:1.5;">
@@ -245,6 +282,8 @@ export function renderLessonReportEmail(data: LessonReportEmailData): {
     attachmentsText,
     `View the full report: ${data.reportUrl}`,
     data.recordingUrl ? `Watch the class recording: ${data.recordingUrl}` : "",
+    "",
+    data.showReferral ? referralText() : "",
     "",
     "— Masani",
   ]

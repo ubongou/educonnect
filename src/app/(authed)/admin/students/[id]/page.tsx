@@ -16,6 +16,11 @@ import {
 import type { StudentFieldValues } from "@/components/admin/StudentFormFields";
 import { ChildDashboardBody } from "@/components/dashboard/ChildDashboardBody";
 import { TableScroll } from "@/components/ui/TableScroll";
+import {
+  SessionsTable,
+  type AdminSessionRow,
+} from "@/components/admin/SessionsTable";
+import type { SessionTeacherOption } from "@/components/admin/SessionRowActions";
 
 type EnrollmentRow = {
   id: string;
@@ -72,8 +77,12 @@ export default async function AdminStudentDetail({
   const { subject: subjectRaw } = await searchParams;
   const supabase = await createClient();
 
-  const [{ data: student }, { data: teacherList }, { data: parentList }] =
-    await Promise.all([
+  const [
+    { data: student },
+    { data: teacherList },
+    { data: parentList },
+    { data: sessionList },
+  ] = await Promise.all([
       supabase
         .from("students")
         .select(
@@ -88,7 +97,6 @@ export default async function AdminStudentDetail({
           teacher:profiles!enrollments_teacher_id_fkey(id, full_name)
         ),
         lesson_reports (id, lesson_date, understanding_check, confidence_level, subjects(name, slug)),
-        sessions (id),
         intake_files (id, kind, original_filename, size_bytes, uploaded_at)
         `,
         )
@@ -109,6 +117,21 @@ export default async function AdminStudentDetail({
         .eq("role", "parent")
         .is("deactivated_at", null)
         .order("full_name"),
+      // Every session for this child — no cap. The list is split into upcoming
+      // and past below; one student's history is small enough to render whole,
+      // and truncating it here is exactly the bug this page is meant to fix.
+      supabase
+        .from("sessions")
+        .select(
+          `
+        id, session_date, duration_minutes, status, lesson_report_id,
+        students ( id, full_name, preferred_name ),
+        subjects ( name ),
+        teacher:profiles!sessions_teacher_id_fkey ( id, full_name )
+        `,
+        )
+        .eq("student_id", id)
+        .order("session_date", { ascending: true }),
     ]);
 
   if (!student) notFound();
@@ -144,7 +167,21 @@ export default async function AdminStudentDetail({
 
   const archived = student.archived_at != null;
   const isTest = student.is_test === true;
-  const sessionCount = ((student.sessions ?? []) as { id: string }[]).length;
+
+  // Sessions are date-only, so "upcoming" splits on today's calendar day —
+  // a session dated today hasn't necessarily happened yet.
+  const today = new Date().toISOString().slice(0, 10);
+  const allSessions = (sessionList ?? []) as unknown as AdminSessionRow[];
+  const upcomingSessions = allSessions.filter((s) => s.session_date >= today);
+  // Newest first: the most recent lesson is the one being asked about.
+  const pastSessions = allSessions
+    .filter((s) => s.session_date < today)
+    .slice()
+    .reverse();
+  const sessionCount = allSessions.length;
+  const sessionTeacherOptions: SessionTeacherOption[] = (teacherList ?? []).map(
+    (t) => ({ id: t.id, name: t.full_name ?? "Unnamed teacher" }),
+  );
   const intakeFileCount = ((student.intake_files ?? []) as { id: string }[]).length;
   const deleteCascade = [
     `${enrollments.length} enrollment${enrollments.length === 1 ? "" : "s"}`,
@@ -305,6 +342,52 @@ export default async function AdminStudentDetail({
               </li>
             ))}
           </ul>
+        )}
+      </section>
+
+      <section className="mt-10">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-heading text-[11px] font-bold uppercase tracking-[0.12em] text-g400">
+            Upcoming sessions
+          </h2>
+          <Link
+            href={`/admin/sessions?student=${student.id}`}
+            className="font-heading text-[13px] font-semibold text-blue underline-offset-4 hover:underline"
+          >
+            Schedule a session →
+          </Link>
+        </div>
+        {upcomingSessions.length === 0 ? (
+          <div className="rounded-[28px] border border-dashed border-line bg-white p-6 text-[14px] text-g600">
+            No upcoming sessions scheduled for {displayName}.
+          </div>
+        ) : (
+          <SessionsTable
+            rows={upcomingSessions}
+            teachers={sessionTeacherOptions}
+            showStudent={false}
+          />
+        )}
+
+        {pastSessions.length > 0 && (
+          <details className="group mt-4 overflow-hidden rounded-2xl border border-line bg-white">
+            <summary className="flex cursor-pointer items-center justify-between gap-3 px-5 py-3 font-heading text-[13px] font-bold text-g600 marker:content-none hover:bg-paper">
+              <span>Past sessions ({pastSessions.length})</span>
+              <span
+                aria-hidden="true"
+                className="text-g400 transition-transform group-open:rotate-180"
+              >
+                ▾
+              </span>
+            </summary>
+            <div className="border-t border-line p-4">
+              <SessionsTable
+                rows={pastSessions}
+                teachers={sessionTeacherOptions}
+                showStudent={false}
+              />
+            </div>
+          </details>
         )}
       </section>
 

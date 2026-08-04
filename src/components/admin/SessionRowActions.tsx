@@ -4,11 +4,13 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   cancelSession,
+  deleteSession,
   updateSession,
   type SessionPatch,
 } from "@/lib/actions/sessions";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { inputBase } from "@/components/ui/FormField";
+import { isDeletableSession } from "@/lib/sessions/filters";
 
 export type SessionTeacherOption = { id: string; name: string };
 
@@ -20,10 +22,14 @@ const STATUS_OPTIONS = [
 ];
 
 /**
- * Per-row management for a session on the admin schedule. Edit opens an inline
- * form to change the date, duration, teacher, and status in one save (via
- * updateSession); Cancel is a quick soft-cancel. The row stays visible for
- * history in every case.
+ * Per-row management for a session on the admin sessions list. Edit opens an
+ * inline form to change the date, duration, teacher, and status in one save
+ * (via updateSession); Cancel is a quick soft-cancel that keeps the row for
+ * history; Delete removes it outright.
+ *
+ * Delete only appears for rows that can actually be deleted — no lesson report
+ * and never marked completed. The server re-checks the same rule, so hiding the
+ * button is a courtesy rather than the guard.
  */
 export function SessionRowActions({
   sessionId,
@@ -31,6 +37,7 @@ export function SessionRowActions({
   durationMinutes,
   teacherId,
   status,
+  lessonReportId = null,
   teachers,
 }: {
   sessionId: string;
@@ -38,6 +45,7 @@ export function SessionRowActions({
   durationMinutes: number;
   teacherId: string | null;
   status: string;
+  lessonReportId?: string | null;
   teachers: SessionTeacherOption[];
 }) {
   const router = useRouter();
@@ -50,6 +58,7 @@ export function SessionRowActions({
   const [pending, startTransition] = useTransition();
 
   const cancelled = status === "cancelled";
+  const canDelete = isDeletableSession({ status, lesson_report_id: lessonReportId });
 
   const reset = () => {
     setDate(sessionDate);
@@ -179,6 +188,25 @@ export function SessionRowActions({
                 className="font-heading text-[13px] font-semibold text-coral underline-offset-4 hover:underline disabled:opacity-50"
               >
                 Cancel
+              </button>
+            }
+          />
+        )}
+        {canDelete && (
+          <ConfirmDialog
+            title="Delete session"
+            tone="danger"
+            description="This permanently removes the session. Cancel instead if you want it to stay on the record as a cancelled lesson."
+            confirmLabel="Delete session"
+            onConfirm={() => deleteSession(sessionId)}
+            onSuccess={() => router.refresh()}
+            trigger={
+              <button
+                type="button"
+                disabled={pending}
+                className="font-heading text-[13px] font-semibold text-coral underline-offset-4 hover:underline disabled:opacity-50"
+              >
+                Delete
               </button>
             }
           />

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { sendLessonReportEmail } from "@/lib/email/sendLessonReport";
 import { sendExtraHomeworkEmail } from "@/lib/email/sendExtraHomework";
 import { promoteStagedAttachments } from "@/lib/uploads/promote";
+import { runReminderSweep } from "@/lib/payments/reminders";
 import { lessonReportSchema, lessonReportEditSchema } from "@/lib/validation";
 
 /** Pulls a string[] of staged attachment ids out of a raw action payload. */
@@ -111,6 +112,19 @@ export async function submitLessonReport(input: unknown): Promise<SubmitReportRe
     }
   } catch (err) {
     console.error("[lesson-report email] unexpected error:", err);
+  }
+
+  // Filing the report is what marks the session delivered, so this is the exact
+  // moment a plan can drop to its last session — the second-to-last report
+  // being filed is what fires the renewal nudge. Scoped to this student, and
+  // idempotent via payment_reminders, so re-filing or editing can't re-send.
+  //
+  // Same fire-and-log contract as the email above: a reminder failure must
+  // never cost the teacher their report.
+  try {
+    await runReminderSweep({ studentId: parsed.data.student_id });
+  } catch (err) {
+    console.error("[payment reminder] sweep failed after report:", err);
   }
 
   revalidatePath("/teacher");

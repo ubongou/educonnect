@@ -2,6 +2,9 @@ import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { ChildTabs, type ChildTabOption } from "@/components/dashboard/ChildTabs";
 import { ChildDashboardBody } from "@/components/dashboard/ChildDashboardBody";
+import { PaymentCard } from "@/components/dashboard/PaymentCard";
+import { createClient } from "@/lib/supabase/server";
+import { loadParentPlanView } from "@/lib/payments/parentView";
 import {
   getParentChildren,
   pickChild,
@@ -51,6 +54,9 @@ export default async function DashboardOverview({
 
   const displayName = selected.preferred_name ?? selected.full_name;
 
+  const supabase = await createClient();
+  const plan = await loadParentPlanView(supabase, selected.id);
+
   return (
     <Container>
       {showRequestedBanner && (
@@ -97,6 +103,10 @@ export default async function DashboardOverview({
         subjectHref={(slug) => `/dashboard?child=${selected.id}&subject=${slug}`}
         variant="parent"
       />
+
+      <div className="mt-6">
+        <PaymentCard plan={plan} childName={displayName} />
+      </div>
     </Container>
   );
 }

@@ -1,11 +1,12 @@
 import { createServiceRoleClient } from "@/lib/supabase/server";
-import { getAppUrl, getFromAddress, getResend } from "./client";
+import { getAppUrl, getFromAddress, getReplyToAddress, getResend } from "./client";
 import {
   renderLessonReportEmail,
   type LessonReportEmailData,
   type ReportAttachment,
 } from "./templates/lessonReport";
 import { materialKindLabel } from "@/lib/uploads/labels";
+import { shouldShowReferral } from "@/lib/payments/referral";
 
 export type SendLessonReportResult =
   | { ok: true; recipients: string[]; skipped: false }
@@ -130,12 +131,24 @@ export async function sendLessonReportEmail(
     isHomework: a.kind === "homework",
   }));
 
+  // How many reports this child has now, which decides whether the referral
+  // offer rides along on this one. Counting rather than tracking a flag keeps
+  // the cadence self-correcting: a deleted report simply shifts the next one.
+  const { count: reportCount } = await supabase
+    .from("lesson_reports")
+    .select("*", { count: "exact", head: true })
+    .eq("student_id", report.student_id)
+    .is("deleted_at", null);
+
+  const showReferral = shouldShowReferral(reportCount ?? 0);
+
   let allOk = true;
   let firstError: string | null = null;
   const sentTo: string[] = [];
 
   for (const r of recipients) {
     const data: LessonReportEmailData = {
+      showReferral,
       parentFirstName: r.fullName?.split(/\s+/)[0] ?? null,
       studentName,
       subjectName,
@@ -159,6 +172,7 @@ export async function sendLessonReportEmail(
 
     const { error } = await resend.emails.send({
       from: getFromAddress(),
+      replyTo: getReplyToAddress(),
       to: r.email,
       subject,
       html,

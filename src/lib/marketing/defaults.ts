@@ -37,6 +37,7 @@ export const defaultGlobals: GlobalsContent = {
   websiteUrl: "https://www.joinmasani.com",
   instagramUrl: "https://www.instagram.com/joinmasani/",
   facebookUrl: "https://www.facebook.com/profile.php?id=61572098883786",
+  whatsappNumber: "2349017246528",
 };
 
 // -----------------------------------------------------------------------------

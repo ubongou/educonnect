@@ -29,7 +29,8 @@ const adminLinks: SidebarLink[] = [
   { href: "/admin/teachers", label: "Teachers", icon: <IconGrad /> },
   { href: "/admin/enrollments", label: "Enrollments", icon: <IconClipboard /> },
   { href: "/admin/subjects", label: "Subjects", icon: <IconBook /> },
-  { href: "/admin/schedule", label: "Schedule", icon: <IconClock /> },
+  { href: "/admin/sessions", label: "Sessions", icon: <IconClock /> },
+  { href: "/admin/payments", label: "Payments", icon: <IconWallet /> },
   { href: "/admin/sessions/import", label: "Import", icon: <IconCalendar /> },
 ];
 
@@ -45,10 +46,25 @@ function rootForRole(role: Role): string {
   return "/dashboard";
 }
 
-function isActive(href: string, pathname: string, role: Role): boolean {
+/**
+ * Which link the current path belongs to.
+ *
+ * Plain `startsWith` lights up two links whenever one href is a prefix of
+ * another — /admin/sessions/import matches both "Sessions" and "Import". So we
+ * pick the longest matching href instead, and the root link only ever matches
+ * exactly.
+ */
+function activeHref(links: SidebarLink[], pathname: string, role: Role): string | null {
   const root = rootForRole(role);
-  if (href === root) return pathname === root;
-  return pathname.startsWith(href);
+  let best: string | null = null;
+  for (const l of links) {
+    const matches =
+      l.href === root
+        ? pathname === root
+        : pathname === l.href || pathname.startsWith(`${l.href}/`);
+    if (matches && (best === null || l.href.length > best.length)) best = l.href;
+  }
+  return best;
 }
 
 export function Sidebar({
@@ -62,11 +78,12 @@ export function Sidebar({
 }) {
   const pathname = usePathname();
   const links = linksForRole(role);
+  const current = activeHref(links, pathname, role);
 
   const nav = (
     <nav className="flex flex-col gap-0.5 px-3 pt-4" aria-label="Dashboard navigation">
       {links.map((l) => {
-        const active = isActive(l.href, pathname, role);
+        const active = l.href === current;
         return (
           <Link
             key={l.href}
@@ -210,6 +227,16 @@ function IconClipboard() {
       <rect x="8" y="2" width="8" height="4" rx="1" />
       <line x1="8" y1="12" x2="16" y2="12" />
       <line x1="8" y1="16" x2="12" y2="16" />
+    </svg>
+  );
+}
+
+function IconWallet() {
+  return (
+    <svg {...s}>
+      <path d="M3 7a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v2" />
+      <path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H5a2 2 0 0 1-2-2z" />
+      <circle cx="16.5" cy="14" r="1" />
     </svg>
   );
 }

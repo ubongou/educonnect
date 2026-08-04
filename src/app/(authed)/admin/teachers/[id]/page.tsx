@@ -68,8 +68,7 @@ export default async function AdminTeacherDetail({
         )
         .eq("teacher_id", id)
         .gte("session_date", new Date().toISOString().slice(0, 10))
-        .order("session_date", { ascending: true })
-        .limit(20),
+        .order("session_date", { ascending: true }),
       supabase
         .from("profiles")
         .select("id, full_name")

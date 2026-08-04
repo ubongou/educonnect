@@ -426,6 +426,163 @@ export type Database = {
           },
         ]
       }
+      payment_plan_adjustments: {
+        Row: {
+          amount_ngn: number
+          created_at: string
+          id: string
+          label: string
+          plan_id: string
+          sort_order: number
+        }
+        Insert: {
+          amount_ngn: number
+          created_at?: string
+          id?: string
+          label: string
+          plan_id: string
+          sort_order?: number
+        }
+        Update: {
+          amount_ngn?: number
+          created_at?: string
+          id?: string
+          label?: string
+          plan_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_plan_adjustments_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "payment_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_reminders: {
+        Row: {
+          id: string
+          kind: string
+          plan_id: string
+          recipients: string[]
+          sent_at: string
+        }
+        Insert: {
+          id?: string
+          kind: string
+          plan_id: string
+          recipients?: string[]
+          sent_at?: string
+        }
+        Update: {
+          id?: string
+          kind?: string
+          plan_id?: string
+          recipients?: string[]
+          sent_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_reminders_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "payment_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_plans: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          notes: string | null
+          paid_at: string | null
+          payer_id: string | null
+          payment_reference: string | null
+          proof_key: string | null
+          proof_uploaded_at: string | null
+          rate_per_session: number
+          receipt_sent_at: string | null
+          reference_code: string
+          sessions_total: number
+          status: string
+          student_id: string
+          subtotal_ngn: number
+          total_ngn: number
+          verified_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          payer_id?: string | null
+          payment_reference?: string | null
+          proof_key?: string | null
+          proof_uploaded_at?: string | null
+          rate_per_session: number
+          receipt_sent_at?: string | null
+          reference_code: string
+          sessions_total: number
+          status?: string
+          student_id: string
+          total_ngn?: number
+          verified_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          payer_id?: string | null
+          payment_reference?: string | null
+          proof_key?: string | null
+          proof_uploaded_at?: string | null
+          rate_per_session?: number
+          receipt_sent_at?: string | null
+          reference_code?: string
+          sessions_total?: number
+          status?: string
+          student_id?: string
+          total_ngn?: number
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_plans_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_plans_payer_id_fkey"
+            columns: ["payer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_plans_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_plans_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -466,6 +623,7 @@ export type Database = {
           enrollment_id: string
           id: string
           lesson_report_id: string | null
+          payment_plan_id: string | null
           scheduled_at: string | null
           session_date: string
           status: string
@@ -479,6 +637,7 @@ export type Database = {
           enrollment_id: string
           id?: string
           lesson_report_id?: string | null
+          payment_plan_id?: string | null
           scheduled_at?: string | null
           session_date: string
           status?: string
@@ -492,6 +651,7 @@ export type Database = {
           enrollment_id?: string
           id?: string
           lesson_report_id?: string | null
+          payment_plan_id?: string | null
           scheduled_at?: string | null
           session_date?: string
           status?: string
@@ -799,6 +959,38 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      attach_payment_proof: {
+        Args: {
+          p_key: string
+          p_plan_id: string
+        }
+        Returns: {
+          created_at: string
+          created_by: string | null
+          id: string
+          notes: string | null
+          paid_at: string | null
+          payer_id: string | null
+          payment_reference: string | null
+          proof_key: string | null
+          proof_uploaded_at: string | null
+          rate_per_session: number
+          receipt_sent_at: string | null
+          reference_code: string
+          sessions_total: number
+          status: string
+          student_id: string
+          subtotal_ngn: number
+          total_ngn: number
+          verified_by: string | null
+        }
+      }
+      next_plan_reference: {
+        Args: {
+          p_student_id: string
+        }
+        Returns: string
+      }
       create_lesson_report: {
         Args: {
           p_confidence_level: number

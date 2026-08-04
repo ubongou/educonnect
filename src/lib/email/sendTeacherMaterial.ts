@@ -1,5 +1,5 @@
 import { createServiceRoleClient } from "@/lib/supabase/server";
-import { getAppUrl, getFromAddress, getResend } from "./client";
+import { getAppUrl, getFromAddress, getReplyToAddress, getResend } from "./client";
 import { renderTeacherMaterialEmail } from "./templates/teacherMaterial";
 
 export type SendTeacherMaterialResult =
@@ -117,6 +117,7 @@ export async function sendTeacherMaterialEmail(
 
     const { error } = await resend.emails.send({
       from: getFromAddress(),
+      replyTo: getReplyToAddress(),
       to: r.email,
       subject,
       html,

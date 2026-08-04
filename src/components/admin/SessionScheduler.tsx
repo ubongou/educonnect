@@ -50,7 +50,11 @@ export function SessionScheduler({
         duration_minutes: Number(duration),
       });
       if (res.ok) {
-        setSuccess("Session scheduled.");
+        setSuccess(
+          res.unfunded
+            ? "Session scheduled — but this student has no paid plan with a credit free, so it's unfunded. Add or mark a plan paid on the Payments page."
+            : "Session scheduled.",
+        );
       } else {
         setError(res.error);
       }

@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { resolveChargeablePlan } from "@/lib/payments/charge";
+import { runReminderSweep } from "@/lib/payments/reminders";
 import {
   sessionBulkCreateSchema,
   sessionCreateSchema,
@@ -14,7 +16,7 @@ import {
 const SESSION_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 export type SessionMutationResult =
-  | { ok: true; sessionId: string }
+  | { ok: true; sessionId: string; unfunded?: boolean }
   | { ok: false; error: string };
 
 export type SimpleMutationResult =
@@ -22,7 +24,7 @@ export type SimpleMutationResult =
   | { ok: false; error: string };
 
 export type BulkSessionResult =
-  | { ok: true; created: number }
+  | { ok: true; created: number; unfunded?: number }
   | { ok: false; error: string };
 
 export type ImportSessionsResult =
@@ -97,6 +99,12 @@ export async function createSession(
     return { ok: false, error: "Assign a teacher to the enrollment first." };
   }
 
+  // Charge the session to the student's oldest paid plan with a credit free.
+  // No payable plan doesn't block the booking — it flags it unfunded, so
+  // backfill, makeup lessons and goodwill sessions stay possible while still
+  // showing up as something to fix.
+  const chargeable = await resolveChargeablePlan(supabase, enrollment.student_id);
+
   const { data: session, error: sessErr } = await supabase
     .from("sessions")
     .insert({
@@ -106,6 +114,7 @@ export async function createSession(
       teacher_id: enrollment.teacher_id,
       session_date: parsed.data.session_date,
       duration_minutes: parsed.data.duration_minutes,
+      payment_plan_id: chargeable?.id ?? null,
     })
     .select("id")
     .single();
@@ -114,10 +123,8 @@ export async function createSession(
     return { ok: false, error: sessErr?.message ?? "Failed to schedule session" };
   }
 
-  revalidatePath("/admin/schedule");
-  revalidatePath("/admin");
-  revalidatePath(`/admin/teachers/${enrollment.teacher_id}`);
-  return { ok: true, sessionId: session.id };
+  revalidateSessionViews(enrollment.student_id, enrollment.teacher_id);
+  return { ok: true, sessionId: session.id, unfunded: chargeable === null };
 }
 
 const SESSION_STATUSES = ["scheduled", "completed", "cancelled", "no_show"] as const;
@@ -175,16 +182,14 @@ export async function updateSession(
   const supabase = await createClient();
   const { data: previous } = await supabase
     .from("sessions")
-    .select("teacher_id")
+    .select("student_id, teacher_id")
     .eq("id", id)
     .maybeSingle();
 
   const { error } = await supabase.from("sessions").update(update).eq("id", id);
   if (error) return { ok: false, error: error.message };
 
-  revalidatePath("/admin/schedule");
-  revalidatePath("/admin");
-  if (previous?.teacher_id) revalidatePath(`/admin/teachers/${previous.teacher_id}`);
+  revalidateSessionViews(previous?.student_id, previous?.teacher_id);
   if (typeof update.teacher_id === "string") {
     revalidatePath(`/admin/teachers/${update.teacher_id}`);
   }
@@ -212,9 +217,29 @@ export async function setSessionAttendance(
   });
   if (error) return { ok: false, error: error.message };
 
-  revalidatePath("/teacher/sessions");
+  // A no-show consumes a paid session just as a taught one does, so it can drop
+  // a plan to its last lesson without any report ever being filed. Without this
+  // the renewal nudge would be missed entirely for a student who no-showed
+  // their second-to-last session. Reverting to 'scheduled' can't un-send a
+  // reminder, but the payment_reminders index means it won't double-send later.
+  if (status === "no_show") {
+    const { data: row } = await supabase
+      .from("sessions")
+      .select("student_id")
+      .eq("id", sessionId)
+      .maybeSingle();
+    const studentId = (row as { student_id: string } | null)?.student_id;
+    if (studentId) {
+      try {
+        await runReminderSweep({ studentId });
+      } catch (err) {
+        console.error("[payment reminder] sweep failed after no-show:", err);
+      }
+    }
+  }
+
   revalidatePath("/teacher");
-  revalidatePath("/admin/schedule");
+  revalidateSessionViews();
   return { ok: true };
 }
 
@@ -227,8 +252,220 @@ export async function cancelSession(id: string): Promise<SimpleMutationResult> {
 
   if (error) return { ok: false, error: error.message };
 
-  revalidatePath("/admin/schedule");
+  revalidateSessionViews();
   return { ok: true };
+}
+
+/**
+ * Revalidates every surface that renders a session list. Sessions appear in
+ * more places than any single mutation touches, so this is centralised rather
+ * than spelled out per action — forgetting one leaves an admin staring at a
+ * stale row and re-running the mutation.
+ */
+function revalidateSessionViews(studentId?: string, teacherId?: string | null) {
+  revalidatePath("/admin/sessions");
+  revalidatePath("/admin/schedule");
+  revalidatePath("/admin");
+  revalidatePath("/teacher/sessions");
+  revalidatePath("/dashboard/sessions");
+  if (studentId) revalidatePath(`/admin/students/${studentId}`);
+  if (teacherId) revalidatePath(`/admin/teachers/${teacherId}`);
+}
+
+export type SessionDeleteResult =
+  | { ok: true; deleted: number; skipped: number }
+  | { ok: false; error: string };
+
+/**
+ * Rows a delete needs to see before it can decide. Kept minimal — the guard
+ * only ever reads status and the report link.
+ */
+type DeletableProbe = {
+  id: string;
+  status: string;
+  lesson_report_id: string | null;
+  student_id: string;
+  teacher_id: string;
+};
+
+/**
+ * A session may be hard-deleted only when it carries no lesson report and was
+ * never marked completed. Cancelled and no-show rows are deletable — they're
+ * scheduling noise rather than a record of delivered teaching.
+ *
+ * Mirrors `isDeletableSession` in lib/sessions/filters.ts, which drives the UI.
+ * This is the authoritative copy: the UI merely hides buttons, and a stale page
+ * or a hand-rolled request must not get past it.
+ */
+function deletable(s: { status: string; lesson_report_id: string | null }): boolean {
+  return s.lesson_report_id === null && s.status !== "completed";
+}
+
+/**
+ * Admin hard-deletes a single session. Distinct from `cancelSession`, which
+ * keeps the row for history — this removes it outright, for sessions scheduled
+ * in error.
+ */
+export async function deleteSession(id: string): Promise<SimpleMutationResult> {
+  const supabase = await createClient();
+
+  const { data: session, error: readErr } = await supabase
+    .from("sessions")
+    .select("id, status, lesson_report_id, student_id, teacher_id")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (readErr) return { ok: false, error: readErr.message };
+  if (!session) return { ok: false, error: "Session not found." };
+
+  const row = session as DeletableProbe;
+  if (!deletable(row)) {
+    return {
+      ok: false,
+      error:
+        row.lesson_report_id !== null
+          ? "This session has a lesson report. Delete the report first."
+          : "Completed sessions can't be deleted — cancel keeps the record instead.",
+    };
+  }
+
+  const { error } = await supabase.from("sessions").delete().eq("id", id);
+  if (error) return { ok: false, error: error.message };
+
+  revalidateSessionViews(row.student_id, row.teacher_id);
+  return { ok: true };
+}
+
+/**
+ * Admin hard-deletes several sessions at once.
+ *
+ * Ineligible rows are skipped rather than failing the batch: selecting a page
+ * of sessions and hitting delete shouldn't be an all-or-nothing gamble on
+ * whether one of them happens to carry a report. The caller is told how many
+ * were left behind so the UI can say so plainly.
+ */
+export async function deleteSessionsBulk(
+  ids: string[],
+): Promise<SessionDeleteResult> {
+  if (ids.length === 0) return { ok: false, error: "No sessions selected." };
+
+  const supabase = await createClient();
+  const { data, error: readErr } = await supabase
+    .from("sessions")
+    .select("id, status, lesson_report_id, student_id, teacher_id")
+    .in("id", ids);
+
+  if (readErr) return { ok: false, error: readErr.message };
+
+  const rows = (data ?? []) as DeletableProbe[];
+  const eligible = rows.filter(deletable);
+  const skipped = ids.length - eligible.length;
+
+  if (eligible.length === 0) {
+    return {
+      ok: false,
+      error:
+        "None of the selected sessions can be deleted — they're completed or already have reports.",
+    };
+  }
+
+  const { error } = await supabase
+    .from("sessions")
+    .delete()
+    .in(
+      "id",
+      eligible.map((r) => r.id),
+    );
+
+  if (error) return { ok: false, error: error.message };
+
+  for (const r of eligible) revalidateSessionViews(r.student_id, r.teacher_id);
+  return { ok: true, deleted: eligible.length, skipped };
+}
+
+export type BulkUpdateResult =
+  | { ok: true; updated: number }
+  | { ok: false; error: string };
+
+/**
+ * Admin applies one change to several sessions: cancel them, mark them
+ * completed, reassign the teacher, or shift every date by a number of days.
+ *
+ * A date shift can't be expressed as a single UPDATE (each row moves relative
+ * to its own date), so it reads the selection and writes each row its new day.
+ * Everything else is one statement.
+ */
+export async function updateSessionsBulk(
+  ids: string[],
+  patch: { status?: string; teacher_id?: string; shift_days?: number },
+): Promise<BulkUpdateResult> {
+  if (ids.length === 0) return { ok: false, error: "No sessions selected." };
+
+  const supabase = await createClient();
+
+  if (patch.shift_days !== undefined) {
+    const days = patch.shift_days;
+    if (!Number.isInteger(days) || days === 0 || Math.abs(days) > 365) {
+      return { ok: false, error: "Shift must be a non-zero number of days, up to 365." };
+    }
+
+    const { data, error: readErr } = await supabase
+      .from("sessions")
+      .select("id, session_date, student_id, teacher_id")
+      .in("id", ids);
+    if (readErr) return { ok: false, error: readErr.message };
+
+    const rows = (data ?? []) as Array<{
+      id: string;
+      session_date: string;
+      student_id: string;
+      teacher_id: string;
+    }>;
+
+    for (const r of rows) {
+      const [y, m, d] = r.session_date.split("-").map(Number);
+      const shifted = new Date(Date.UTC(y, m - 1, d) + days * 86_400_000)
+        .toISOString()
+        .slice(0, 10);
+      const { error } = await supabase
+        .from("sessions")
+        .update({ session_date: shifted })
+        .eq("id", r.id);
+      if (error) return { ok: false, error: error.message };
+    }
+
+    for (const r of rows) revalidateSessionViews(r.student_id, r.teacher_id);
+    return { ok: true, updated: rows.length };
+  }
+
+  const update: { status?: string; teacher_id?: string } = {};
+  if (patch.status !== undefined) {
+    if (!SESSION_STATUSES.includes(patch.status as (typeof SESSION_STATUSES)[number])) {
+      return { ok: false, error: "Invalid session status." };
+    }
+    update.status = patch.status;
+  }
+  if (patch.teacher_id !== undefined) update.teacher_id = patch.teacher_id;
+
+  if (Object.keys(update).length === 0) {
+    return { ok: false, error: "Nothing to update." };
+  }
+
+  const { data, error } = await supabase
+    .from("sessions")
+    .update(update)
+    .in("id", ids)
+    .select("id, student_id, teacher_id");
+
+  if (error) return { ok: false, error: error.message };
+
+  const rows = (data ?? []) as Array<{
+    id: string;
+    student_id: string;
+    teacher_id: string;
+  }>;
+  for (const r of rows) revalidateSessionViews(r.student_id, r.teacher_id);
+  return { ok: true, updated: rows.length };
 }
 
 export async function rescheduleSession(
@@ -247,7 +484,7 @@ export async function rescheduleSession(
 
   if (error) return { ok: false, error: error.message };
 
-  revalidatePath("/admin/schedule");
+  revalidateSessionViews();
   return { ok: true };
 }
 
@@ -266,13 +503,20 @@ export async function createSessionsBulk(input: unknown): Promise<BulkSessionRes
   if (!loaded.ok) return loaded;
   const { enrollment } = loaded;
 
-  const rows = parsed.data.rows.map((r) => ({
+  // A recurring run can outlast the plan paying for it: the first N sessions
+  // charge to the plan's remaining credits and the rest are created unfunded,
+  // rather than silently overbooking a block the parent hasn't paid for.
+  const chargeable = await resolveChargeablePlan(supabase, enrollment.student_id);
+  const funded = chargeable?.remaining ?? 0;
+
+  const rows = parsed.data.rows.map((r, i) => ({
     enrollment_id: enrollment.id,
     student_id: enrollment.student_id,
     subject_id: enrollment.subject_id,
     teacher_id: enrollment.teacher_id,
     session_date: r.session_date,
     duration_minutes: r.duration_minutes,
+    payment_plan_id: i < funded ? (chargeable?.id ?? null) : null,
   }));
 
   const { data: inserted, error } = await supabase
@@ -282,10 +526,12 @@ export async function createSessionsBulk(input: unknown): Promise<BulkSessionRes
 
   if (error) return { ok: false, error: error.message };
 
-  revalidatePath("/admin/schedule");
-  revalidatePath("/admin");
-  revalidatePath(`/admin/teachers/${enrollment.teacher_id}`);
-  return { ok: true, created: inserted?.length ?? rows.length };
+  revalidateSessionViews(enrollment.student_id, enrollment.teacher_id);
+  return {
+    ok: true,
+    created: inserted?.length ?? rows.length,
+    unfunded: Math.max(0, rows.length - funded),
+  };
 }
 
 /**
@@ -361,9 +607,7 @@ export async function importPastSessions(input: unknown): Promise<ImportSessions
     imported++;
   }
 
-  revalidatePath("/admin/schedule");
+  revalidateSessionViews(enrollment.student_id, enrollment.teacher_id);
   revalidatePath("/admin/reports");
-  revalidatePath("/admin");
-  revalidatePath(`/admin/students/${enrollment.student_id}`);
   return { ok: true, imported, failed };
 }
