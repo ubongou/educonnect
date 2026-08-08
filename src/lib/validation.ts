@@ -398,3 +398,32 @@ export const lessonReportEditSchema = z.object({
 });
 
 export type LessonReportEditInput = z.infer<typeof lessonReportEditSchema>;
+
+// -----------------------------------------------------------------------------
+// Admin creates/edits a skill within a subject's skill tracker
+// -----------------------------------------------------------------------------
+
+export const skillCreateSchema = z.object({
+  subject_id: z.string().uuid(),
+  name: z.string().trim().min(1, "Enter a skill name"),
+  description: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => (v ? v : undefined)),
+  sort_order: z.coerce.number().int().optional(),
+});
+
+export type SkillCreateInput = z.infer<typeof skillCreateSchema>;
+
+export const skillUpdateSchema = z.object({
+  name: z.string().trim().min(1, "Enter a skill name"),
+  description: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => (v ? v : undefined)),
+  sort_order: z.coerce.number().int().optional(),
+});
+
+export type SkillUpdateInput = z.infer<typeof skillUpdateSchema>;

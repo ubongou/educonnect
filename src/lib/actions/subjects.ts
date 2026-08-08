@@ -7,6 +7,10 @@ export type SubjectMutationResult =
   | { ok: true }
   | { ok: false; error: string };
 
+export type SubjectCreateResult =
+  | { ok: true; id: string }
+  | { ok: false; error: string };
+
 function slugify(s: string): string {
   return s
     .toLowerCase()
@@ -15,7 +19,7 @@ function slugify(s: string): string {
     .replace(/^-|-$/g, "");
 }
 
-export async function createSubject(name: string): Promise<SubjectMutationResult> {
+export async function createSubject(name: string): Promise<SubjectCreateResult> {
   const trimmed = name.trim();
   if (trimmed.length === 0) return { ok: false, error: "Enter a subject name." };
 
@@ -23,11 +27,15 @@ export async function createSubject(name: string): Promise<SubjectMutationResult
   if (slug.length === 0) return { ok: false, error: "Subject name must contain letters or numbers." };
 
   const supabase = await createClient();
-  const { error } = await supabase.from("subjects").insert({ name: trimmed, slug });
+  const { data, error } = await supabase
+    .from("subjects")
+    .insert({ name: trimmed, slug })
+    .select("id")
+    .single();
   if (error) return { ok: false, error: error.message };
 
   revalidatePath("/admin/subjects");
-  return { ok: true };
+  return { ok: true, id: data.id };
 }
 
 export async function renameSubject(id: string, name: string): Promise<SubjectMutationResult> {

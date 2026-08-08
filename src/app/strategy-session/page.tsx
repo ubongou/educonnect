@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "../../styles/strategy-session.css";
+import { ClarityScript } from "@/components/ClarityScript";
 import { MarketingScrollReveal } from "@/components/marketing/MarketingScrollReveal";
 import { bundledAssets } from "@/lib/marketing/defaults";
 import { StrategyBookingProvider } from "./StrategyBooking";
@@ -347,6 +348,7 @@ export default function StrategySessionPage() {
 
   return (
     <div className="mkt-root">
+      <ClarityScript />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}

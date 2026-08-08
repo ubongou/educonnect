@@ -836,6 +836,7 @@ export type Database = {
         Row: {
           description: string | null
           id: string
+          is_archived: boolean
           name: string
           sort_order: number
           subject_id: string
@@ -843,6 +844,7 @@ export type Database = {
         Insert: {
           description?: string | null
           id?: string
+          is_archived?: boolean
           name: string
           sort_order?: number
           subject_id: string
@@ -850,6 +852,7 @@ export type Database = {
         Update: {
           description?: string | null
           id?: string
+          is_archived?: boolean
           name?: string
           sort_order?: number
           subject_id?: string

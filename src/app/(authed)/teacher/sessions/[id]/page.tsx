@@ -65,6 +65,7 @@ export default async function TeacherSessionComposerPage({
     .from("subject_skills")
     .select("id, name, sort_order")
     .eq("subject_id", session.subject_id)
+    .eq("is_archived", false)
     .order("sort_order");
 
   const skillRows = (skills ?? []) as SubjectSkill[];

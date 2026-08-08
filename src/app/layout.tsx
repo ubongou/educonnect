@@ -3,7 +3,7 @@ import { Nunito, Nunito_Sans, Outfit, Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import "../styles/marketing.css";
-import { CLARITY_PROJECT_ID, META_PIXEL_ID } from "@/lib/analytics";
+import { META_PIXEL_ID } from "@/lib/analytics";
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 const GA4_ID = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
@@ -86,18 +86,6 @@ fbq('track', 'PageView');`}
             </Script>
           </>
         )}
-        {/* Microsoft Clarity (session recordings + heatmaps). Kept last of the
-            analytics tags on purpose: Clarity wraps history.pushState and
-            restores the original on its internal reset, which can unhook any
-            script that wrapped pushState after it. Loading it after the pixel
-            and GA keeps their wrappers underneath Clarity's, not above it. */}
-        <Script id="ms-clarity" strategy="afterInteractive">
-          {`(function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "${CLARITY_PROJECT_ID}");`}
-        </Script>
         {children}
       </body>
     </html>

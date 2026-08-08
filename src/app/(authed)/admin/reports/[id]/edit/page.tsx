@@ -75,6 +75,7 @@ export default async function AdminReportEditPage({
     .from("subject_skills")
     .select("id, name, sort_order")
     .eq("subject_id", report.subject_id)
+    .eq("is_archived", false)
     .order("sort_order", { ascending: true });
 
   const subjectSkills = (subjectSkillsRaw ?? []) as SubjectSkillRow[];

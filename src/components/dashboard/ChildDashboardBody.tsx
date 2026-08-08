@@ -42,9 +42,10 @@ type EnrollmentSubjectRow = {
 };
 
 function averageSkill(ratings: Array<{ rating: number }>): number | null {
-  if (ratings.length === 0) return null;
-  const sum = ratings.reduce((acc, r) => acc + r.rating, 0);
-  return Math.round((sum / ratings.length) * 10) / 10;
+  const rated = ratings.filter((r) => r.rating !== 0);
+  if (rated.length === 0) return null;
+  const sum = rated.reduce((acc, r) => acc + r.rating, 0);
+  return Math.round((sum / rated.length) * 10) / 10;
 }
 
 // How many recent reports the progression charts plot. A rolling window —
