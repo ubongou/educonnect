@@ -16,6 +16,7 @@ type ReportRow = {
   understanding_check: number;
   confidence_level: number;
   emailed_at: string | null;
+  first_viewed_at: string | null;
   created_at: string;
   students: { id: string; full_name: string; preferred_name: string | null } | null;
   subjects: { name: string } | null;
@@ -28,7 +29,7 @@ export default async function AdminReportsPage() {
 
   const reportSelect = `
       id, lesson_date, lesson_focus, understanding_check, confidence_level,
-      emailed_at, created_at,
+      emailed_at, first_viewed_at, created_at,
       students ( id, full_name, preferred_name ),
       subjects ( name ),
       uploader:profiles!lesson_reports_uploaded_by_fkey ( full_name )
@@ -86,6 +87,7 @@ export default async function AdminReportsPage() {
                 <th className="px-5 py-3">Understanding</th>
                 <th className="px-5 py-3">Confidence</th>
                 <th className="px-5 py-3">Email</th>
+                <th className="px-5 py-3">Viewed</th>
                 <th className="px-5 py-3 text-right">Actions</th>
               </tr>
             </thead>
@@ -102,6 +104,11 @@ export default async function AdminReportsPage() {
                 const emailLabel = r.emailed_at
                   ? `Sent ${formatDate(r.emailed_at)}`
                   : "Not sent";
+                const viewedTone: "blue" | "gray" =
+                  r.first_viewed_at ? "blue" : "gray";
+                const viewedLabel = r.first_viewed_at
+                  ? `Viewed ${formatDate(r.first_viewed_at)}`
+                  : "Not viewed yet";
                 return (
                   <tr key={r.id} className="border-t border-line align-middle hover:bg-paper">
                     <td className="px-5 py-3 font-heading font-bold text-navy">
@@ -143,6 +150,9 @@ export default async function AdminReportsPage() {
                     </td>
                     <td className="px-5 py-3">
                       <StatusBadge tone={emailTone}>{emailLabel}</StatusBadge>
+                    </td>
+                    <td className="px-5 py-3">
+                      <StatusBadge tone={viewedTone}>{viewedLabel}</StatusBadge>
                     </td>
                     <td className="px-5 py-3">
                       <div className="flex flex-col items-end gap-2">
