@@ -5,9 +5,14 @@ import { useRouter } from "next/navigation";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { inputBase } from "@/components/ui/FormField";
 import {
+  RenewPlanDialog,
+  type RenewInitial,
+} from "@/components/admin/RenewPlanDialog";
+import type { PlanPayerOption } from "@/components/admin/NewPlanForm";
+import type { DraftAdjustment } from "@/components/admin/PlanAdjustmentsEditor";
+import {
   attachSessionsToPlan,
   markPlanPaid,
-  renewPaymentPlan,
   sendPaymentReminderNow,
   unarchivePaymentPlan,
   voidPaymentPlan,
@@ -16,10 +21,12 @@ import {
 /**
  * Row actions for one plan on the payments list.
  *
- * "Mark paid" and "Renew" both open a small form rather than firing
- * immediately — the transfer reference is what makes a payment reconcilable
- * later, and a renewal's sessions/rate are worth one glance before they're
- * copied into a new plan, so each is worth one extra click.
+ * "Mark paid" opens a small inline form rather than firing immediately — the
+ * transfer reference is what makes a payment reconcilable later, worth one
+ * extra click while the admin is looking at the bank app. "Renew" opens a
+ * full dialog (everything the New Plan form can edit — sessions, rate,
+ * payer, notes, every discount/add-on line) pre-filled from this plan, since
+ * terms like a referral discount don't necessarily repeat every renewal.
  *
  * Void and Hide are combined: voiding frees every session the plan funded
  * and takes it off the list in the same action, since a voided plan isn't
@@ -32,6 +39,10 @@ export function PaymentPlanActions({
   hasUnfundedSessions,
   sessionsTotal,
   ratePerSession,
+  payerId,
+  notes,
+  adjustments,
+  payers,
   archived = false,
 }: {
   planId: string;
@@ -40,6 +51,10 @@ export function PaymentPlanActions({
   hasUnfundedSessions: boolean;
   sessionsTotal: number;
   ratePerSession: number;
+  payerId: string | null;
+  notes: string | null;
+  adjustments: DraftAdjustment[];
+  payers: PlanPayerOption[];
   archived?: boolean;
 }) {
   const router = useRouter();
@@ -47,12 +62,19 @@ export function PaymentPlanActions({
   const [reference, setReference] = useState("");
   const [paidOn, setPaidOn] = useState(new Date().toISOString().slice(0, 10));
   const [sendReceipt, setSendReceipt] = useState(true);
-  const [renewing, setRenewing] = useState(false);
-  const [renewSessions, setRenewSessions] = useState(String(sessionsTotal));
-  const [renewRate, setRenewRate] = useState(String(ratePerSession));
+  const [renewOpen, setRenewOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+
+  const renewInitial: RenewInitial = {
+    studentId,
+    sessionsTotal,
+    ratePerSession,
+    payerId,
+    notes,
+    adjustments,
+  };
 
   const confirmPaid = () => {
     setError(null);
@@ -66,29 +88,6 @@ export function PaymentPlanActions({
       if (res.ok) {
         setMarking(false);
         setReference("");
-        router.refresh();
-      } else {
-        setError(res.error);
-      }
-    });
-  };
-
-  const confirmRenew = () => {
-    setError(null);
-    startTransition(async () => {
-      const res = await renewPaymentPlan(planId, {
-        sessions_total: Number(renewSessions),
-        rate_per_session: Number(renewRate),
-      });
-      if (res.ok) {
-        setRenewing(false);
-        setNotice(
-          `Renewed as ${res.referenceCode}${
-            res.attached > 0
-              ? ` · ${res.attached} session${res.attached === 1 ? "" : "s"} attached`
-              : ""
-          }.`,
-        );
         router.refresh();
       } else {
         setError(res.error);
@@ -143,57 +142,6 @@ export function PaymentPlanActions({
           />
           Email the receipt to the parent
         </label>
-        {error && <span className="text-[12px] font-semibold text-coral">{error}</span>}
-      </div>
-    );
-  }
-
-  if (renewing) {
-    return (
-      <div className="flex flex-col items-end gap-2">
-        <div className="flex flex-wrap items-center justify-end gap-2">
-          <input
-            type="number"
-            min={1}
-            max={200}
-            value={renewSessions}
-            onChange={(e) => setRenewSessions(e.target.value)}
-            aria-label="Sessions in the new plan"
-            className={`${inputBase} w-[80px] py-1`}
-          />
-          <input
-            type="number"
-            min={0}
-            step="0.01"
-            value={renewRate}
-            onChange={(e) => setRenewRate(e.target.value)}
-            aria-label="Rate per session, in naira"
-            className={`${inputBase} w-[120px] py-1`}
-          />
-          <button
-            type="button"
-            onClick={confirmRenew}
-            disabled={pending}
-            className="font-heading text-[13px] font-semibold text-blue underline-offset-4 hover:underline disabled:opacity-50"
-          >
-            {pending ? "Creating…" : "Confirm renew"}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setRenewing(false);
-              setRenewSessions(String(sessionsTotal));
-              setRenewRate(String(ratePerSession));
-              setError(null);
-            }}
-            className="font-heading text-[13px] font-semibold text-g600 underline-offset-4 hover:underline"
-          >
-            Cancel
-          </button>
-        </div>
-        <p className="text-[12px] text-g600">
-          Sessions and rate to carry into the new plan — edit if they&apos;ve changed.
-        </p>
         {error && <span className="text-[12px] font-semibold text-coral">{error}</span>}
       </div>
     );
@@ -259,11 +207,9 @@ export function PaymentPlanActions({
             onClick={() => {
               setError(null);
               setNotice(null);
-              setRenewSessions(String(sessionsTotal));
-              setRenewRate(String(ratePerSession));
-              setRenewing(true);
+              setRenewOpen(true);
             }}
-            className="font-heading text-[13px] font-semibold text-blue underline-offset-4 hover:underline disabled:opacity-50"
+            className="font-heading text-[13px] font-semibold text-blue underline-offset-4 hover:underline"
           >
             Renew
           </button>
@@ -309,6 +255,21 @@ export function PaymentPlanActions({
       </div>
       {notice && <span className="text-[12px] font-semibold text-blue">{notice}</span>}
       {error && <span className="text-[12px] font-semibold text-coral">{error}</span>}
+
+      {renewOpen && (
+        <RenewPlanDialog
+          onClose={() => setRenewOpen(false)}
+          onRenewed={(referenceCode, attached) =>
+            setNotice(
+              `Renewed as ${referenceCode}${
+                attached > 0 ? ` · ${attached} session${attached === 1 ? "" : "s"} attached` : ""
+              }.`,
+            )
+          }
+          initial={renewInitial}
+          payers={payers}
+        />
+      )}
     </div>
   );
 }

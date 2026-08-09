@@ -5,11 +5,10 @@ import { useRouter } from "next/navigation";
 import { inputBase } from "@/components/ui/FormField";
 import { createPaymentPlan } from "@/lib/actions/payments";
 import {
-  ADJUSTMENT_OPTIONS,
-  adjustmentOption,
-  resolveAdjustmentAmount,
-  type AdjustmentMode,
-} from "@/lib/payments/adjustments";
+  PlanAdjustmentsEditor,
+  type DraftAdjustment,
+} from "@/components/admin/PlanAdjustmentsEditor";
+import { adjustmentOption, resolveAdjustmentAmount } from "@/lib/payments/adjustments";
 import { formatNaira } from "@/lib/payments/plans";
 
 export type PlanStudentOption = { id: string; label: string };
@@ -25,13 +24,6 @@ const PRESETS = [
   { sessions: 24, rate: 18333, label: "24 sessions · ₦18,333/session" },
   { sessions: 48, rate: 17500, label: "48 sessions · ₦17,500/session" },
 ] as const;
-
-type DraftAdjustment = {
-  key: string;
-  optionId: string;
-  mode: AdjustmentMode;
-  value: string;
-};
 
 /**
  * Issues a plan for one student. The same form serves brand-new parents and
@@ -88,24 +80,10 @@ export function NewPlanForm({
   );
 
   const total = resolved.reduce((sum, r) => sum + r.amount, subtotal);
-
-  const addAdjustment = () => {
-    setAdjustments((prev) => [
-      ...prev,
-      {
-        key: crypto.randomUUID(),
-        optionId: ADJUSTMENT_OPTIONS[0].id,
-        mode: "naira",
-        value: "",
-      },
-    ]);
-  };
-
-  const patchAdjustment = (key: string, patch: Partial<DraftAdjustment>) => {
-    setAdjustments((prev) =>
-      prev.map((a) => (a.key === key ? { ...a, ...patch } : a)),
-    );
-  };
+  const resolvedByKey = useMemo(
+    () => new Map(resolved.map((r) => [r.key, r.amount])),
+    [resolved],
+  );
 
   const submit = () => {
     setError(null);
@@ -235,84 +213,11 @@ export function NewPlanForm({
         </label>
       </div>
 
-      {/* Discounts and add-ons — each becomes a line on the receipt. */}
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <span className="font-heading text-[13px] font-medium text-navy">
-            Discounts &amp; add-ons
-          </span>
-          <button
-            type="button"
-            onClick={addAdjustment}
-            className="font-heading text-[13px] font-semibold text-blue underline-offset-4 hover:underline"
-          >
-            + Add a line
-          </button>
-        </div>
-
-        {adjustments.map((a) => (
-          <div key={a.key} className="flex flex-wrap items-center gap-2">
-            <select
-              value={a.optionId}
-              onChange={(e) => patchAdjustment(a.key, { optionId: e.target.value })}
-              aria-label="Adjustment type"
-              className={`${inputBase} w-auto min-w-[190px] py-2`}
-            >
-              <optgroup label="Discounts">
-                {ADJUSTMENT_OPTIONS.filter((o) => o.kind === "discount").map((o) => (
-                  <option key={o.id} value={o.id}>
-                    {o.label}
-                  </option>
-                ))}
-              </optgroup>
-              <optgroup label="Add-ons">
-                {ADJUSTMENT_OPTIONS.filter((o) => o.kind === "addon").map((o) => (
-                  <option key={o.id} value={o.id}>
-                    {o.label}
-                  </option>
-                ))}
-              </optgroup>
-            </select>
-
-            <select
-              value={a.mode}
-              onChange={(e) =>
-                patchAdjustment(a.key, { mode: e.target.value as AdjustmentMode })
-              }
-              aria-label="Amount type"
-              className={`${inputBase} w-auto py-2`}
-            >
-              <option value="naira">₦ amount</option>
-              <option value="percent">% of subtotal</option>
-            </select>
-
-            <input
-              type="number"
-              min={0}
-              step="any"
-              value={a.value}
-              onChange={(e) => patchAdjustment(a.key, { value: e.target.value })}
-              placeholder={a.mode === "percent" ? "10" : "40000"}
-              aria-label="Amount"
-              className={`${inputBase} w-[120px] py-2`}
-            />
-
-            <span className="min-w-[110px] text-right font-heading text-[13px] font-semibold tabular-nums text-navy">
-              {formatNaira(resolved.find((r) => r.key === a.key)?.amount ?? 0)}
-            </span>
-
-            <button
-              type="button"
-              onClick={() =>
-                setAdjustments((prev) => prev.filter((x) => x.key !== a.key))
-              }
-              className="font-heading text-[13px] font-semibold text-coral underline-offset-4 hover:underline"
-            >
-              Remove
-            </button>
-          </div>
-        ))}
-      </div>
+      <PlanAdjustmentsEditor
+        adjustments={adjustments}
+        onChange={setAdjustments}
+        resolvedByKey={resolvedByKey}
+      />
 
       {/* Receipt preview — exactly what the parent will see. */}
       <div className="rounded-2xl border border-line bg-paper p-5">
@@ -371,9 +276,9 @@ export function NewPlanForm({
           <span className="font-heading font-semibold text-navy">
             Attach this child&apos;s existing unfunded sessions
           </span>{" "}
-          — links already-scheduled sessions that aren&apos;t on any plan, oldest
-          first, up to this plan&apos;s size. Leave ticked when bringing an
-          existing student onto plans for the first time.
+          — links already-scheduled sessions that aren&apos;t on any plan, nearest
+          to today first, up to this plan&apos;s size. Leave ticked when bringing
+          an existing student onto plans for the first time.
         </span>
       </label>
 

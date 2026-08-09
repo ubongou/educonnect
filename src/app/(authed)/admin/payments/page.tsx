@@ -13,6 +13,8 @@ import { PaymentPlanActions } from "@/components/admin/PaymentPlanActions";
 import { FilterSelectClient } from "@/components/admin/FilterSelectClient";
 import { RunRemindersButton } from "@/components/admin/RunRemindersButton";
 import { BANK_DETAILS } from "@/lib/payments/bankDetails";
+import { ADJUSTMENT_OPTIONS } from "@/lib/payments/adjustments";
+import type { DraftAdjustment } from "@/components/admin/PlanAdjustmentsEditor";
 import {
   formatNaira,
   remainingToDeliver,
@@ -35,10 +37,37 @@ type PlanRecord = PlanRow & {
   proof_uploaded_at: string | null;
   created_at: string;
   archived_at: string | null;
+  payer_id: string | null;
+  notes: string | null;
   students: { id: string; full_name: string; preferred_name: string | null } | null;
   payer: { full_name: string | null; email: string | null } | null;
   adjustments: Array<{ label: string; amount_ngn: number }>;
 };
+
+/**
+ * Reconstructs the Renew dialog's editable draft rows from a plan's stored
+ * (already-resolved) adjustments. Amounts land as naira, not percent — the
+ * original mode isn't stored, only the resolved figure — which is still the
+ * right default: it's exactly what this plan actually charged. A label that
+ * no longer matches the fixed option list (renamed since) is dropped rather
+ * than guessed at.
+ */
+function draftAdjustmentsFor(
+  adjustments: Array<{ label: string; amount_ngn: number }>,
+): DraftAdjustment[] {
+  return adjustments.flatMap((a) => {
+    const option = ADJUSTMENT_OPTIONS.find((o) => o.label === a.label);
+    if (!option) return [];
+    return [
+      {
+        key: crypto.randomUUID(),
+        optionId: option.id,
+        mode: "naira" as const,
+        value: String(Math.abs(Number(a.amount_ngn))),
+      },
+    ];
+  });
+}
 
 const STATUS_FILTERS = [
   { value: "", label: "All statuses" },
@@ -92,7 +121,7 @@ export default async function AdminPaymentsPage({
       `
       id, student_id, sessions_total, rate_per_session, subtotal_ngn, total_ngn,
       reference_code, status, paid_at, payment_reference, proof_key,
-      proof_uploaded_at, created_at, archived_at,
+      proof_uploaded_at, created_at, archived_at, payer_id, notes,
       students ( id, full_name, preferred_name ),
       payer:profiles!payment_plans_payer_id_fkey ( full_name, email ),
       adjustments:payment_plan_adjustments ( label, amount_ngn )
@@ -434,6 +463,10 @@ export default async function AdminPaymentsPage({
                           hasUnfundedSessions={unfundedByStudent.has(p.student_id)}
                           sessionsTotal={p.sessions_total}
                           ratePerSession={Number(p.rate_per_session)}
+                          payerId={p.payer_id}
+                          notes={p.notes}
+                          adjustments={draftAdjustmentsFor(p.adjustments)}
+                          payers={payerOptions}
                           archived={Boolean(p.archived_at)}
                         />
                       </td>
