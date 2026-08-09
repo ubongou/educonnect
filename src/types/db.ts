@@ -495,6 +495,7 @@ export type Database = {
       }
       payment_plans: {
         Row: {
+          archived_at: string | null
           created_at: string
           created_by: string | null
           id: string
@@ -515,6 +516,7 @@ export type Database = {
           verified_by: string | null
         }
         Insert: {
+          archived_at?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
@@ -534,6 +536,7 @@ export type Database = {
           verified_by?: string | null
         }
         Update: {
+          archived_at?: string | null
           created_at?: string
           created_by?: string | null
           id?: string

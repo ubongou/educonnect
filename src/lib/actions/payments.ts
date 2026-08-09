@@ -4,7 +4,10 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth";
-import { sendPaymentReceiptEmail } from "@/lib/email/sendPaymentEmails";
+import {
+  sendPaymentReceiptEmail,
+  sendPaymentReminderEmail,
+} from "@/lib/email/sendPaymentEmails";
 import { runReminderSweep } from "@/lib/payments/reminders";
 import {
   ADJUSTMENT_OPTIONS,
@@ -12,6 +15,12 @@ import {
   resolveAdjustmentAmount,
   type AdjustmentMode,
 } from "@/lib/payments/adjustments";
+import {
+  remainingToDeliver,
+  tallyPlanUsage,
+  usageFor,
+  type PlanRow,
+} from "@/lib/payments/plans";
 
 export type PaymentResult = { ok: true } | { ok: false; error: string };
 export type PlanCreateResult =
@@ -217,6 +226,90 @@ export async function attachSessionsToPlan(
   return res;
 }
 
+/**
+ * Duplicates a plan's terms into a brand-new one, instead of the admin
+ * re-typing the New Plan form for a routine renewal. Copies student, payer,
+ * sessions_total, rate, notes, and adjustments verbatim; the new plan still
+ * starts 'unpaid' — renewing doesn't skip confirming the transfer landed,
+ * it just skips re-entering numbers that haven't changed.
+ *
+ * Sweeps the student's unfunded sessions onto it immediately, same as ticking
+ * "attach existing" on a fresh plan — the whole point of renewing is picking
+ * up where the old block left off.
+ */
+export async function renewPaymentPlan(planId: string): Promise<PlanCreateResult> {
+  await requireAdmin();
+
+  const supabase = await createClient();
+  const { data: source, error: srcErr } = await supabase
+    .from("payment_plans")
+    .select(
+      `
+      student_id, payer_id, sessions_total, rate_per_session, notes,
+      adjustments:payment_plan_adjustments ( label, amount_ngn, sort_order )
+      `,
+    )
+    .eq("id", planId)
+    .maybeSingle();
+
+  if (srcErr || !source) return { ok: false, error: srcErr?.message ?? "Plan not found." };
+
+  const { data: reference, error: refErr } = await supabase.rpc(
+    "next_plan_reference",
+    { p_student_id: source.student_id },
+  );
+  if (refErr || !reference) {
+    return { ok: false, error: refErr?.message ?? "Couldn't generate a reference code." };
+  }
+
+  const { data: plan, error: planErr } = await supabase
+    .from("payment_plans")
+    .insert({
+      student_id: source.student_id,
+      payer_id: source.payer_id,
+      sessions_total: source.sessions_total,
+      rate_per_session: source.rate_per_session,
+      reference_code: reference as string,
+      notes: source.notes,
+    })
+    .select("id, reference_code")
+    .single();
+
+  if (planErr || !plan) {
+    return { ok: false, error: planErr?.message ?? "Couldn't create the plan." };
+  }
+
+  const adjustments = (source.adjustments ?? []) as Array<{
+    label: string;
+    amount_ngn: number;
+    sort_order: number;
+  }>;
+  if (adjustments.length > 0) {
+    const { error: adjErr } = await supabase.from("payment_plan_adjustments").insert(
+      adjustments.map((a) => ({
+        plan_id: plan.id,
+        label: a.label,
+        amount_ngn: a.amount_ngn,
+        sort_order: a.sort_order,
+      })),
+    );
+    if (adjErr) {
+      await supabase.from("payment_plans").delete().eq("id", plan.id);
+      return { ok: false, error: adjErr.message };
+    }
+  }
+
+  const attachRes = await attachUnfundedSessions(
+    source.student_id,
+    plan.id,
+    source.sessions_total,
+  );
+  const attached = attachRes.ok ? attachRes.attached : 0;
+
+  revalidatePayments(source.student_id);
+  return { ok: true, planId: plan.id, referenceCode: plan.reference_code, attached };
+}
+
 const markPaidSchema = z.object({
   plan_id: z.string().uuid(),
   payment_reference: z.string().max(200).optional(),
@@ -312,6 +405,60 @@ export async function runPaymentRemindersNow(): Promise<ReminderRunResult> {
   }
 }
 
+export type ManualReminderResult =
+  | { ok: true; recipients: string[] }
+  | { ok: false; error: string };
+
+/**
+ * Admin fires a reminder for one plan on demand — the payments-page
+ * equivalent of resending a session email. Deliberately bypasses the
+ * `payment_reminders` idempotency log the automatic sweep uses: that log
+ * exists to stop the sweep re-pestering a parent for the same reason, not to
+ * stop an admin who's looking at this specific plan and wants to nudge again.
+ * Nothing is written back to the log, so it can't suppress a later automatic
+ * send either.
+ */
+export async function sendPaymentReminderNow(planId: string): Promise<ManualReminderResult> {
+  await requireAdmin();
+
+  const supabase = await createClient();
+  const { data: plan, error } = await supabase
+    .from("payment_plans")
+    .select("id, student_id, sessions_total, status")
+    .eq("id", planId)
+    .maybeSingle();
+  if (error || !plan) return { ok: false, error: error?.message ?? "Plan not found." };
+
+  const { data: sessionRows } = await supabase
+    .from("sessions")
+    .select("status, session_date")
+    .eq("payment_plan_id", planId);
+
+  const sessions = sessionRows ?? [];
+  const usage = tallyPlanUsage(
+    sessions.map((s) => ({ payment_plan_id: planId, status: s.status })),
+  );
+  const remaining = remainingToDeliver(plan as unknown as PlanRow, usageFor(planId, usage));
+  const kind = remaining <= 0 ? "plan_exhausted" : "renewal_due";
+
+  const today = new Date().toISOString().slice(0, 10);
+  const nextSessionDate =
+    sessions
+      .filter((s) => s.status === "scheduled" && s.session_date >= today)
+      .map((s) => s.session_date)
+      .sort()[0] ?? null;
+
+  const res = await sendPaymentReminderEmail(planId, kind, {
+    sessionsDelivered: usageFor(planId, usage).delivered,
+    nextSessionDate,
+  });
+
+  if (!res.ok) return { ok: false, error: res.error };
+  if (res.skipped) return { ok: false, error: res.reason };
+
+  return { ok: true, recipients: res.recipients };
+}
+
 /**
  * Voids a plan. Kept rather than deleted so the reference code stays reserved
  * and the history of a mistaken or refunded plan is auditable. Sessions
@@ -325,6 +472,47 @@ export async function voidPaymentPlan(planId: string): Promise<PaymentResult> {
   const { data, error } = await supabase
     .from("payment_plans")
     .update({ status: "void" })
+    .eq("id", planId)
+    .select("student_id")
+    .maybeSingle();
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePayments((data as { student_id: string } | null)?.student_id);
+  return { ok: true };
+}
+
+/**
+ * Hides a plan entered by mistake (duplicate, wrong child) from the payments
+ * list, without the financial consequences of voiding it — the plan keeps
+ * whatever status it had, still counts toward runway if it's paid. Purely a
+ * "get this off my screen" toggle, and reversible.
+ */
+export async function archivePaymentPlan(planId: string): Promise<PaymentResult> {
+  await requireAdmin();
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("payment_plans")
+    .update({ archived_at: new Date().toISOString() })
+    .eq("id", planId)
+    .select("student_id")
+    .maybeSingle();
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePayments((data as { student_id: string } | null)?.student_id);
+  return { ok: true };
+}
+
+/** Restores a hidden plan back onto the payments list. */
+export async function unarchivePaymentPlan(planId: string): Promise<PaymentResult> {
+  await requireAdmin();
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("payment_plans")
+    .update({ archived_at: null })
     .eq("id", planId)
     .select("student_id")
     .maybeSingle();

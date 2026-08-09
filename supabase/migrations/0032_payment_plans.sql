@@ -14,8 +14,9 @@
 --                  plan have room for another booking?". Cancelling frees the
 --                  credit again, so a cancelled lesson is rescheduled, not
 --                  burnt.
---   • delivered  — attached sessions marked completed or no_show. Governs the
---                  renewal reminder (fired at one session left to deliver).
+--   • delivered  — attached sessions marked completed (a no-show does not
+--                  count). Governs the renewal reminder (fired at one session
+--                  left to deliver).
 -- Both are counted in application code from the attached rows; there's no
 -- denormalised counter to drift.
 --

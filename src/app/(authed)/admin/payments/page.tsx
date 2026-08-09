@@ -34,6 +34,7 @@ type PlanRecord = PlanRow & {
   proof_key: string | null;
   proof_uploaded_at: string | null;
   created_at: string;
+  archived_at: string | null;
   students: { id: string; full_name: string; preferred_name: string | null } | null;
   payer: { full_name: string | null; email: string | null } | null;
   adjustments: Array<{ label: string; amount_ngn: number }>;
@@ -74,13 +75,14 @@ function StatusPill({ status }: { status: StudentPaymentStatus }) {
 export default async function AdminPaymentsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ student?: string; status?: string }>;
+  searchParams: Promise<{ student?: string; status?: string; hidden?: string }>;
 }) {
   const sp = await searchParams;
   const studentFilter = sp.student || null;
   const statusFilter = STATUS_FILTERS.some((s) => s.value === sp.status && s.value)
     ? (sp.status as StudentPaymentStatus)
     : null;
+  const showHidden = sp.hidden === "1";
 
   const supabase = await createClient();
 
@@ -90,7 +92,7 @@ export default async function AdminPaymentsPage({
       `
       id, student_id, sessions_total, rate_per_session, subtotal_ngn, total_ngn,
       reference_code, status, paid_at, payment_reference, proof_key,
-      proof_uploaded_at, created_at,
+      proof_uploaded_at, created_at, archived_at,
       students ( id, full_name, preferred_name ),
       payer:profiles!payment_plans_payer_id_fkey ( full_name, email ),
       adjustments:payment_plan_adjustments ( label, amount_ngn )
@@ -99,6 +101,7 @@ export default async function AdminPaymentsPage({
     .order("created_at", { ascending: false });
 
   if (studentFilter) plansQuery = plansQuery.eq("student_id", studentFilter);
+  if (!showHidden) plansQuery = plansQuery.is("archived_at", null);
 
   const [
     { data: planRows },
@@ -149,9 +152,15 @@ export default async function AdminPaymentsPage({
       .map((s) => s.student_id),
   );
 
+  // Hidden plans are cosmetic-only — a mistaken entry must not still count as
+  // runway just because it's off the visible list. Status, counts, and the
+  // received-this-month total are always computed from the non-hidden set,
+  // even when `showHidden` is bringing archived rows into the table below.
+  const activePlans = plans.filter((p) => !p.archived_at);
+
   // Status is a property of the student, not of one plan, so group first.
   const plansByStudent = new Map<string, PlanRecord[]>();
-  for (const p of plans) {
+  for (const p of activePlans) {
     const list = plansByStudent.get(p.student_id) ?? [];
     list.push(p);
     plansByStudent.set(p.student_id, list);
@@ -177,7 +186,7 @@ export default async function AdminPaymentsPage({
     counts[statusByStudent.get(s.id) ?? "unpaid"] += 1;
   }
 
-  const receivedThisMonth = plans
+  const receivedThisMonth = activePlans
     .filter(
       (p) =>
         p.status === "paid" &&
@@ -203,12 +212,18 @@ export default async function AdminPaymentsPage({
       : (p.email ?? "Unnamed parent"),
   }));
 
-  const filterHref = (patch: { student?: string | null; status?: string | null }) => {
+  const filterHref = (patch: {
+    student?: string | null;
+    status?: string | null;
+    hidden?: boolean;
+  }) => {
     const params = new URLSearchParams();
     const student = patch.student === undefined ? studentFilter : patch.student;
     const status = patch.status === undefined ? statusFilter : patch.status;
+    const hidden = patch.hidden === undefined ? showHidden : patch.hidden;
     if (student) params.set("student", student);
     if (status) params.set("status", status);
+    if (hidden) params.set("hidden", "1");
     const q = params.toString();
     return `/admin/payments${q ? `?${q}` : ""}`;
   };
@@ -291,9 +306,17 @@ export default async function AdminPaymentsPage({
               hrefFor={(v) => filterHref({ status: v || null })}
             />
           </div>
-          <p className="pb-2 text-[13px] tabular-nums text-g600">
-            {visible.length} plan{visible.length === 1 ? "" : "s"}
-          </p>
+          <div className="flex items-end gap-4 pb-2">
+            <p className="text-[13px] tabular-nums text-g600">
+              {visible.length} plan{visible.length === 1 ? "" : "s"}
+            </p>
+            <Link
+              href={filterHref({ hidden: !showHidden })}
+              className="font-heading text-[13px] font-semibold text-g600 underline-offset-4 hover:underline"
+            >
+              {showHidden ? "Hide hidden plans" : "Show hidden plans"}
+            </Link>
+          </div>
         </div>
 
         {visible.length === 0 ? (
@@ -325,7 +348,10 @@ export default async function AdminPaymentsPage({
                   const toSchedule = remainingToSchedule(p, u);
                   const student = p.students;
                   return (
-                    <tr key={p.id} className="border-t border-line align-top">
+                    <tr
+                      key={p.id}
+                      className={`border-t border-line align-top ${p.archived_at ? "opacity-50" : ""}`}
+                    >
                       <td className="px-5 py-3 text-navy">
                         {student ? (
                           <Link
@@ -336,6 +362,11 @@ export default async function AdminPaymentsPage({
                           </Link>
                         ) : (
                           "—"
+                        )}
+                        {p.archived_at && (
+                          <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-g400">
+                            Hidden
+                          </p>
                         )}
                         {p.payer?.full_name && (
                           <p className="mt-1 text-[12px] text-g400">
@@ -401,6 +432,7 @@ export default async function AdminPaymentsPage({
                           studentId={p.student_id}
                           status={p.status}
                           hasUnfundedSessions={unfundedByStudent.has(p.student_id)}
+                          archived={Boolean(p.archived_at)}
                         />
                       </td>
                     </tr>

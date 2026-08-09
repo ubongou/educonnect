@@ -13,6 +13,7 @@ import { inputBase } from "@/components/ui/FormField";
 import { isDeletableSession } from "@/lib/sessions/filters";
 
 export type SessionTeacherOption = { id: string; name: string };
+export type SessionPlanOption = { id: string; label: string };
 
 const STATUS_OPTIONS = [
   { value: "scheduled", label: "Scheduled" },
@@ -21,11 +22,18 @@ const STATUS_OPTIONS = [
   { value: "cancelled", label: "Cancelled" },
 ];
 
+const UNFUNDED_VALUE = "";
+
 /**
  * Per-row management for a session on the admin sessions list. Edit opens an
- * inline form to change the date, duration, teacher, and status in one save
- * (via updateSession); Cancel is a quick soft-cancel that keeps the row for
- * history; Delete removes it outright.
+ * inline form to change the date, duration, teacher, status, and which plan
+ * it's charged to, in one save (via updateSession); Cancel is a quick
+ * soft-cancel that keeps the row for history; Delete removes it outright.
+ *
+ * The plan picker exists because a session only ever gets attached to a plan
+ * once — at creation, or via "Attach sessions" while it's still unfunded. A
+ * session already charged to an old, exhausted plan has no other way to move
+ * onto a freshly paid one, so this is that lever.
  *
  * Delete only appears for rows that can actually be deleted — no lesson report
  * and never marked completed. The server re-checks the same rule, so hiding the
@@ -39,6 +47,8 @@ export function SessionRowActions({
   status,
   lessonReportId = null,
   teachers,
+  planId = null,
+  planOptions = [],
 }: {
   sessionId: string;
   sessionDate: string;
@@ -47,6 +57,8 @@ export function SessionRowActions({
   status: string;
   lessonReportId?: string | null;
   teachers: SessionTeacherOption[];
+  planId?: string | null;
+  planOptions?: SessionPlanOption[];
 }) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
@@ -54,6 +66,7 @@ export function SessionRowActions({
   const [duration, setDuration] = useState(String(durationMinutes));
   const [teacher, setTeacher] = useState(teacherId ?? "");
   const [statusValue, setStatusValue] = useState(status);
+  const [planValue, setPlanValue] = useState(planId ?? UNFUNDED_VALUE);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -65,6 +78,7 @@ export function SessionRowActions({
     setDuration(String(durationMinutes));
     setTeacher(teacherId ?? "");
     setStatusValue(status);
+    setPlanValue(planId ?? UNFUNDED_VALUE);
     setError(null);
   };
 
@@ -75,6 +89,9 @@ export function SessionRowActions({
     if (Number(duration) !== durationMinutes) patch.duration_minutes = Number(duration);
     if (teacher && teacher !== teacherId) patch.teacher_id = teacher;
     if (statusValue !== status) patch.status = statusValue;
+    if (planValue !== (planId ?? UNFUNDED_VALUE)) {
+      patch.payment_plan_id = planValue || null;
+    }
 
     if (Object.keys(patch).length === 0) {
       setEditing(false);
@@ -136,6 +153,22 @@ export function SessionRowActions({
             {STATUS_OPTIONS.map((s) => (
               <option key={s.value} value={s.value}>
                 {s.label}
+              </option>
+            ))}
+          </select>
+          <select
+            value={planValue}
+            onChange={(e) => setPlanValue(e.target.value)}
+            aria-label="Charged to plan"
+            className={`${inputBase} w-auto py-1`}
+          >
+            <option value={UNFUNDED_VALUE}>Unfunded</option>
+            {planId && !planOptions.some((p) => p.id === planId) && (
+              <option value={planId}>Current plan</option>
+            )}
+            {planOptions.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.label}
               </option>
             ))}
           </select>

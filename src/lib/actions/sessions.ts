@@ -134,22 +134,40 @@ export type SessionPatch = {
   duration_minutes?: number;
   teacher_id?: string;
   status?: string;
+  /**
+   * Which plan this session is charged to. Sessions are only ever auto-attached
+   * once — at creation, or via the "Attach sessions" sweep, and only while
+   * `payment_plan_id` is still null (see attachUnfundedSessions). A session
+   * already funded by an old, exhausted plan has no other way to move onto a
+   * new one, so this is the escape hatch: null unfunds it, a plan id moves it.
+   */
+  payment_plan_id?: string | null;
 };
 
 /**
  * Admin-only: edit a scheduled session — move its date, change duration,
- * reassign the teacher, or set its status. Only the provided fields are
- * written. Admin writes go through sessions_admin_write (FOR ALL).
+ * reassign the teacher, set its status, or repoint which plan it's charged to.
+ * Only the provided fields are written. Admin writes go through
+ * sessions_admin_write (FOR ALL).
  */
 export async function updateSession(
   id: string,
   patch: SessionPatch,
 ): Promise<SimpleMutationResult> {
+  const supabase = await createClient();
+  const { data: previous } = await supabase
+    .from("sessions")
+    .select("student_id, teacher_id")
+    .eq("id", id)
+    .maybeSingle();
+  if (!previous) return { ok: false, error: "Session not found." };
+
   const update: {
     session_date?: string;
     duration_minutes?: number;
     teacher_id?: string;
     status?: string;
+    payment_plan_id?: string | null;
   } = {};
 
   if (patch.session_date !== undefined) {
@@ -174,22 +192,32 @@ export async function updateSession(
     }
     update.status = patch.status;
   }
+  if (patch.payment_plan_id !== undefined) {
+    if (patch.payment_plan_id === null) {
+      update.payment_plan_id = null;
+    } else {
+      const { data: plan } = await supabase
+        .from("payment_plans")
+        .select("id, student_id")
+        .eq("id", patch.payment_plan_id)
+        .maybeSingle();
+      if (!plan) return { ok: false, error: "Plan not found." };
+      if (plan.student_id !== previous.student_id) {
+        return { ok: false, error: "That plan belongs to a different student." };
+      }
+      update.payment_plan_id = patch.payment_plan_id;
+    }
+  }
 
   if (Object.keys(update).length === 0) {
     return { ok: false, error: "Nothing to update." };
   }
 
-  const supabase = await createClient();
-  const { data: previous } = await supabase
-    .from("sessions")
-    .select("student_id, teacher_id")
-    .eq("id", id)
-    .maybeSingle();
-
   const { error } = await supabase.from("sessions").update(update).eq("id", id);
   if (error) return { ok: false, error: error.message };
 
-  revalidateSessionViews(previous?.student_id, previous?.teacher_id);
+  revalidateSessionViews(previous.student_id, previous.teacher_id);
+  revalidatePath("/admin/payments");
   if (typeof update.teacher_id === "string") {
     revalidatePath(`/admin/teachers/${update.teacher_id}`);
   }

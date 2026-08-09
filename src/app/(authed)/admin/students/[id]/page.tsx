@@ -124,7 +124,7 @@ export default async function AdminStudentDetail({
         .from("sessions")
         .select(
           `
-        id, session_date, duration_minutes, status, lesson_report_id,
+        id, session_date, duration_minutes, status, lesson_report_id, payment_plan_id,
         students ( id, full_name, preferred_name ),
         subjects ( name ),
         teacher:profiles!sessions_teacher_id_fkey ( id, full_name )
@@ -133,6 +133,20 @@ export default async function AdminStudentDetail({
         .eq("student_id", id)
         .order("session_date", { ascending: true }),
     ]);
+
+  // Every plan this student has, any status — feeds the "charged to" picker on
+  // each session row so a session stuck on an old, exhausted plan can be moved.
+  const { data: studentPlanList } = await supabase
+    .from("payment_plans")
+    .select("id, reference_code, status")
+    .eq("student_id", id)
+    .order("created_at", { ascending: false });
+  const studentPlanOptions = ((studentPlanList ?? []) as Array<{
+    id: string;
+    reference_code: string;
+    status: string;
+  }>).map((p) => ({ id: p.id, label: `${p.reference_code} · ${p.status}` }));
+  const plansByStudent = { [id]: studentPlanOptions };
 
   if (!student) notFound();
 
@@ -366,6 +380,7 @@ export default async function AdminStudentDetail({
             rows={upcomingSessions}
             teachers={sessionTeacherOptions}
             showStudent={false}
+            plansByStudent={plansByStudent}
           />
         )}
 
@@ -385,6 +400,7 @@ export default async function AdminStudentDetail({
                 rows={pastSessions}
                 teachers={sessionTeacherOptions}
                 showStudent={false}
+                plansByStudent={plansByStudent}
               />
             </div>
           </details>

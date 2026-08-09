@@ -55,7 +55,7 @@ export default async function AdminSessionsPage({
     .from("sessions")
     .select(
       `
-      id, session_date, duration_minutes, status, lesson_report_id,
+      id, session_date, duration_minutes, status, lesson_report_id, payment_plan_id,
       students ( id, full_name, preferred_name ),
       subjects ( name ),
       teacher:profiles!sessions_teacher_id_fkey ( id, full_name )
@@ -76,6 +76,7 @@ export default async function AdminSessionsPage({
     { data: teacherList },
     { data: studentList },
     { data: subjectList },
+    { data: planList },
   ] = await Promise.all([
     query
       .order("session_date", { ascending: ascendingFor(filters.range) })
@@ -105,6 +106,13 @@ export default async function AdminSessionsPage({
       .is("archived_at", null)
       .order("full_name"),
     supabase.from("subjects").select("id, name").eq("is_archived", false).order("name"),
+    // Every plan, any status — the per-row "charged to" picker on the sessions
+    // table needs to show a session's current plan even if it's since gone
+    // void or unpaid, not just plans that are currently payable.
+    supabase
+      .from("payment_plans")
+      .select("id, student_id, reference_code, status")
+      .order("created_at", { ascending: false }),
   ]);
 
   const teacherOptions: SessionTeacherOption[] = (teacherList ?? []).map((t) => ({
@@ -123,6 +131,19 @@ export default async function AdminSessionsPage({
   const subjectOptions: FilterOption[] = (
     (subjectList ?? []) as Array<{ id: string; name: string }>
   ).map((s) => ({ id: s.id, label: s.name }));
+
+  const plansByStudent: Record<string, { id: string; label: string }[]> = {};
+  for (const p of (planList ?? []) as Array<{
+    id: string;
+    student_id: string;
+    reference_code: string;
+    status: string;
+  }>) {
+    (plansByStudent[p.student_id] ??= []).push({
+      id: p.id,
+      label: `${p.reference_code} · ${p.status}`,
+    });
+  }
 
   const rows = (sessions ?? []) as unknown as AdminSessionRow[];
   const total = count ?? 0;
@@ -209,7 +230,11 @@ export default async function AdminSessionsPage({
           </div>
         ) : (
           <>
-            <SessionsTable rows={rows} teachers={teacherOptions} />
+            <SessionsTable
+              rows={rows}
+              teachers={teacherOptions}
+              plansByStudent={plansByStudent}
+            />
             {pages > 1 && (
               <nav
                 aria-label="Pagination"

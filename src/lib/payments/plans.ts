@@ -34,11 +34,11 @@ export type PlanUsage = {
    * can be rebooked rather than lost.
    */
   scheduled: number;
-  /** Attached sessions actually delivered: taught, or missed by the student. */
+  /** Attached sessions actually taught — a no-show does not count. */
   delivered: number;
 };
 
-const DELIVERED_STATUSES = new Set(["completed", "no_show"]);
+const DELIVERED_STATUSES = new Set(["completed"]);
 
 /** Tallies usage per plan id from a flat list of sessions. */
 export function tallyPlanUsage(

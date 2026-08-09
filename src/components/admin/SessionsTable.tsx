@@ -8,6 +8,7 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { inputBase } from "@/components/ui/FormField";
 import {
   SessionRowActions,
+  type SessionPlanOption,
   type SessionTeacherOption,
 } from "@/components/admin/SessionRowActions";
 import { isDeletableSession } from "@/lib/sessions/filters";
@@ -19,6 +20,7 @@ export type AdminSessionRow = {
   duration_minutes: number;
   status: string;
   lesson_report_id: string | null;
+  payment_plan_id?: string | null;
   students: { id: string; full_name: string; preferred_name: string | null } | null;
   subjects: { name: string } | null;
   teacher: { id: string; full_name: string | null } | null;
@@ -66,10 +68,13 @@ export function SessionsTable({
   rows,
   teachers,
   showStudent = true,
+  plansByStudent = {},
 }: {
   rows: AdminSessionRow[];
   teachers: SessionTeacherOption[];
   showStudent?: boolean;
+  /** A student's plans, keyed by student id — drives the per-row plan picker. */
+  plansByStudent?: Record<string, SessionPlanOption[]>;
 }) {
   const router = useRouter();
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -271,6 +276,8 @@ export function SessionsTable({
                       status={s.status}
                       lessonReportId={s.lesson_report_id}
                       teachers={teachers}
+                      planId={s.payment_plan_id ?? null}
+                      planOptions={plansByStudent[s.students?.id ?? ""] ?? []}
                     />
                   </td>
                 </tr>

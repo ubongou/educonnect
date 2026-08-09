@@ -5,8 +5,12 @@ import { useRouter } from "next/navigation";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { inputBase } from "@/components/ui/FormField";
 import {
+  archivePaymentPlan,
   attachSessionsToPlan,
   markPlanPaid,
+  renewPaymentPlan,
+  sendPaymentReminderNow,
+  unarchivePaymentPlan,
   voidPaymentPlan,
 } from "@/lib/actions/payments";
 
@@ -22,17 +26,20 @@ export function PaymentPlanActions({
   studentId,
   status,
   hasUnfundedSessions,
+  archived = false,
 }: {
   planId: string;
   studentId: string;
   status: string;
   hasUnfundedSessions: boolean;
+  archived?: boolean;
 }) {
   const router = useRouter();
   const [marking, setMarking] = useState(false);
   const [reference, setReference] = useState("");
   const [paidOn, setPaidOn] = useState(new Date().toISOString().slice(0, 10));
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   const confirmPaid = () => {
@@ -115,6 +122,8 @@ export function PaymentPlanActions({
             disabled={pending}
             onClick={() =>
               startTransition(async () => {
+                setError(null);
+                setNotice(null);
                 const res = await attachSessionsToPlan(studentId, planId);
                 if (res.ok) router.refresh();
                 else setError(res.error);
@@ -123,6 +132,55 @@ export function PaymentPlanActions({
             className="font-heading text-[13px] font-semibold text-navy underline-offset-4 hover:underline disabled:opacity-50"
           >
             Attach sessions
+          </button>
+        )}
+
+        {status === "paid" && (
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() =>
+              startTransition(async () => {
+                setError(null);
+                setNotice(null);
+                const res = await sendPaymentReminderNow(planId);
+                if (res.ok) {
+                  setNotice(`Reminder sent to ${res.recipients.join(", ")}.`);
+                } else {
+                  setError(res.error);
+                }
+              })
+            }
+            className="font-heading text-[13px] font-semibold text-navy underline-offset-4 hover:underline disabled:opacity-50"
+          >
+            Send reminder
+          </button>
+        )}
+
+        {status === "paid" && (
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() =>
+              startTransition(async () => {
+                setError(null);
+                setNotice(null);
+                const res = await renewPaymentPlan(planId);
+                if (res.ok) {
+                  setNotice(
+                    `Renewed as ${res.referenceCode}${
+                      res.attached > 0 ? ` · ${res.attached} session${res.attached === 1 ? "" : "s"} attached` : ""
+                    }.`,
+                  );
+                  router.refresh();
+                } else {
+                  setError(res.error);
+                }
+              })
+            }
+            className="font-heading text-[13px] font-semibold text-blue underline-offset-4 hover:underline disabled:opacity-50"
+          >
+            Renew
           </button>
         )}
 
@@ -144,7 +202,44 @@ export function PaymentPlanActions({
             }
           />
         )}
+
+        {archived ? (
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() =>
+              startTransition(async () => {
+                setError(null);
+                setNotice(null);
+                const res = await unarchivePaymentPlan(planId);
+                if (res.ok) router.refresh();
+                else setError(res.error);
+              })
+            }
+            className="font-heading text-[13px] font-semibold text-g600 underline-offset-4 hover:underline disabled:opacity-50"
+          >
+            Unhide
+          </button>
+        ) : (
+          <ConfirmDialog
+            title="Hide this plan"
+            tone="default"
+            confirmLabel="Hide plan"
+            description="Entered by mistake? Hiding takes it off the payments list without changing its status — sessions already attached keep their link, and it stays reversible from the hidden view."
+            onConfirm={() => archivePaymentPlan(planId)}
+            onSuccess={() => router.refresh()}
+            trigger={
+              <button
+                type="button"
+                className="font-heading text-[13px] font-semibold text-g600 underline-offset-4 hover:underline"
+              >
+                Hide
+              </button>
+            }
+          />
+        )}
       </div>
+      {notice && <span className="text-[12px] font-semibold text-blue">{notice}</span>}
       {error && <span className="text-[12px] font-semibold text-coral">{error}</span>}
     </div>
   );

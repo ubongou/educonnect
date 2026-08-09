@@ -32,11 +32,11 @@ const sessions = (planId: string | null, statuses: string[]) =>
   statuses.map((status) => ({ payment_plan_id: planId, status }));
 
 describe("tallyPlanUsage", () => {
-  it("counts non-cancelled as scheduled and completed/no_show as delivered", () => {
+  it("counts non-cancelled as scheduled, but only completed as delivered", () => {
     const usage = tallyPlanUsage(
       sessions("plan-1", ["completed", "completed", "no_show", "scheduled", "cancelled"]),
     );
-    expect(usage.get("plan-1")).toEqual({ scheduled: 4, delivered: 3 });
+    expect(usage.get("plan-1")).toEqual({ scheduled: 4, delivered: 2 });
   });
 
   it("ignores unfunded sessions entirely", () => {
@@ -167,14 +167,15 @@ describe("reminder triggers", () => {
     expect(needsRenewalReminder(plan({ status: "unpaid" }), seven)).toBe(false);
   });
 
-  it("counts a no-show as delivered — the slot was paid for and burnt", () => {
+  it("does not count a no-show as delivered — only a taught lesson does", () => {
     const usage = usageFor(
       "plan-1",
       tallyPlanUsage(
         sessions("plan-1", [...Array(6).fill("completed"), "no_show"]),
       ),
     );
-    expect(needsRenewalReminder(plan(), usage)).toBe(true);
+    // 6 delivered of 8, still 2 to go — not at the renewal threshold yet.
+    expect(needsRenewalReminder(plan(), usage)).toBe(false);
   });
 });
 
