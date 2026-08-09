@@ -317,6 +317,10 @@ const markPaidSchema = z.object({
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, "Expected a YYYY-MM-DD date")
     .optional(),
+  // Defaults on: a real payment landing should tell the parent. Off is for
+  // backfilling old, already-taught sessions onto a plan after the fact —
+  // bookkeeping the admin is doing, not news the parent needs.
+  send_receipt: z.boolean().optional(),
 });
 
 /**
@@ -334,7 +338,7 @@ export async function markPlanPaid(input: unknown): Promise<PaymentResult> {
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
-  const { plan_id, payment_reference, paid_on } = parsed.data;
+  const { plan_id, payment_reference, paid_on, send_receipt } = parsed.data;
 
   const supabase = await createClient();
   const { data: plan, error: readErr } = await supabase
@@ -364,11 +368,14 @@ export async function markPlanPaid(input: unknown): Promise<PaymentResult> {
   // Receipt is best-effort and deliberately after the write: neither a Resend
   // outage nor a missing service-role key may roll back a payment that
   // genuinely landed. Idempotent on receipt_sent_at, so a plan whose receipt
-  // failed can be retried without double-sending.
-  try {
-    await sendPaymentReceiptEmail(plan_id);
-  } catch {
-    // Swallowed on purpose — the money is recorded, which is what matters.
+  // failed can be retried without double-sending. Skippable for backfill —
+  // marking an old, already-delivered batch paid shouldn't email the parent.
+  if (send_receipt !== false) {
+    try {
+      await sendPaymentReceiptEmail(plan_id);
+    } catch {
+      // Swallowed on purpose — the money is recorded, which is what matters.
+    }
   }
 
   revalidatePayments(plan.student_id);

@@ -38,6 +38,7 @@ export function PaymentPlanActions({
   const [marking, setMarking] = useState(false);
   const [reference, setReference] = useState("");
   const [paidOn, setPaidOn] = useState(new Date().toISOString().slice(0, 10));
+  const [sendReceipt, setSendReceipt] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -49,6 +50,7 @@ export function PaymentPlanActions({
         plan_id: planId,
         payment_reference: reference,
         paid_on: paidOn,
+        send_receipt: sendReceipt,
       });
       if (res.ok) {
         setMarking(false);
@@ -98,6 +100,15 @@ export function PaymentPlanActions({
             Cancel
           </button>
         </div>
+        <label className="flex items-center gap-2 text-[12px] text-g600">
+          <input
+            type="checkbox"
+            checked={sendReceipt}
+            onChange={(e) => setSendReceipt(e.target.checked)}
+            className="h-3.5 w-3.5 accent-[var(--color-coral)]"
+          />
+          Email the receipt to the parent
+        </label>
         {error && <span className="text-[12px] font-semibold text-coral">{error}</span>}
       </div>
     );
