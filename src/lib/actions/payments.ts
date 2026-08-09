@@ -242,19 +242,45 @@ export async function attachSessionsToPlan(
   return res;
 }
 
+export type RenewOverrides = { sessions_total?: number; rate_per_session?: number };
+
 /**
  * Duplicates a plan's terms into a brand-new one, instead of the admin
  * re-typing the New Plan form for a routine renewal. Copies student, payer,
- * sessions_total, rate, notes, and adjustments verbatim; the new plan still
- * starts 'unpaid' — renewing doesn't skip confirming the transfer landed,
- * it just skips re-entering numbers that haven't changed.
+ * notes, and adjustments verbatim; sessions_total and rate_per_session copy
+ * across too unless the caller overrides them (the confirm dialog pre-fills
+ * both from the source plan, editable in case a price or block size changed).
+ * The new plan still starts 'unpaid' — renewing doesn't skip confirming the
+ * transfer landed, it just skips re-entering numbers that haven't changed.
  *
  * Sweeps the student's unfunded sessions onto it immediately, same as ticking
  * "attach existing" on a fresh plan — the whole point of renewing is picking
  * up where the old block left off.
  */
-export async function renewPaymentPlan(planId: string): Promise<PlanCreateResult> {
+export async function renewPaymentPlan(
+  planId: string,
+  overrides: RenewOverrides = {},
+): Promise<PlanCreateResult> {
   await requireAdmin();
+
+  if (overrides.sessions_total !== undefined) {
+    if (
+      !Number.isInteger(overrides.sessions_total) ||
+      overrides.sessions_total < 1 ||
+      overrides.sessions_total > 200
+    ) {
+      return { ok: false, error: "Sessions must be a whole number between 1 and 200." };
+    }
+  }
+  if (overrides.rate_per_session !== undefined) {
+    if (
+      !Number.isFinite(overrides.rate_per_session) ||
+      overrides.rate_per_session < 0 ||
+      overrides.rate_per_session > 10_000_000
+    ) {
+      return { ok: false, error: "Rate must be between ₦0 and ₦10,000,000." };
+    }
+  }
 
   const supabase = await createClient();
   const { data: source, error: srcErr } = await supabase
@@ -270,6 +296,9 @@ export async function renewPaymentPlan(planId: string): Promise<PlanCreateResult
 
   if (srcErr || !source) return { ok: false, error: srcErr?.message ?? "Plan not found." };
 
+  const sessionsTotal = overrides.sessions_total ?? source.sessions_total;
+  const ratePerSession = overrides.rate_per_session ?? source.rate_per_session;
+
   const { data: reference, error: refErr } = await supabase.rpc(
     "next_plan_reference",
     { p_student_id: source.student_id },
@@ -283,8 +312,8 @@ export async function renewPaymentPlan(planId: string): Promise<PlanCreateResult
     .insert({
       student_id: source.student_id,
       payer_id: source.payer_id,
-      sessions_total: source.sessions_total,
-      rate_per_session: source.rate_per_session,
+      sessions_total: sessionsTotal,
+      rate_per_session: ratePerSession,
       reference_code: reference as string,
       notes: source.notes,
     })
@@ -315,11 +344,7 @@ export async function renewPaymentPlan(planId: string): Promise<PlanCreateResult
     }
   }
 
-  const attachRes = await attachUnfundedSessions(
-    source.student_id,
-    plan.id,
-    source.sessions_total,
-  );
+  const attachRes = await attachUnfundedSessions(source.student_id, plan.id, sessionsTotal);
   const attached = attachRes.ok ? attachRes.attached : 0;
 
   revalidatePayments(source.student_id);
@@ -483,18 +508,30 @@ export async function sendPaymentReminderNow(planId: string): Promise<ManualRemi
 }
 
 /**
- * Voids a plan. Kept rather than deleted so the reference code stays reserved
- * and the history of a mistaken or refunded plan is auditable. Sessions
- * attached to it keep their link — ON DELETE SET NULL only fires on a real
- * delete, and unpicking delivered teaching would rewrite history.
+ * Voids a plan — kept rather than deleted so the reference code stays
+ * reserved and the history of a mistaken or refunded plan is auditable.
+ *
+ * Also frees every session it funded (back to unfunded) and hides the plan
+ * from the payments list, in one action: a voided plan is, by definition,
+ * not paying for anything, so its sessions shouldn't stay stranded on it —
+ * releasing them lets a replacement plan pick them up via Attach — and it
+ * shouldn't keep cluttering the list either. Reversible: unhide it from the
+ * "show hidden plans" view any time, sessions just won't come back with it.
  */
 export async function voidPaymentPlan(planId: string): Promise<PaymentResult> {
   await requireAdmin();
 
   const supabase = await createClient();
+
+  const { error: unlinkErr } = await supabase
+    .from("sessions")
+    .update({ payment_plan_id: null })
+    .eq("payment_plan_id", planId);
+  if (unlinkErr) return { ok: false, error: unlinkErr.message };
+
   const { data, error } = await supabase
     .from("payment_plans")
-    .update({ status: "void" })
+    .update({ status: "void", archived_at: new Date().toISOString() })
     .eq("id", planId)
     .select("student_id")
     .maybeSingle();
@@ -505,30 +542,8 @@ export async function voidPaymentPlan(planId: string): Promise<PaymentResult> {
   return { ok: true };
 }
 
-/**
- * Hides a plan entered by mistake (duplicate, wrong child) from the payments
- * list, without the financial consequences of voiding it — the plan keeps
- * whatever status it had, still counts toward runway if it's paid. Purely a
- * "get this off my screen" toggle, and reversible.
- */
-export async function archivePaymentPlan(planId: string): Promise<PaymentResult> {
-  await requireAdmin();
-
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("payment_plans")
-    .update({ archived_at: new Date().toISOString() })
-    .eq("id", planId)
-    .select("student_id")
-    .maybeSingle();
-
-  if (error) return { ok: false, error: error.message };
-
-  revalidatePayments((data as { student_id: string } | null)?.student_id);
-  return { ok: true };
-}
-
-/** Restores a hidden plan back onto the payments list. */
+/** Restores a hidden (or voided) plan back onto the payments list. Doesn't
+ *  change its status — a restored void plan is still void, just visible. */
 export async function unarchivePaymentPlan(planId: string): Promise<PaymentResult> {
   await requireAdmin();
 

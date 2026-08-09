@@ -432,6 +432,8 @@ export default async function AdminPaymentsPage({
                           studentId={p.student_id}
                           status={p.status}
                           hasUnfundedSessions={unfundedByStudent.has(p.student_id)}
+                          sessionsTotal={p.sessions_total}
+                          ratePerSession={Number(p.rate_per_session)}
                           archived={Boolean(p.archived_at)}
                         />
                       </td>
