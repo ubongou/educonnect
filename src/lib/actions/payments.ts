@@ -152,9 +152,18 @@ export async function createPaymentPlan(input: unknown): Promise<PlanCreateResul
 }
 
 /**
- * Links a student's plan-less sessions to a plan, oldest first, up to the
- * plan's capacity. Used by the "attach existing sessions" box on plan creation
- * and by the manual attach action.
+ * Links a student's plan-less sessions to a plan, nearest-to-today first, up
+ * to the plan's capacity. Used by the "attach existing sessions" box on plan
+ * creation and by the manual attach action.
+ *
+ * Deliberately not oldest-first: a plan created today for a student who has
+ * been on the platform for months has a backlog of ancient unfunded sessions
+ * — ones nobody intends to retroactively bill for. Oldest-first would spend
+ * the whole capacity on that backlog and leave the session actually due
+ * tomorrow still unfunded. Nearest-to-today (recent unfunded lessons and the
+ * immediate upcoming ones) is what "this plan covers what's currently
+ * running" actually means; ancient history only gets swept up if capacity is
+ * left over after everything closer to now is covered.
  */
 async function attachUnfundedSessions(
   studentId: string,
@@ -165,15 +174,22 @@ async function attachUnfundedSessions(
 
   const { data: loose, error } = await supabase
     .from("sessions")
-    .select("id")
+    .select("id, session_date")
     .eq("student_id", studentId)
     .is("payment_plan_id", null)
-    .neq("status", "cancelled")
-    .order("session_date", { ascending: true })
-    .limit(capacity);
+    .neq("status", "cancelled");
 
   if (error) return { ok: false, error: error.message };
-  const ids = (loose ?? []).map((s) => s.id);
+
+  const today = Date.now();
+  const ids = [...(loose ?? [])]
+    .sort(
+      (a, b) =>
+        Math.abs(new Date(a.session_date).getTime() - today) -
+        Math.abs(new Date(b.session_date).getTime() - today),
+    )
+    .slice(0, capacity)
+    .map((s) => s.id);
   if (ids.length === 0) return { ok: true, attached: 0 };
 
   const { error: linkErr } = await supabase
