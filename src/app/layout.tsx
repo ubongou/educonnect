@@ -40,6 +40,9 @@ export const metadata: Metadata = {
   title: "Masani | Personal Tutoring from World Class Teachers",
   description:
     "Masani — Personal Tutoring from World Class Teachers. One-on-one sessions in Maths, English, and Science. Backed by MIT.",
+  other: {
+    "facebook-domain-verification": "9c0cjwsjvobp9yu7v1f1umvg0goje1",
+  },
 };
 
 export default function RootLayout({
