@@ -10,16 +10,13 @@ import { appendToGoogleSheet } from "@/lib/integrations/googleSheets";
 import { addToZohoCampaigns } from "@/lib/integrations/zohoCampaigns";
 import { sendStrategyLeadFailureEmail } from "@/lib/email/sendStrategyLeadFailure";
 
-export type SubmitStrategyLeadState =
-  | null
-  | {
-      status: "error";
-      fieldErrors: Record<string, string>;
-      formError?: string;
-      values: Record<string, string>;
-    }
-  // Always returned on a valid submission — the modal reveals the calendar.
-  | { status: "success" };
+export type SubmitStrategyLeadResult =
+  | { status: "error"; fieldErrors: Record<string, string>; formError?: string }
+  // Genuine, validated submission — exported (best-effort) and tracked.
+  | { status: "success" }
+  // Honeypot catch: the caller should still reveal the calendar (so a scraper
+  // never learns the trap exists) but must skip export and tracking entirely.
+  | { status: "ignored" };
 
 const isSubject = (v: string): v is StrategySubject =>
   (strategySubjectValues as readonly string[]).includes(v);
@@ -27,22 +24,21 @@ const isSubject = (v: string): v is StrategySubject =>
 /**
  * Strategy-session landing-page submission. SEPARATE from submitBookingRequest
  * (which serves /book). Order:
- *   1. Honeypot — silent success for bots.
- *   2. Zod parse. Failure => field errors + typed values for re-render.
+ *   1. Honeypot — "ignored", no export, no analytics.
+ *   2. Zod parse. Failure => field errors.
  *   3. Best-effort fan-out to Google Sheets + Zoho Campaigns (never blocks the user).
- *   4. If BOTH exports fail, email the admin so the lead isn't lost.
- *   5. Always return success so the caller reveals the inline calendar.
+ *   4. If EITHER export fails, email the admin so the lead isn't lost.
+ *   5. "success" — the caller reveals the calendar and fires analytics.
  *
  * There is deliberately no Supabase insert and no routine admin email here —
  * the Sheet + Zoho are the record of truth (see plan).
  */
 export async function submitStrategyLead(
-  _prev: SubmitStrategyLeadState,
   formData: FormData,
-): Promise<SubmitStrategyLeadState> {
-  // 1. Honeypot
+): Promise<SubmitStrategyLeadResult> {
+  // 1. Honeypot.
   if (String(formData.get("_hp") ?? "").length > 0) {
-    return { status: "success" };
+    return { status: "ignored" };
   }
 
   // 2. Zod parse. `subjects` arrives as repeated form entries.
@@ -73,20 +69,7 @@ export async function submitStrategyLead(
       const key = String(issue.path[0] ?? "");
       if (key && !fieldErrors[key]) fieldErrors[key] = issue.message;
     }
-    // Echo scalar values back for re-render (arrays handled client-side).
-    const values: Record<string, string> = {
-      child_age_range: raw.child_age_range,
-      school_level: raw.school_level,
-      parent_name: raw.parent_name,
-      tutored_before: raw.tutored_before,
-      timeline: raw.timeline,
-      country: raw.country,
-      parent_phone: raw.parent_phone,
-      subject_other: raw.subject_other,
-      parent_email: raw.parent_email,
-      contact_method: raw.contact_method,
-    };
-    return { status: "error", fieldErrors, values };
+    return { status: "error", fieldErrors };
   }
 
   // 3. Best-effort fan-out. Neither export blocks the visitor.
@@ -112,10 +95,19 @@ export async function submitStrategyLead(
   const zohoFailed = failed(zoho);
   if (errors.length) console.error("[strategy-lead] export issues:", errors);
 
-  // 4. Only escalate when BOTH exports failed (skips don't count as failures).
-  if (sheetFailed && zohoFailed) {
+  // 4. Escalate on ANY export failure (skips don't count as failures) — a lead
+  // that silently misses just one sink is still a lost lead if nobody notices.
+  if (sheetFailed || zohoFailed) {
     try {
-      const result = await sendStrategyLeadFailureEmail(parsed.data, errors);
+      const failedSinks = [
+        sheetFailed && "Google Sheets",
+        zohoFailed && "Zoho Campaigns",
+      ].filter((v): v is string => Boolean(v));
+      const result = await sendStrategyLeadFailureEmail(
+        parsed.data,
+        errors,
+        failedSinks,
+      );
       if (!result.ok) {
         console.error("[strategy-lead] failure email failed:", result.error);
       }

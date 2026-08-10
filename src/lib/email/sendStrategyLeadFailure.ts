@@ -17,14 +17,16 @@ export type SendStrategyLeadFailureResult =
   | { ok: false; error: string };
 
 /**
- * Safety net for the strategy-session form: only called when BOTH exports
- * (Google Sheets + Zoho Campaigns) failed for a submission. Emails the admin the
- * full lead so it isn't lost. RESEND_API_KEY absent => skipped (nothing else
- * we can do — this path only runs when the other sinks already failed).
+ * Safety net for the strategy-session form: called when at least one export
+ * (Google Sheets and/or Zoho Campaigns) failed for a submission. Emails the
+ * admin the full lead so it isn't lost even if only one sink missed it.
+ * RESEND_API_KEY absent => skipped (nothing else we can do — this path only
+ * runs when at least one other sink already failed).
  */
 export async function sendStrategyLeadFailureEmail(
   input: StrategyLeadInput,
   errors: string[],
+  failedSinks: string[],
 ): Promise<SendStrategyLeadFailureResult> {
   const resend = getResend();
   if (!resend) {
@@ -57,6 +59,9 @@ export async function sendStrategyLeadFailureEmail(
     )
     .join("\n");
 
+  const sinkList = failedSinks.join(" and ");
+  const partial = failedSinks.length < 2;
+
   const html = `
     <!doctype html>
     <html>
@@ -64,7 +69,7 @@ export async function sendStrategyLeadFailureEmail(
         <div style="max-width:620px;margin:0 auto;background:#fff;border:1px solid #f5b7b1;border-radius:18px;padding:32px;">
           <p style="margin:0 0 4px;font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#a83a2a;">Strategy session lead — export failed</p>
           <h1 style="margin:0 0 12px;font-size:20px;line-height:1.2;color:#04131C;">${esc(input.parent_name)}</h1>
-          <p style="margin:0 0 20px;font-size:13px;color:#a83a2a;">Both Google Sheets and Zoho Campaigns writes failed for this submission — logged here so the lead isn't lost. Please add it manually.</p>
+          <p style="margin:0 0 20px;font-size:13px;color:#a83a2a;">${esc(sinkList)} ${failedSinks.length > 1 ? "writes" : "write"} failed for this submission${partial ? " (the other export may have succeeded — check before re-adding)" : ""} — logged here so the lead isn't lost. Please add it manually if missing.</p>
           <table style="border-collapse:collapse;font-size:14px;color:#3a4750;">${rows}</table>
           <hr style="border:none;border-top:1px solid #e8e3d6;margin:24px 0 16px;" />
           <p style="margin:0;font-size:12px;color:#6b7680;">Export errors:<br />${errors.map((e) => esc(e)).join("<br />")}</p>
@@ -75,7 +80,7 @@ export async function sendStrategyLeadFailureEmail(
 
   const text = [
     "Strategy session lead — export failed",
-    "Both Google Sheets and Zoho Campaigns writes failed. Add this lead manually.",
+    `${sinkList} ${failedSinks.length > 1 ? "writes" : "write"} failed.${partial ? " The other export may have succeeded — check before re-adding." : ""} Add this lead manually if missing.`,
     "",
     ...fields.map(([k, v]) => `${k}: ${v}`),
     "",

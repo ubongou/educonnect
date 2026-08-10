@@ -74,3 +74,26 @@ export function setPixelUserData({ email, phone, name }: PixelUserData): void {
   if (Object.keys(data).length === 0) return;
   window.fbq("init", META_PIXEL_ID, data);
 }
+
+// -----------------------------------------------------------------------------
+// Strategy-session composed events. Each business event (booking modal opened,
+// lead captured) bundles GA + Pixel + Advanced Matching in one call, so a call
+// site never has to remember to pair them up itself.
+// -----------------------------------------------------------------------------
+
+/** Fires when the strategy-session booking modal opens (a CTA click). */
+export function trackScheduleOpened(source: string): void {
+  trackPixel("Schedule", { content_name: "strategy_session", source });
+  trackEvent("book_strategy_session", { source });
+}
+
+/**
+ * Fires once a strategy-session lead is genuinely captured — i.e. the server
+ * validated the submission and it wasn't a honeypot catch. Attaches Advanced
+ * Matching before the Lead event so it carries it.
+ */
+export function trackLeadSubmitted(source: string, userData: PixelUserData): void {
+  setPixelUserData(userData);
+  trackPixel("Lead", { content_name: "strategy_session", source });
+  trackEvent("booking_complete", {});
+}

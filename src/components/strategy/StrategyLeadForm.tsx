@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  startTransition,
-  useActionState,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
+import { useRef, useState, type FormEvent, type ReactNode } from "react";
 import clsx from "clsx";
 import {
   ageRangeValues,
@@ -27,18 +20,20 @@ import {
 import { COUNTRIES } from "@/lib/strategy/countries";
 import {
   submitStrategyLead,
-  type SubmitStrategyLeadState,
+  type SubmitStrategyLeadResult,
 } from "@/lib/actions/strategyLead";
 import { trackEvent, type PixelUserData } from "@/lib/analytics";
 
 export type StrategyLeadFormProps = {
   /** Attribution label passed through to Sheets/Zoho (see sourceLabels). */
   source: string;
-  /**
-   * Called once the submission succeeds (modal reveals the calendar). Receives
-   * the customer info the visitor entered, for Meta Advanced Matching.
-   */
-  onSuccess?: (userData: PixelUserData) => void;
+  /** Called once submission completes without error — reveals the calendar.
+   * Fires for both a genuine lead and a honeypot catch, so a scraper never
+   * learns the trap exists. */
+  onDone: () => void;
+  /** Called only for a genuine (non-bot) submission — the caller should fire
+   * analytics/pixel tracking here. */
+  onLeadCaptured: (userData: PixelUserData) => void;
   heading?: string;
   lead?: string;
   submitLabel?: string;
@@ -77,18 +72,17 @@ const EMPTY_FORM: Record<ScalarField, string> = {
 
 export function StrategyLeadForm({
   source,
-  onSuccess,
+  onDone,
+  onLeadCaptured,
   heading = "Tell us about your child",
   lead = "Two minutes now. Next, you'll pick a time that works for your family.",
   submitLabel = "Book Your FREE Strategy Session",
   reassurance,
 }: StrategyLeadFormProps) {
-  const [state, formAction, pending] = useActionState<
-    SubmitStrategyLeadState,
-    FormData
-  >(submitStrategyLead, null);
+  const [pending, setPending] = useState(false);
+  const [result, setResult] = useState<SubmitStrategyLeadResult | null>(null);
 
-  const errs = state?.status === "error" ? state.fieldErrors : {};
+  const errs = result?.status === "error" ? result.fieldErrors : {};
 
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -106,31 +100,42 @@ export function StrategyLeadForm({
         : [...prev, value],
     );
 
-  // Hand control back to the caller once the server confirms, passing along the
-  // customer info for Advanced Matching (the pixel hashes it before sending).
-  const succeeded = state?.status === "success";
-  useEffect(() => {
-    if (!succeeded) return;
-    onSuccess?.({
-      email: form.parent_email,
-      phone: form.parent_phone,
-      name: form.parent_name,
-    });
-  }, [succeeded, onSuccess, form.parent_email, form.parent_phone, form.parent_name]);
+  // Submission is a plain async handler, not a useEffect reacting to derived
+  // state — so onLeadCaptured/onDone fire exactly once, deterministically,
+  // right when the server call resolves. (An effect-based version of this
+  // used to double-fire in dev under React Strict Mode's intentional
+  // double-invocation of effects.)
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    trackEvent("booking_form_submit", { source });
+    const fd = new FormData(e.currentTarget);
+    setPending(true);
+    const res = await submitStrategyLead(fd);
+    setPending(false);
+    setResult(res);
 
-  // After a failed submit, jump to the first errored field.
-  useEffect(() => {
-    if (state?.status !== "error") return;
-    if (Object.keys(state.fieldErrors).length === 0) return;
-    const formEl = formRef.current;
-    if (!formEl) return;
-    const firstErr = formEl.querySelector<HTMLElement>(".field.error");
-    if (!firstErr) return;
-    firstErr.scrollIntoView({ behavior: "smooth", block: "center" });
-    firstErr
-      .querySelector<HTMLElement>("input, textarea, select")
-      ?.focus({ preventScroll: true });
-  }, [state]);
+    if (res.status === "error") {
+      // Jump to the first errored field once the error markup has rendered.
+      requestAnimationFrame(() => {
+        const formEl = formRef.current;
+        const firstErr = formEl?.querySelector<HTMLElement>(".field.error");
+        firstErr?.scrollIntoView({ behavior: "smooth", block: "center" });
+        firstErr
+          ?.querySelector<HTMLElement>("input, textarea, select")
+          ?.focus({ preventScroll: true });
+      });
+      return;
+    }
+
+    if (res.status === "success") {
+      onLeadCaptured({
+        email: form.parent_email,
+        phone: form.parent_phone,
+        name: form.parent_name,
+      });
+    }
+    onDone();
+  }
 
   return (
     <div className="booking-embed" aria-labelledby="strategy-heading">
@@ -145,18 +150,7 @@ export function StrategyLeadForm({
         aria-label="Strategy session request form"
         noValidate
         style={{ display: "block", marginTop: 32 }}
-        // We dispatch the action manually instead of via `action={formAction}`.
-        // React 19 auto-resets a form submitted through `action=`, and that
-        // reset mutates <select>/checkbox/radio DOM out from under React so
-        // their controlled values are lost on a validation-error re-render.
-        // Snapshotting FormData here and dispatching in a transition avoids the
-        // auto-reset entirely, so every field survives a failed submit.
-        onSubmit={(e) => {
-          e.preventDefault();
-          trackEvent("booking_form_submit", { source });
-          const fd = new FormData(e.currentTarget);
-          startTransition(() => formAction(fd));
-        }}
+        onSubmit={handleSubmit}
       >
         <input type="hidden" name="source" value={source} />
         <input
@@ -299,7 +293,7 @@ export function StrategyLeadForm({
           required
         />
 
-        {state?.status === "error" && state.formError && (
+        {result?.status === "error" && result.formError && (
           <div
             role="alert"
             style={{
@@ -311,7 +305,7 @@ export function StrategyLeadForm({
               marginTop: 16,
             }}
           >
-            {state.formError}
+            {result.formError}
           </div>
         )}
 

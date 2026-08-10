@@ -11,12 +11,10 @@ import {
 } from "react";
 import { StrategyLeadForm } from "@/components/strategy/StrategyLeadForm";
 import {
-  setPixelUserData,
-  trackEvent,
-  trackPixel,
+  trackLeadSubmitted,
+  trackScheduleOpened,
   type PixelUserData,
 } from "@/lib/analytics";
-import { recordStrategyLead } from "./leadCapture";
 
 // The single, canonical CTA label. Do not vary this anywhere on the page.
 export const CTA_LABEL = "Book Your FREE Strategy Session";
@@ -49,25 +47,20 @@ export function StrategyBookingProvider({ children }: { children: ReactNode }) {
   const openForm = useCallback((src: string) => {
     setSource(src);
     setMode("form");
-    // Ad-optimisation + attribution, mirroring the previous CTA behaviour.
-    trackPixel("Schedule", { content_name: "strategy_session", source: src });
-    trackEvent("book_strategy_session", { source: src });
-    recordStrategyLead(src);
+    trackScheduleOpened(src);
   }, []);
 
-  // Fired once the form submits successfully (validation passed on the server).
-  // This is the real "lead captured" moment — it's the Meta `Lead` conversion
-  // Ads Manager should optimise toward, not the earlier form-open `Schedule`.
-  const onFormSuccess = useCallback(
-    (userData: PixelUserData) => {
-      // Attach Advanced Matching first so the Lead event carries it.
-      setPixelUserData(userData);
-      trackPixel("Lead", { content_name: "strategy_session", source });
-      trackEvent("booking_complete", {});
-      setMode("calendar");
-    },
+  // Fired only for a genuine (non-bot) submission — this is the real "lead
+  // captured" moment, the Meta `Lead` conversion Ads Manager should optimise
+  // toward, not the earlier form-open `Schedule`.
+  const onLeadCaptured = useCallback(
+    (userData: PixelUserData) => trackLeadSubmitted(source, userData),
     [source],
   );
+
+  // Reveals the calendar. Fires for both a genuine lead and a honeypot catch
+  // (via StrategyLeadForm's onDone), so a bot never learns the trap exists.
+  const onDone = useCallback(() => setMode("calendar"), []);
 
   const close = useCallback(() => setMode("idle"), []);
 
@@ -123,7 +116,8 @@ export function StrategyBookingProvider({ children }: { children: ReactNode }) {
             {mode === "form" ? (
               <StrategyLeadForm
                 source={source}
-                onSuccess={onFormSuccess}
+                onDone={onDone}
+                onLeadCaptured={onLeadCaptured}
                 heading="Tell us about your child"
                 lead="Two minutes now. Next, you'll pick a time that works for your family."
                 submitLabel={CTA_LABEL}
