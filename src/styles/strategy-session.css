@@ -514,6 +514,17 @@
   padding-top: 16px;
 }
 
+/* ---------- BOOKED PAGE (standalone, reached via /strategy-session/booked) ---------- */
+.mkt-root .ss-booked {
+  padding: 48px 16px 64px;
+  display: flex;
+  justify-content: center;
+}
+.mkt-root .ss-booked-card {
+  width: 100%;
+  max-width: 620px;
+}
+
 /* ---------- CALENDAR REVEAL ---------- */
 .mkt-root .ss-calendar-title {
   font-size: clamp(24px, 3.4vw, 30px);
@@ -792,5 +803,8 @@
   }
   .mkt-root .ss-calendar-frame iframe {
     min-height: 520px;
+  }
+  .mkt-root .ss-booked {
+    padding: 24px 16px 48px;
   }
 }

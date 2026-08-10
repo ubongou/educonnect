@@ -10,21 +10,13 @@ import {
   type ReactNode,
 } from "react";
 import { StrategyLeadForm } from "@/components/strategy/StrategyLeadForm";
-import {
-  trackLeadSubmitted,
-  trackScheduleOpened,
-  type PixelUserData,
-} from "@/lib/analytics";
+import { trackScheduleOpened, type PixelUserData } from "@/lib/analytics";
+import { stashLead } from "./leadHandoff";
 
 // The single, canonical CTA label. Do not vary this anywhere on the page.
 export const CTA_LABEL = "Book Your FREE Strategy Session";
 
-// Google Calendar appointment scheduler shown in-page after the form is sent.
-// The visitor never leaves joinmasani.com.
-const CALENDAR_SRC =
-  "https://calendar.google.com/calendar/appointments/schedules/AcZssZ3Pw7m0MEzTPPhxFpcJwv58pLksiCgsVN_N5_ioZlWsjkaujmxDI6fn0eAxPKJ4EDtC5tQcWmdL?gv=true";
-
-type Mode = "idle" | "form" | "calendar";
+type Mode = "idle" | "form";
 
 type BookingContextValue = { openForm: (source: string) => void };
 
@@ -41,7 +33,6 @@ export function useStrategyBooking(): BookingContextValue {
 export function StrategyBookingProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<Mode>("idle");
   const [source, setSource] = useState("ss-hero");
-  const calendarRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
 
   const openForm = useCallback((src: string) => {
@@ -50,17 +41,21 @@ export function StrategyBookingProvider({ children }: { children: ReactNode }) {
     trackScheduleOpened(src);
   }, []);
 
-  // Fired only for a genuine (non-bot) submission — this is the real "lead
-  // captured" moment, the Meta `Lead` conversion Ads Manager should optimise
-  // toward, not the earlier form-open `Schedule`.
+  // Fired only for a genuine (non-bot) submission. Stashes the lead for
+  // /strategy-session/booked to pick up — that page fires the Meta `Lead`
+  // event on its own load (a real page load, not a button click), which is
+  // what actually confirmed a submission happened rather than merely clicked.
   const onLeadCaptured = useCallback(
-    (userData: PixelUserData) => trackLeadSubmitted(source, userData),
+    (userData: PixelUserData) => stashLead({ ...userData, source }),
     [source],
   );
 
-  // Reveals the calendar. Fires for both a genuine lead and a honeypot catch
-  // (via StrategyLeadForm's onDone), so a bot never learns the trap exists.
-  const onDone = useCallback(() => setMode("calendar"), []);
+  // Navigates to the booking page. Fires for both a genuine lead and a
+  // honeypot catch (via StrategyLeadForm's onDone), so a bot never learns the
+  // trap exists — it just sees the same "success" page a real lead would.
+  const onDone = useCallback(() => {
+    window.location.href = "/strategy-session/booked";
+  }, []);
 
   const close = useCallback(() => setMode("idle"), []);
 
@@ -80,14 +75,6 @@ export function StrategyBookingProvider({ children }: { children: ReactNode }) {
       document.removeEventListener("keydown", onKey);
     };
   }, [open, close]);
-
-  // On successful submit, bring the freshly revealed calendar into view.
-  useEffect(() => {
-    if (mode !== "calendar") return;
-    const el = dialogRef.current;
-    if (el) el.scrollTop = 0;
-    calendarRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [mode]);
 
   return (
     <BookingContext.Provider value={{ openForm }}>
@@ -113,44 +100,23 @@ export function StrategyBookingProvider({ children }: { children: ReactNode }) {
               ×
             </button>
 
-            {mode === "form" ? (
-              <StrategyLeadForm
-                source={source}
-                onDone={onDone}
-                onLeadCaptured={onLeadCaptured}
-                heading="Tell us about your child"
-                lead="Two minutes now. Next, you'll pick a time that works for your family."
-                submitLabel={CTA_LABEL}
-                reassurance={
-                  <>
-                    <ShieldIcon />
-                    <span>
-                      We only use your details to prepare for your session. We
-                      never share them.
-                    </span>
-                  </>
-                }
-              />
-            ) : (
-              <div className="ss-calendar" ref={calendarRef}>
-                <h2 className="ss-calendar-title">
-                  Pick a time for your free session
-                </h2>
-                <p className="ss-calendar-lead">
-                  Thanks — your details are on their way to us. Choose a slot
-                  below and you&apos;re booked.
-                </p>
-                <div className="ss-calendar-frame">
-                  <iframe
-                    src={CALENDAR_SRC}
-                    title="Masani appointment scheduling"
-                    width="100%"
-                    height={600}
-                    style={{ border: 0 }}
-                  />
-                </div>
-              </div>
-            )}
+            <StrategyLeadForm
+              source={source}
+              onDone={onDone}
+              onLeadCaptured={onLeadCaptured}
+              heading="Tell us about your child"
+              lead="Two minutes now. Next, you'll pick a time that works for your family."
+              submitLabel={CTA_LABEL}
+              reassurance={
+                <>
+                  <ShieldIcon />
+                  <span>
+                    We only use your details to prepare for your session. We
+                    never share them.
+                  </span>
+                </>
+              }
+            />
           </div>
         </div>
       )}
