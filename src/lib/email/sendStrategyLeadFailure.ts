@@ -9,6 +9,7 @@ import {
   timelineLabel,
   contactMethodLabel,
   type StrategyLeadInput,
+  resolveCountry,
 } from "@/lib/strategy/schema";
 
 export type SendStrategyLeadFailureResult =
@@ -43,7 +44,7 @@ export async function sendStrategyLeadFailureEmail(
     ["Full name", input.parent_name],
     ["Email", input.parent_email],
     ["Phone", input.parent_phone],
-    ["Country", input.country],
+    ["Country", resolveCountry(input)],
     ["Child's age", ageRangeLabel[input.child_age_range]],
     ["School level", schoolLevelLabel[input.school_level]],
     ["Tutored before", tutoredBeforeLabel[input.tutored_before]],

@@ -54,6 +54,7 @@ export async function submitStrategyLead(
     tutored_before: String(formData.get("tutored_before") ?? ""),
     timeline: String(formData.get("timeline") ?? ""),
     country: String(formData.get("country") ?? ""),
+    country_other: String(formData.get("country_other") ?? ""),
     parent_phone: String(formData.get("parent_phone") ?? ""),
     subjects,
     subject_other: String(formData.get("subject_other") ?? ""),

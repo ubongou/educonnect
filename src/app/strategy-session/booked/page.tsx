@@ -6,7 +6,7 @@ import { BookedCalendar } from "./BookedCalendar";
 // navigation from StrategyBooking's onDone) — not meant to be indexed,
 // bookmarked, or linked to directly.
 export const metadata: Metadata = {
-  title: "Pick a time for your free session | Masani",
+  title: "One last step: pick your time | Masani",
   robots: { index: false, follow: false },
 };
 
@@ -29,6 +29,12 @@ export default function StrategySessionBookedPage() {
           </div>
         </section>
       </main>
+
+      <footer className="ss-footer" aria-label="Site footer">
+        <div className="container">
+          <p className="ss-foot-copy">© 2026 Masani · joinmasani.com</p>
+        </div>
+      </footer>
     </div>
   );
 }

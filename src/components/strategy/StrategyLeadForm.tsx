@@ -17,7 +17,7 @@ import {
   contactMethodLabel,
   type StrategySubject,
 } from "@/lib/strategy/schema";
-import { COUNTRIES } from "@/lib/strategy/countries";
+import { COUNTRIES, COUNTRY_OTHER } from "@/lib/strategy/countries";
 import {
   submitStrategyLead,
   type SubmitStrategyLeadResult,
@@ -52,6 +52,7 @@ type ScalarField =
   | "tutored_before"
   | "timeline"
   | "country"
+  | "country_other"
   | "parent_phone"
   | "subject_other"
   | "parent_email"
@@ -64,6 +65,7 @@ const EMPTY_FORM: Record<ScalarField, string> = {
   tutored_before: "",
   timeline: "",
   country: "",
+  country_other: "",
   parent_phone: "",
   subject_other: "",
   parent_email: "",
@@ -138,10 +140,12 @@ export function StrategyLeadForm({
   }
 
   return (
+    // h2, not h1: this renders inside a modal on top of the landing page, which
+    // already owns the document's h1.
     <div className="booking-embed" aria-labelledby="strategy-heading">
-      <h1 id="strategy-heading" style={{ marginTop: 14 }}>
+      <h2 id="strategy-heading" style={{ marginTop: 14 }}>
         {heading}
-      </h1>
+      </h2>
       <p className="lead">{lead}</p>
 
       <form
@@ -235,6 +239,17 @@ export function StrategyLeadForm({
           error={errs.country}
           required
         />
+
+        {form.country === COUNTRY_OTHER && (
+          <TextField
+            label="Which country?"
+            name="country_other"
+            value={form.country_other}
+            onChange={setField("country_other")}
+            error={errs.country_other}
+            required
+          />
+        )}
 
         <TextField
           label="Phone number"
@@ -344,12 +359,18 @@ export function StrategyLeadForm({
 // All controlled: value + onChange, so nothing is ever lost on re-render.
 // -----------------------------------------------------------------------------
 
+// Radio and checkbox groups can't use a <label> (they label a group, not one
+// control), so they get a <span>. These values MUST stay in sync with the
+// `.field label` rule in marketing.css — when they drifted, half the form's
+// questions rendered small and grey and the other half large and black, which
+// reads as an unfinished form on the one screen where polish signals safety.
 const labelStyle: React.CSSProperties = {
-  fontWeight: 700,
-  fontSize: 15,
-  marginBottom: 10,
-  color: "#04131C",
   display: "block",
+  fontSize: 13,
+  fontWeight: 500,
+  color: "var(--ink-2)",
+  marginBottom: 8,
+  letterSpacing: "0.02em",
 };
 
 function FieldError({ id, error }: { id?: string; error?: string }) {

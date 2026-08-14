@@ -7,6 +7,7 @@ import {
   timelineLabel,
   contactMethodLabel,
   type StrategyLeadInput,
+  resolveCountry,
 } from "@/lib/strategy/schema";
 
 export type SheetExportResult =
@@ -39,7 +40,7 @@ export async function appendToGoogleSheet(
     full_name: input.parent_name,
     email: input.parent_email,
     phone: input.parent_phone,
-    country: input.country,
+    country: resolveCountry(input),
     child_age_range: ageRangeLabel[input.child_age_range],
     school_level: schoolLevelLabel[input.school_level],
     tutored_before: tutoredBeforeLabel[input.tutored_before],

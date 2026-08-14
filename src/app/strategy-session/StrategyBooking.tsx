@@ -14,7 +14,13 @@ import { trackScheduleOpened, type PixelUserData } from "@/lib/analytics";
 import { stashLead } from "./leadHandoff";
 
 // The single, canonical CTA label. Do not vary this anywhere on the page.
-export const CTA_LABEL = "Book Your FREE Strategy Session";
+export const CTA_LABEL = "Get My Child's FREE Learning Plan";
+
+// The form's submit button is deliberately NOT the CTA label. Submitting does
+// not book anything — it opens the calendar. A button that says "Book…" makes
+// some share of parents believe they are finished and close the tab one step
+// short of the only action that produces a consultation.
+export const FORM_SUBMIT_LABEL = "Continue to pick your time";
 
 type Mode = "idle" | "form";
 
@@ -61,18 +67,51 @@ export function StrategyBookingProvider({ children }: { children: ReactNode }) {
 
   const open = mode !== "idle";
 
-  // Lock body scroll + wire Escape while the modal is open.
+  // Lock body scroll, wire Escape, move focus into the dialog and keep Tab
+  // inside it while it is open. Without the trap, tabbing out of the form lands
+  // on the page behind the overlay with no visible focus ring.
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
     document.body.style.overflow = "hidden";
+
+    // Focus the card itself rather than the first field: auto-focusing a
+    // <select> on a phone scrolls the modal and can pop a native picker before
+    // the visitor has read the heading.
+    dialogRef.current?.focus();
+
+    const FOCUSABLE =
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
+      if (e.key === "Escape") {
+        close();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const card = dialogRef.current;
+      if (!card) return;
+      const items = [...card.querySelectorAll<HTMLElement>(FOCUSABLE)].filter(
+        (el) => el.offsetParent !== null,
+      );
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
+
     document.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = prev;
       document.removeEventListener("keydown", onKey);
+      previouslyFocused?.focus?.();
     };
   }, [open, close]);
 
@@ -90,7 +129,7 @@ export function StrategyBookingProvider({ children }: { children: ReactNode }) {
             if (e.target === e.currentTarget) close();
           }}
         >
-          <div className="ss-modal-card" ref={dialogRef}>
+          <div className="ss-modal-card" ref={dialogRef} tabIndex={-1}>
             <button
               type="button"
               className="ss-modal-close"
@@ -105,14 +144,14 @@ export function StrategyBookingProvider({ children }: { children: ReactNode }) {
               onDone={onDone}
               onLeadCaptured={onLeadCaptured}
               heading="Tell us about your child"
-              lead="Two minutes now. Next, you'll pick a time that works for your family."
-              submitLabel={CTA_LABEL}
+              lead="This is what we build the plan from. Two minutes now, then you pick a time for the call."
+              submitLabel={FORM_SUBMIT_LABEL}
               reassurance={
                 <>
                   <ShieldIcon />
                   <span>
-                    We only use your details to prepare for your session. We
-                    never share them.
+                    We only use your details to prepare for your call. We never
+                    share them.
                   </span>
                 </>
               }

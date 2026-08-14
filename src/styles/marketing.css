@@ -408,9 +408,12 @@
   align-items: center;
   margin-bottom: 18px;
 }
+/* flex-start, not center: on a phone this line wraps to two or three lines, and
+   centring left the dot floating in the gap between them looking like a stray
+   bullet. It now sits against the first line where it reads as a marker. */
 .mkt-root .hero-microcopy {
-  display: inline-flex;
-  align-items: center;
+  display: flex;
+  align-items: flex-start;
   gap: 10px;
   font-size: 14px;
   color: var(--ink-3);
@@ -422,6 +425,11 @@
   background: var(--sky);
   display: inline-block;
   box-shadow: 0 0 0 4px rgba(62, 190, 255, 0.18);
+}
+/* Optical centring against the first line of 14px/1.5 text. */
+.mkt-root .hero-microcopy .dot {
+  flex: 0 0 auto;
+  margin-top: 7px;
 }
 
 .mkt-root .hero-visual {
@@ -1465,24 +1473,42 @@
 }
 
 /* ---------- REVEAL ANIMATION ---------- */
+/* Content is visible by DEFAULT and only hidden inside `scripting: enabled`.
+   Previously `.reveal` was unconditionally `opacity: 0` and relied on an
+   IntersectionObserver to bring it back — so with JS disabled or blocked, every
+   marketing section below the hero was permanently invisible and the page had
+   no readable content at all. A browser too old to understand `scripting`
+   ignores the whole block and simply shows everything, which is the safe way to
+   fail. */
 .mkt-root .reveal {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
-}
-.mkt-root .reveal.visible {
   opacity: 1;
   transform: none;
 }
-.mkt-root .reveal.delay-1 {
-  transition-delay: 0.08s;
+
+@media (scripting: enabled) {
+  /* Fast on purpose. At 0.8s a quickly-scrolling phone visitor — the norm on ad
+     traffic — outran the animation and saw blank sections where the content
+     should be. Short enough to read as polish, not as a loading state. */
+  .mkt-root .reveal {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .mkt-root .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+  .mkt-root .reveal.delay-1 {
+    transition-delay: 0.04s;
+  }
+  .mkt-root .reveal.delay-2 {
+    transition-delay: 0.08s;
+  }
+  .mkt-root .reveal.delay-3 {
+    transition-delay: 0.12s;
+  }
 }
-.mkt-root .reveal.delay-2 {
-  transition-delay: 0.16s;
-}
-.mkt-root .reveal.delay-3 {
-  transition-delay: 0.24s;
-}
+
 @media (prefers-reduced-motion: reduce) {
   .mkt-root .reveal {
     opacity: 1;

@@ -101,10 +101,67 @@
 }
 .mkt-root .ss-cta-note {
   display: inline-flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   font-size: 14px;
   color: var(--ink-3);
+}
+/* Same wrapped-line fix as .hero-microcopy — see marketing.css. */
+.mkt-root .ss-cta-note .dot {
+  flex: 0 0 auto;
+  margin-top: 7px;
+}
+
+/* ---------- OFFER SPLIT (what happens on the call vs. what you keep) ------- */
+.mkt-root .ss-offer-split {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 20px;
+  align-items: start;
+  max-width: 940px;
+  margin: 0 auto;
+}
+.mkt-root .ss-offer-col {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 28px 26px;
+}
+/* The plan is the product the ad promised, so it carries the visual weight. */
+.mkt-root .ss-offer-col.is-primary {
+  border-color: rgba(62, 190, 255, 0.45);
+  box-shadow: 0 18px 44px -28px rgba(4, 19, 28, 0.35);
+}
+.mkt-root .ss-offer-col h3 {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 18px;
+}
+.mkt-root .ss-offer-col.is-primary h3 {
+  color: var(--sky);
+}
+.mkt-root .ss-offer-col ul {
+  list-style: none;
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+}
+.mkt-root .ss-offer-col li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 15.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.mkt-root .ss-offer-col .ss-check-ico {
+  flex: 0 0 auto;
+  margin-top: 3px;
+  color: var(--sky);
 }
 
 /* ---------- CHECKLISTS (problem + offer) ---------- */
@@ -151,6 +208,20 @@
   font-size: clamp(20px, 2.4vw, 26px);
   letter-spacing: -0.02em;
   color: var(--ink);
+}
+/* A longer, quieter variant. The display weight above is built for a single
+   punchy line; a 50-word caveat set in it reads as a wall rather than as the
+   candid aside it is meant to be. */
+.mkt-root .ss-closing.is-note {
+  font-family: inherit;
+  font-weight: 400;
+  font-size: 15.5px;
+  line-height: 1.65;
+  letter-spacing: 0;
+  color: var(--ink-2);
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* ---------- WHY (reuses .pillars/.pillar with .ss icons) ---------- */
@@ -214,6 +285,11 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 18px;
+}
+/* The steps now sit inside the offer section, below the candour note, rather
+   than in a section of their own. */
+.mkt-root .ss-closing + .ss-steps {
+  margin-top: 34px;
 }
 .mkt-root .ss-step {
   background: #fff;
@@ -499,7 +575,7 @@
 .mkt-root .ss-modal-card .booking-embed .eyebrow {
   margin-bottom: 10px;
 }
-.mkt-root .ss-modal-card .booking-embed h1 {
+.mkt-root .ss-modal-card .booking-embed h2 {
   font-size: clamp(24px, 3.4vw, 30px);
   letter-spacing: -0.02em;
 }
@@ -543,11 +619,42 @@
   border: 1px solid var(--line);
   background: #fff;
 }
-.mkt-root .ss-calendar-frame iframe {
+/* No max-height and no inner scrollbar: Cal auto-resizes its iframe to fit its
+   content, so the PAGE scrolls. The previous Google embed was pinned to 600px
+   and the visitor had to scroll inside a box to reach the time slots. */
+.mkt-root .ss-cal-embed {
   display: block;
   width: 100%;
-  min-height: 600px;
+  min-height: 620px;
+  overflow: visible;
+}
+.mkt-root .ss-cal-embed iframe {
+  display: block;
+  width: 100%;
   border: 0;
+}
+.mkt-root .ss-calendar-fallback {
+  margin-top: 18px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-3);
+  text-align: center;
+}
+.mkt-root .ss-calendar-fallback a {
+  color: var(--ink-2);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+/* Cal never painted — promote the fallback from fine print to the main path. */
+.mkt-root .ss-calendar-fallback.is-urgent {
+  margin-top: 20px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  color: var(--ink);
+  font-size: 15px;
 }
 
 /* ---------- HERO IMAGE FILL (rectangular photo, not a cutout) ---------- */
@@ -701,6 +808,21 @@
   padding: 48px 44px;
   text-align: center;
 }
+/* The "why this is free" section leads on the word FREE rather than on its
+   heading, so the badge is sized to act as the headline and coloured green to
+   read as a stamp rather than as one more yellow accent. #1d9e75 is the green
+   already in use on the fourth testimonial avatar. */
+.mkt-root .ss-free-badge.is-lead {
+  /* Sits on the navy .ss-whyfree card, so the green has to be a light mint
+     rather than the darker #1d9e75 used on light backgrounds. That one tested
+     nearly unreadable here. */
+  background: rgba(95, 224, 168, 0.16);
+  color: #5fe0a8;
+  font-size: clamp(16px, 2.2vw, 22px);
+  padding: 10px 24px;
+  letter-spacing: 0.06em;
+  margin-bottom: 20px;
+}
 .mkt-root .ss-free-badge {
   display: inline-flex;
   align-items: center;
@@ -784,6 +906,13 @@
     grid-template-columns: 1fr;
     gap: 12px;
   }
+  .mkt-root .ss-offer-split {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .mkt-root .ss-offer-col {
+    padding: 24px 20px;
+  }
   .mkt-root .ss-compare {
     grid-template-columns: 1fr;
   }
@@ -801,8 +930,8 @@
     border-radius: 0;
     padding: 56px 20px 32px;
   }
-  .mkt-root .ss-calendar-frame iframe {
-    min-height: 520px;
+  .mkt-root .ss-cal-embed {
+    min-height: 560px;
   }
   .mkt-root .ss-booked {
     padding: 24px 16px 48px;

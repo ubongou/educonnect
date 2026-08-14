@@ -21,6 +21,8 @@ type TrackEventMap = {
   booking_complete: Record<string, never>;
   // Strategy-session landing page (/strategy-session)
   book_strategy_session: { source: string };
+  /** The visitor picked a slot on /booked — the real business conversion. */
+  strategy_session_booked: { source: string };
   scroll_depth: { percent: 25 | 50 | 75 | 100 };
 };
 
@@ -40,9 +42,25 @@ export function trackEvent<K extends keyof TrackEventMap>(
 export function trackPixel(
   event: string,
   params?: Record<string, unknown>,
+  /** `{ eventID }` — lets a matching Conversions API event deduplicate. */
+  options?: { eventID: string },
 ): void {
   if (typeof window === "undefined" || !window.fbq) return;
-  window.fbq("track", event, params ?? {});
+  if (options) window.fbq("track", event, params ?? {}, options);
+  else window.fbq("track", event, params ?? {});
+}
+
+/**
+ * Fire a NON-standard pixel event. Use this for anything Meta doesn't already
+ * have a defined meaning for — reusing a standard event name for a different
+ * action corrupts what ad delivery learns from it.
+ */
+export function trackCustomPixel(
+  event: string,
+  params?: Record<string, unknown>,
+): void {
+  if (typeof window === "undefined" || !window.fbq) return;
+  window.fbq("trackCustom", event, params ?? {});
 }
 
 /** Customer info captured from a form, used for Meta Advanced Matching. */
@@ -81,10 +99,44 @@ export function setPixelUserData({ email, phone, name }: PixelUserData): void {
 // site never has to remember to pair them up itself.
 // -----------------------------------------------------------------------------
 
-/** Fires when the strategy-session booking modal opens (a CTA click). */
+/**
+ * Fires when the strategy-session booking modal opens (a CTA click).
+ *
+ * Deliberately a CUSTOM pixel event, not the standard `Schedule`. Meta reads
+ * `Schedule` as "an appointment was booked", and this is only "a form was
+ * opened" — sending it here would train ad delivery on modal-openers. The real
+ * `Schedule` is fired by trackBookingCompleted() below.
+ */
 export function trackScheduleOpened(source: string): void {
-  trackPixel("Schedule", { content_name: "strategy_session", source });
+  trackCustomPixel("StrategyFormOpened", {
+    content_name: "strategy_session",
+    source,
+  });
   trackEvent("book_strategy_session", { source });
+}
+
+/**
+ * Fires when the visitor actually picks a slot on /booked — i.e. a consultation
+ * exists in the calendar. THIS is the event Meta campaigns should optimise for;
+ * `Lead` (form submitted) is a diagnostic only.
+ *
+ * Cal.com's embed reports this to the parent page via its `bookingSuccessful`
+ * callback, so it fires client-side. A Cal webhook -> Conversions API relay
+ * should send the same event server-side for the ~20% of browsers that block
+ * the pixel; both carry the same event_id so Meta deduplicates them.
+ */
+export function trackBookingCompleted(
+  source: string,
+  userData: PixelUserData,
+  eventId?: string,
+): void {
+  setPixelUserData(userData);
+  trackPixel(
+    "Schedule",
+    { content_name: "strategy_session", source },
+    eventId ? { eventID: eventId } : undefined,
+  );
+  trackEvent("strategy_session_booked", { source });
 }
 
 /**

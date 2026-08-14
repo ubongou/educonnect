@@ -20,132 +20,131 @@ const HERO_IMAGE = "/brand-v2/strategy-hero.jpg";
 const HERO_HEADLINE_VARIANT: "A" | "B" | "C" = "A";
 
 const HERO_HEADLINES: Record<"A" | "B" | "C", string> = {
-  A: "Your child deserves a personalised learning strategy to help them learn smarter, grow faster, and reach their full potential.",
-  B: "A clear academic plan for your child, from Nigeria's finest teachers",
-  C: "Give your child the academic support you wish you could give yourself",
+  A: "Your child deserves a personalised learning plan to help them reach their full potential.",
+  B: "A free learning plan for your child, built around how they actually learn.",
+  C: "Give us 15 minutes about your child. We will write the plan that fits them.",
 };
 
 export const metadata: Metadata = {
-  title: "Free 15-Minute Academic Strategy Session for Your Child | Masani",
+  title: "Your Child's Free Personalised Learning Plan | Masani",
   description:
-    "Give us 15 minutes and we'll help you uncover how your child learns best, then hand you a personalised roadmap to build confidence and improve results. One-on-one tutoring for diaspora Nigerian families in the UK, US, Canada, and Australia.",
+    "Give us 15 minutes and we'll help you uncover how your child learns best, then hand you a personalised plan to build confidence and improve results",
 };
 
 // ---- Copy (kept dash-free per brand rules) ----------------------------------
 
-// What the parent leaves the session with (hero-adjacent outcomes).
-const discoverPoints = [
-  "How your child learns best",
-  "The hidden opportunities that could accelerate their academic growth",
-  "Practical recommendations tailored specifically to your child",
-  "A personalised roadmap to help them achieve lasting academic success",
+// The offer is split in two: the strategy session is the mechanism, the written
+// plan is the product. Collapsing them into one list hides the only thing the
+// parent keeps, and turns distinct deliverables into synonyms for "advice".
+const sessionPoints = [
+  "Where your child is now, what is working and what is not",
+  "Straight answers on their subjects, their exams, and what is realistic",
+  "Fifteen minutes with one of our experts",
 ];
 
-// "Is your child..." — the parent recognises their own situation here.
+const planPoints = [
+  "Your child's strengths, and the gaps worth closing first",
+  "What to do about each one, subject by subject",
+  "What you can do at home, and what needs a teacher",
+  "Written after the session and sent within 24 hours",
+];
+
+// "Does this sound like your child?" — the parent recognises their own
+// situation here. Broad on purpose: struggling, coasting and high-achieving
+// children all have a line they fit.
 const problemPoints = [
-  "Finding schoolwork more challenging than it should be?",
-  "Working hard but not seeing the results they deserve?",
-  "Losing confidence in certain subjects?",
-  "Doing well but capable of achieving even higher grades?",
-  "Preparing for important exams or school transitions?",
-  "Bright and curious, but not consistently reaching their potential?",
-  "Ready to become a more confident, independent learner?",
+  "Finding schoolwork harder than it should be?",
+  "Working hard without the results to show for it?",
+  "Losing confidence in a subject?",
+  "Doing well, but capable of more?",
+  "Facing exams or a change of school?",
+  "Bright and curious, but not consistent?",
+  "Ready to work more independently?",
 ];
 
-// What happens together during the session (the four phases).
-const approach = [
-  {
-    title: "Understand",
-    body: "Identify your child's learning strengths, challenges, and opportunities.",
-  },
-  {
-    title: "Discover",
-    body: "Uncover the learning approaches most likely to help your child thrive.",
-  },
-  {
-    title: "Plan",
-    body: "Receive personalised recommendations based on your child's unique needs, not generic advice.",
-  },
-  {
-    title: "Move forward",
-    body: "Leave with a clear roadmap you can begin using immediately, whether you continue with Masani or not.",
-  },
-];
-
-const traditionalPoints = [
-  "The same teaching style for every child",
-  "Focuses mainly on completing schoolwork",
-  "Reactive support after problems appear",
-  "Limited parent involvement",
-];
-
-const masaniPoints = [
-  "A personalised learning strategy",
-  "Individual tutor matching",
-  "Focus on confidence and long-term growth",
-  "Parents included throughout the learning journey",
-  "Recommendations tailored to your child's goals",
-];
-
-// What happens after they book.
+// The four steps live inside the offer section. They used to be a separate
+// "what happens next" block, which meant the page explained the same sequence
+// three times over.
 const steps = [
   {
     title: "Book your session",
-    body: "Choose a convenient time online.",
+    body: "Pick a time that suits you. Every slot shows in your own timezone.",
   },
   {
-    title: "Meet with an education specialist",
-    body: "We listen carefully to your concerns, learn about your child's goals, strengths, and challenges, and answer your questions.",
+    title: "Speak to an expert",
+    body: "Fifteen minutes about your child.",
   },
   {
-    title: "Receive your personalised roadmap",
-    body: "You leave with practical recommendations and a clearer understanding of the best path forward.",
+    title: "Get the personalised plan",
+    body: "Written after the session, sent within 24 hours by WhatsApp or email.",
   },
   {
-    title: "Decide your next step",
-    body: "If Masani is the right fit, we recommend the most suitable plan. If another solution is better, we tell you honestly. Your child's success always comes first.",
+    title: "Decide",
+    body: "If Masani fits your child, we say how. If not, we say that too.",
   },
+];
+
+// The comparison carries the whole "why us" argument now. The three pillar
+// cards that used to sit above it said the same things in more words, so their
+// content was folded into the right-hand column and the cards removed.
+const traditionalPoints = [
+  "The same teaching style for every child",
+  "Focused on finishing tonight's homework",
+  "Help arrives after the problem shows up",
+  "You hear how it went only if you ask",
+  "No record of what was covered",
+  "Reach them during lesson hours, if at all",
+];
+
+// Ordered by what matters most to a parent choosing: the plan first, the
+// credential last.
+const masaniPoints = [
+  "A personalised learning plan for your child",
+  "A teacher chosen from the top 3% of applicants",
+  "Built for Nigerian families abroad",
+  "Focus on confidence and long term growth",
+  "A written report after every lesson",
+  "Every class recorded, so your child can rewatch it",
+  "Progress tracked skill by skill in our online parent portal",
+  "Support 24 hours a day, 7 days a week",
+  "Backed by MIT",
 ];
 
 const faqItems: FaqItem[] = [
   {
-    question: "Is the strategy session really free?",
+    question: "Is the plan really free?",
     answer:
-      "Yes. There are no hidden fees or obligations. This session is our opportunity to understand your child's needs and give you meaningful guidance.",
+      "Yes. No hidden fees, nothing to buy. We write and send the plan whatever you decide afterwards, and tutoring is never compulsory. If we think Masani can help, we explain how. If not, we point you to what we believe is better for your child.",
   },
   {
-    question: "Is this only for children who are struggling?",
+    question: "How and when do I get the plan?",
     answer:
-      "Not at all. Many families come to us because their children are already doing well and they want to help them achieve even more. Whether your child needs support, enrichment, or preparation for future academic goals, this session is designed to give you clarity and direction.",
+      "Within 24 hours of the session, on whichever channel you told us you prefer: WhatsApp, email or text. You keep it. Nothing to log into, nothing that expires.",
   },
   {
-    question: "Will I receive recommendations even if I don't enrol?",
+    question: "Does my child need to be on the call?",
     answer:
-      "Absolutely. Our goal is for every family to leave with valuable insights and practical next steps they can put into action immediately.",
+      "No. This session is for you as the parent. Fifteen minutes on your own is usually more useful because you can speak freely about what worries you. You are welcome to have your child there, but it is not needed.",
   },
   {
-    question: "What ages do you support?",
+    question: "Who will I be speaking to?",
     answer:
-      "We work with children from primary through secondary school, across the UK, Nigerian, American, and international curricula.",
+      "One of our education experts, usually Grace or Unyime. They are also the people who write your child's plan, so nothing you say gets handed off or lost along the way.",
   },
   {
-    question: "How long does the session take?",
-    answer: "Around 15 minutes.",
-  },
-  {
-    question: "Is tutoring compulsory afterwards?",
+    question: "What ages and curricula do you cover?",
     answer:
-      "No. The strategy session is completely independent. If we believe Masani can help, we explain how. If not, we point you toward the option we believe is best for your child.",
-  },
-  {
-    question: "How are the sessions delivered?",
-    answer:
-      "Every session is one-on-one and fully online, so your child learns from home wherever your family is in the world.",
+      "Primary through secondary school, across the UK, Nigerian, American and international curricula. Every lesson is one to one and fully online, so your child learns from home wherever your family is.",
   },
   {
     question: "Can you work around our time zone?",
     answer:
-      "Yes. We schedule around your family's time zone across the UK, US, Canada, and Australia, including evenings and weekends.",
+      "Yes. When you pick a slot, every time appears in your own local time automatically, so there is nothing to convert and nothing to get wrong. We hold sessions across UK, US, Canada and Australia hours.",
+  },
+  {
+    question: "Can I reschedule if something comes up?",
+    answer:
+      "Yes. Your confirmation email has a link to reschedule or cancel in one click. You can also reply to it or message us on WhatsApp and we will sort it out.",
   },
 ];
 
@@ -218,129 +217,6 @@ function CrossIcon() {
   );
 }
 
-function ShieldIcon() {
-  return (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M9 12l2 2 4-4"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function CapIcon() {
-  return (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M12 4L2 9l10 5 10-5-10-5z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M6 11v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function GlobeIcon() {
-  return (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" />
-      <path
-        d="M3 12h18M12 3c2.5 2.5 3.8 5.7 3.8 9S14.5 18.5 12 21c-2.5-2.5-3.8-5.7-3.8-9S9.5 5.5 12 3z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-// Icons for the four session phases.
-function LensIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8" />
-      <path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-  );
-}
-function BulbIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.6 1 1 1 2v.5h6V15c0-1 .3-1.4 1-2A6 6 0 0 0 12 3z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-function MapIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinejoin="round"
-      />
-      <path d="M9 4v14M15 6v14" stroke="currentColor" strokeWidth="1.8" />
-    </svg>
-  );
-}
-function ArrowIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M5 12h14m-6-6 6 6-6 6"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-const approachIcons = [<LensIcon key="l" />, <BulbIcon key="b" />, <MapIcon key="m" />, <ArrowIcon key="a" />];
-
-const whyPoints = [
-  {
-    icon: <ShieldIcon />,
-    title: "Top 3% of applicants",
-    body: "Fewer than 3% of teachers who apply are accepted. We choose each one for their subject mastery, their empathy, and their gift for building real confidence in the students they teach.",
-  },
-  {
-    icon: <CapIcon />,
-    title: "Backed by MIT",
-    body: "Masani was selected for the MIT Social Innovation Fellowship in 2025. Our teaching is built on the same rigorous, evidence-led standards.",
-  },
-  {
-    icon: <GlobeIcon />,
-    title: "Built for diaspora families",
-    body: "The best Nigerian teachers, matched to diaspora Nigerian families who want academic excellence and cultural understanding in one place. We select and place the right teacher for your child, so you never sort through a list.",
-  },
-];
-
 // -----------------------------------------------------------------------------
 
 export default function StrategySessionPage() {
@@ -355,7 +231,7 @@ export default function StrategySessionPage() {
       />
 
       {/* Every CTA on the page opens the shared booking form in this provider's
-          modal, then reveals the calendar inline on submit. */}
+          modal, then sends the visitor to /booked to pick a time. */}
       <StrategyBookingProvider>
         <a href="#main-content" className="skip-link">
           Skip to main content
@@ -382,15 +258,14 @@ export default function StrategySessionPage() {
                   Whether they&apos;re struggling, keeping up, or already
                   excelling, every child learns differently. Give us just 15
                   minutes, and we&apos;ll help you uncover how your child learns
-                  best, then hand you a personalised roadmap to build confidence,
-                  improve academically, and reach even greater success.
+                  best. Completely free.
                 </p>
                 <div className="hero-ctas reveal delay-3">
                   <StrategyCTA source="ss-hero" />
                 </div>
                 <div className="hero-microcopy reveal delay-3">
-                  <span className="dot" aria-hidden="true" /> No obligation. No
-                  pressure. Just expert guidance built around your child.
+                  <span className="dot" aria-hidden="true" /> No obligation. Free
+                  expert guidance built around your child.
                 </div>
                 <div className="ss-trustbar reveal delay-3">
                   <span className="ss-trust-item">
@@ -400,14 +275,13 @@ export default function StrategySessionPage() {
                     ·
                   </span>
                   <span className="ss-trust-item">
-                    <CheckIcon /> Top 3% of applicants
+                    <CheckIcon /> Top 3% of teachers accepted
                   </span>
                   <span className="ss-trust-sep" aria-hidden="true">
                     ·
                   </span>
                   <span className="ss-trust-item">
-                    <CheckIcon /> Trusted by families in the UK, US, Canada, and
-                    Australia
+                    <CheckIcon /> Families in the UK, US, Canada and Australia
                   </span>
                 </div>
               </div>
@@ -461,73 +335,114 @@ export default function StrategySessionPage() {
             </div>
           </section>
 
-          {/* ---------- PROOF BAND (quantified outcomes) ---------- */}
+          {/* ---------- 2. PROOF BAND ----------
+              Reads as a timeline: what you notice first, what the school
+              notices next, how long families end up staying. */}
           <section className="ss-proof" aria-label="Results families see">
             <div className="container ss-proof-grid">
               <div className="ss-proof-item reveal">
                 <div className="ss-proof-num">3 years</div>
                 <div className="ss-proof-label">
-                  The average time families stay with Masani
+                  How long families stay with us
                 </div>
               </div>
               <div className="ss-proof-item reveal">
-                <div className="ss-proof-num">First month</div>
+                <div className="ss-proof-num">Month one</div>
                 <div className="ss-proof-label">
-                  When many families start seeing results
+                  When you start to notice the difference
                 </div>
               </div>
               <div className="ss-proof-item reveal">
-                <div className="ss-proof-num">Higher grades</div>
+                <div className="ss-proof-num">3 months</div>
                 <div className="ss-proof-label">
-                  Students move up as skills and confidence grow
+                  Parents report better grades and more confidence
                 </div>
               </div>
             </div>
           </section>
 
-          {/* ---------- 2. WHAT YOU'LL DISCOVER ---------- */}
+          {/* ---------- 3. WHAT YOU GET ----------
+              Merged from three former sections: "what you'll discover", "what
+              the session is", and "what happens next". */}
           <section className="ss-section">
             <div className="container">
               <div className="ss-head reveal">
-                <h2>
-                  During your free 15-minute academic strategy session, you&apos;ll
-                  discover:
-                </h2>
+                <h2>What you get</h2>
+                <p>
+                  A 15 minute strategy session, then your child&apos;s
+                  personalised plan in writing.
+                </p>
               </div>
-              <div className="ss-checklist ss-offer">
-                {discoverPoints.map((point, i) => (
-                  <div key={i} className="ss-check reveal">
-                    <span className="ss-check-ico">
-                      <CheckIcon />
-                    </span>
-                    <span>{point}</span>
+
+              <div className="ss-offer-split">
+                <div className="ss-offer-col reveal">
+                  <h3>The session</h3>
+                  <ul>
+                    {sessionPoints.map((point, i) => (
+                      <li key={i}>
+                        <span className="ss-check-ico">
+                          <CheckIcon />
+                        </span>
+                        <span>{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* The plan is the product, so it gets the visual weight. */}
+                <div className="ss-offer-col is-primary reveal">
+                  <h3>The plan</h3>
+                  <ul>
+                    {planPoints.map((point, i) => (
+                      <li key={i}>
+                        <span className="ss-check-ico">
+                          <CheckIcon />
+                        </span>
+                        <span>{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Answers "how can you know anything in 15 minutes?" by removing
+                  the constraint rather than defending it. */}
+              <p className="ss-closing is-note reveal">
+                Fifteen minutes may not be enough. If it isn&apos;t, we book
+                another session, still free, until we know your child well
+                enough to write the plan properly.
+              </p>
+
+              <div className="ss-steps">
+                {steps.map((step, i) => (
+                  <div key={i} className="ss-step reveal">
+                    <div className="ss-step-num">
+                      {String(i + 1).padStart(2, "0")}
+                    </div>
+                    <h3>{step.title}</h3>
+                    <p>{step.body}</p>
                   </div>
                 ))}
               </div>
+
               <div className="ss-cta-row reveal">
                 <StrategyCTA source="ss-discover" />
                 <span className="ss-cta-note">
-                  <span className="dot" aria-hidden="true" /> No obligation. Just
-                  expert guidance designed around your child.
+                  <span className="dot" aria-hidden="true" /> Completely free.
+                  Fifteen minutes.
                 </span>
               </div>
             </div>
           </section>
 
-          {/* ---------- 3. THE PROBLEM ---------- */}
+          {/* ---------- 4. DOES THIS SOUND LIKE YOUR CHILD? ---------- */}
           <section className="ss-section ss-alt">
             <div className="container">
               <div className="ss-head reveal">
-                <h2>
-                  Every child learns differently. The right strategy makes all
-                  the difference.
-                </h2>
+                <h2>Does this sound like your child?</h2>
                 <p>
-                  Some children need extra support. Some simply need a different
-                  approach. Others are already performing well and could achieve
-                  even more. The challenge is rarely intelligence. It is finding
-                  the learning approach that works best for your child. That is
-                  why we begin with understanding, not assumptions.
+                  Your child does not lack ability. Nobody has looked closely
+                  enough to work out how they learn best.
                 </p>
               </div>
               <div className="ss-checklist ss-problem">
@@ -541,79 +456,25 @@ export default function StrategySessionPage() {
                 ))}
               </div>
               <p className="ss-closing reveal">
-                Wherever your child is today, the right strategy can help them
-                move forward.
+                Every term you wait is a term they do not get back.
               </p>
               <div className="ss-cta-row reveal">
                 <StrategyCTA source="ss-problem" />
                 <span className="ss-cta-note">
-                  <span className="dot" aria-hidden="true" /> No cost. No
-                  obligation. Booking takes 2 minutes.
+                  <span className="dot" aria-hidden="true" /> Completely free. No
+                  obligation.
                 </span>
               </div>
             </div>
           </section>
 
-          {/* ---------- 4. WHAT THE SESSION IS ---------- */}
+          {/* ---------- 5. WHY FAMILIES CHOOSE MASANI ----------
+              Table only. The three pillar cards that used to sit above it are
+              folded into the right-hand column. */}
           <section className="ss-section">
-            <div className="container">
-              <div className="ss-head reveal">
-                <h2>A planning session focused entirely on your child</h2>
-                <p>
-                  This isn&apos;t a tutoring sales call. It is a personalised
-                  academic planning session focused entirely on your child.
-                  Together we&apos;ll help you:
-                </p>
-              </div>
-              <div className="ss-approach">
-                {approach.map((item, i) => (
-                  <div key={i} className="ss-approach-card reveal">
-                    <div className="icon">{approachIcons[i]}</div>
-                    <h3>{item.title}</h3>
-                    <p>{item.body}</p>
-                  </div>
-                ))}
-              </div>
-              <p className="ss-closing reveal">
-                Our goal isn&apos;t simply better grades. It is helping your child
-                become a more confident learner for years to come.
-              </p>
-            </div>
-          </section>
-
-          {/* ---------- 5. WHY MASANI ---------- */}
-          <section className="ss-section ss-alt ss-why">
             <div className="container">
               <div className="ss-head reveal">
                 <h2>Why families choose Masani</h2>
-              </div>
-              <div className="pillars">
-                {whyPoints.map((point, i) => (
-                  <div key={i} className={`pillar p${i + 1} reveal`}>
-                    <div className="icon">{point.icon}</div>
-                    <h3>{point.title}</h3>
-                    <p>{point.body}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* ---------- 6. WHAT MAKES MASANI DIFFERENT ---------- */}
-          <section className="ss-section">
-            <div className="container">
-              <div className="ss-head reveal">
-                <h2>What makes Masani different</h2>
-              </div>
-              <div className="ss-prose reveal">
-                <p>
-                  Every child deserves more than one-size-fits-all tutoring. We
-                  believe meaningful progress begins with understanding the
-                  child, not just the curriculum. Our approach combines
-                  experienced educators, personalised learning strategies, and
-                  ongoing support to help children build confidence, improve
-                  performance, and enjoy learning again.
-                </p>
               </div>
               <div className="ss-compare">
                 <div className="ss-compare-card is-old reveal">
@@ -646,7 +507,7 @@ export default function StrategySessionPage() {
             </div>
           </section>
 
-          {/* ---------- 7. SOCIAL PROOF ---------- */}
+          {/* ---------- 6. SOCIAL PROOF ---------- */}
           <section className="ss-section ss-alt">
             <div className="container">
               <div className="ss-head reveal">
@@ -678,73 +539,39 @@ export default function StrategySessionPage() {
               <div className="ss-cta-row reveal">
                 <StrategyCTA source="ss-testimonials" />
                 <span className="ss-cta-note">
-                  <span className="dot" aria-hidden="true" /> No cost. No
-                  obligation. Booking takes 2 minutes.
+                  <span className="dot" aria-hidden="true" /> Completely free.
+                  Fifteen minutes.
                 </span>
               </div>
             </div>
           </section>
 
-          {/* ---------- 8. WHAT HAPPENS NEXT ---------- */}
+          {/* ---------- 7. WHY THIS IS FREE ---------- */}
           <section className="ss-section">
             <div className="container">
-              <div className="ss-head reveal">
-                <h2>Here&apos;s what happens next</h2>
-              </div>
-              <div className="ss-steps">
-                {steps.map((step, i) => (
-                  <div key={i} className="ss-step reveal">
-                    <div className="ss-step-num">
-                      {String(i + 1).padStart(2, "0")}
-                    </div>
-                    <h3>{step.title}</h3>
-                    <p>{step.body}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* ---------- 9. WHY WE OFFER THIS FREE ---------- */}
-          <section className="ss-section ss-alt">
-            <div className="container">
               <div className="ss-whyfree reveal">
-                <span className="ss-free-badge">Completely free</span>
-                <h2>Why we offer this session free</h2>
+                <span className="ss-free-badge is-lead">Completely free</span>
+                <h2>Why this is free</h2>
                 <p>
-                  Choosing the right educational support shouldn&apos;t involve
-                  guesswork. We believe parents deserve clarity before making
-                  important decisions about their child&apos;s learning.
+                  You should not have to guess whether we are any good. Read the
+                  plan, judge it yourself, then decide.
                 </p>
                 <p>
-                  That is why this session is completely free. No obligation. No
-                  pressure. Just thoughtful guidance from educators who genuinely
-                  care about helping children succeed.
+                  Fifteen minutes with an educator who cares whether your child
+                  does well. The sooner we speak, the sooner you have the plan.
                 </p>
               </div>
               <div className="ss-cta-row reveal">
                 <StrategyCTA source="ss-whyfree" />
                 <span className="ss-cta-note">
-                  <span className="dot" aria-hidden="true" /> No cost. No
-                  obligation. Booking takes 2 minutes.
+                  <span className="dot" aria-hidden="true" /> Completely free. No
+                  obligation.
                 </span>
               </div>
             </div>
           </section>
 
-          {/* ---------- 10. FAQ ---------- */}
-          <section className="ss-section ss-faq">
-            <div className="container">
-              <div className="ss-head reveal">
-                <h2>Frequently asked questions</h2>
-              </div>
-              <div className="reveal">
-                <StrategyFAQ items={faqItems} />
-              </div>
-            </div>
-          </section>
-
-          {/* ---------- 11. FINAL CTA ---------- */}
+          {/* ---------- 8. THE CLOSE ---------- */}
           <section className="ss-final">
             <div className="ss-final-content">
               <h2 className="reveal">
@@ -764,6 +591,20 @@ export default function StrategySessionPage() {
                   Help your child learn smarter, grow faster, and reach their
                   full potential.
                 </span>
+              </div>
+            </div>
+          </section>
+
+          {/* ---------- 9. FAQ ----------
+              Sits below the close on purpose. It answers doubts for the
+              visitor who did not act, rather than delaying the one who would. */}
+          <section className="ss-section ss-alt ss-faq">
+            <div className="container">
+              <div className="ss-head reveal">
+                <h2>Frequently asked questions</h2>
+              </div>
+              <div className="reveal">
+                <StrategyFAQ items={faqItems} />
               </div>
             </div>
           </section>

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { COUNTRY_OTHER } from "./countries";
 
 // -----------------------------------------------------------------------------
 // Strategy-session landing-page lead form.
@@ -130,6 +131,9 @@ export const strategyLeadSchema = z
     }),
     timeline: z.enum(timelineValues, { message: "Pick a timeframe" }),
     country: z.string().trim().min(1, "Select your country").max(80),
+    // Only used when country === "Other". Kept separate so the dropdown can
+    // stay short without losing where the family actually lives.
+    country_other: z.string().trim().max(80).default(""),
     parent_phone: z
       .string()
       .trim()
@@ -148,7 +152,18 @@ export const strategyLeadSchema = z
   .refine(
     (data) => !data.subjects.includes("other") || data.subject_other.length > 0,
     { message: "Please specify the other subject", path: ["subject_other"] },
+  )
+  .refine(
+    (data) => data.country !== COUNTRY_OTHER || data.country_other.length > 0,
+    { message: "Tell us which country", path: ["country_other"] },
   );
+
+/** The country to record: the free-text answer when "Other" was picked. */
+export function resolveCountry(input: StrategyLeadInput): string {
+  return input.country === COUNTRY_OTHER && input.country_other
+    ? input.country_other
+    : input.country;
+}
 
 export type StrategyLeadInput = z.infer<typeof strategyLeadSchema>;
 
