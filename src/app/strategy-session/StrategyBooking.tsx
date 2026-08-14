@@ -9,6 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useRouter } from "next/navigation";
 import { StrategyLeadForm } from "@/components/strategy/StrategyLeadForm";
 import { trackScheduleOpened, type PixelUserData } from "@/lib/analytics";
 import { stashLead } from "./leadHandoff";
@@ -39,13 +40,20 @@ export function useStrategyBooking(): BookingContextValue {
 export function StrategyBookingProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<Mode>("idle");
   const [source, setSource] = useState("ss-hero");
+  const router = useRouter();
   const dialogRef = useRef<HTMLDivElement>(null);
 
-  const openForm = useCallback((src: string) => {
-    setSource(src);
-    setMode("form");
-    trackScheduleOpened(src);
-  }, []);
+  const openForm = useCallback(
+    (src: string) => {
+      setSource(src);
+      setMode("form");
+      trackScheduleOpened(src);
+      // Warm /booked while they fill the form in. By the time they submit, the
+      // route is already in the client cache and the transition is instant.
+      router.prefetch("/strategy-session/booked");
+    },
+    [router],
+  );
 
   // Fired only for a genuine (non-bot) submission. Stashes the lead for
   // /strategy-session/booked to pick up — that page fires the Meta `Lead`
@@ -59,9 +67,16 @@ export function StrategyBookingProvider({ children }: { children: ReactNode }) {
   // Navigates to the booking page. Fires for both a genuine lead and a
   // honeypot catch (via StrategyLeadForm's onDone), so a bot never learns the
   // trap exists — it just sees the same "success" page a real lead would.
+  //
+  // router.push, not window.location.href: the hard navigation threw away the
+  // running app and reloaded the whole document, measured at ~1.8s on
+  // production before Cal even started booting. The Meta `Lead` event is
+  // unaffected — BookedCalendar reads the stashed lead in a useEffect, which
+  // runs on a client transition exactly as it does on a full load, and
+  // stashLead() has already written to sessionStorage by this point.
   const onDone = useCallback(() => {
-    window.location.href = "/strategy-session/booked";
-  }, []);
+    router.push("/strategy-session/booked");
+  }, [router]);
 
   const close = useCallback(() => setMode("idle"), []);
 

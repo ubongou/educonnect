@@ -225,6 +225,10 @@ export default function StrategySessionPage() {
   return (
     <div className="mkt-root">
       <ClarityScript />
+      {/* Warms the connection to Cal before the visitor ever reaches /booked,
+          so the calendar's first request skips DNS and the TLS handshake. */}
+      <link rel="preconnect" href="https://app.cal.com" crossOrigin="" />
+      <link rel="dns-prefetch" href="https://app.cal.com" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}

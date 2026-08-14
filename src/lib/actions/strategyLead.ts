@@ -1,9 +1,11 @@
 "use server";
 
+import { after } from "next/server";
 import {
   strategyLeadSchema,
   normalizeSource,
   strategySubjectValues,
+  type StrategyLeadInput,
   type StrategySubject,
 } from "@/lib/strategy/schema";
 import { appendToGoogleSheet } from "@/lib/integrations/googleSheets";
@@ -22,13 +24,62 @@ const isSubject = (v: string): v is StrategySubject =>
   (strategySubjectValues as readonly string[]).includes(v);
 
 /**
+ * Pushes a validated lead to Google Sheets and Zoho Campaigns, and emails the
+ * admin if either misses. Runs inside `after()`, so it must never throw: an
+ * unhandled rejection here would be invisible to the visitor but could fail the
+ * serverless invocation. Every branch is caught and logged.
+ */
+async function exportLead(lead: StrategyLeadInput): Promise<void> {
+  try {
+    const [sheet, zoho] = await Promise.allSettled([
+      appendToGoogleSheet(lead),
+      addToZohoCampaigns(lead),
+    ]);
+
+    const errors: string[] = [];
+    const failed = (
+      r: PromiseSettledResult<{ ok: boolean; error?: string }>,
+    ) => {
+      if (r.status === "rejected") {
+        errors.push(String(r.reason));
+        return true;
+      }
+      if (!r.value.ok) {
+        errors.push(r.value.error ?? "unknown error");
+        return true;
+      }
+      return false;
+    };
+
+    const sheetFailed = failed(sheet);
+    const zohoFailed = failed(zoho);
+    if (errors.length) console.error("[strategy-lead] export issues:", errors);
+
+    // Escalate on ANY export failure (skips don't count as failures) — a lead
+    // that silently misses just one sink is still a lost lead if nobody notices.
+    if (!sheetFailed && !zohoFailed) return;
+
+    const failedSinks = [
+      sheetFailed && "Google Sheets",
+      zohoFailed && "Zoho Campaigns",
+    ].filter((v): v is string => Boolean(v));
+    const result = await sendStrategyLeadFailureEmail(lead, errors, failedSinks);
+    if (!result.ok) {
+      console.error("[strategy-lead] failure email failed:", result.error);
+    }
+  } catch (err) {
+    console.error("[strategy-lead] export threw:", err);
+  }
+}
+
+/**
  * Strategy-session landing-page submission. SEPARATE from submitBookingRequest
  * (which serves /book). Order:
  *   1. Honeypot — "ignored", no export, no analytics.
  *   2. Zod parse. Failure => field errors.
- *   3. Best-effort fan-out to Google Sheets + Zoho Campaigns (never blocks the user).
- *   4. If EITHER export fails, email the admin so the lead isn't lost.
- *   5. "success" — the caller reveals the calendar and fires analytics.
+ *   3. Return "success" immediately; the caller navigates and fires analytics.
+ *   4. AFTER the response is sent, fan out to Google Sheets + Zoho Campaigns,
+ *      and email the admin if either misses (see exportLead above).
  *
  * There is deliberately no Supabase insert and no routine admin email here —
  * the Sheet + Zoho are the record of truth (see plan).
@@ -73,49 +124,16 @@ export async function submitStrategyLead(
     return { status: "error", fieldErrors };
   }
 
-  // 3. Best-effort fan-out. Neither export blocks the visitor.
-  const [sheet, zoho] = await Promise.allSettled([
-    appendToGoogleSheet(parsed.data),
-    addToZohoCampaigns(parsed.data),
-  ]);
-
-  const errors: string[] = [];
-  const failed = (r: PromiseSettledResult<{ ok: boolean; error?: string }>) => {
-    if (r.status === "rejected") {
-      errors.push(String(r.reason));
-      return true;
-    }
-    if (!r.value.ok) {
-      errors.push(r.value.error ?? "unknown error");
-      return true;
-    }
-    return false;
-  };
-
-  const sheetFailed = failed(sheet);
-  const zohoFailed = failed(zoho);
-  if (errors.length) console.error("[strategy-lead] export issues:", errors);
-
-  // 4. Escalate on ANY export failure (skips don't count as failures) — a lead
-  // that silently misses just one sink is still a lost lead if nobody notices.
-  if (sheetFailed || zohoFailed) {
-    try {
-      const failedSinks = [
-        sheetFailed && "Google Sheets",
-        zohoFailed && "Zoho Campaigns",
-      ].filter((v): v is string => Boolean(v));
-      const result = await sendStrategyLeadFailureEmail(
-        parsed.data,
-        errors,
-        failedSinks,
-      );
-      if (!result.ok) {
-        console.error("[strategy-lead] failure email failed:", result.error);
-      }
-    } catch (err) {
-      console.error("[strategy-lead] failure email threw:", err);
-    }
-  }
+  // 3. Fan out AFTER the response is sent.
+  //
+  // This used to be awaited inline, which meant the parent sat on a spinner
+  // while a Google Apps Script cold start and a Zoho token refresh plus contact
+  // create completed, and then a failure email on top of that if either missed.
+  // Measured against production, the action itself costs ~195ms; everything
+  // beyond that was these calls. Nothing the visitor does next depends on them
+  // (the action returns "success" regardless), so they belong off the critical
+  // path. The admin still gets the failure email either way.
+  after(() => exportLead(parsed.data));
 
   // 5. Always succeed for the visitor.
   return { status: "success" };

@@ -21,6 +21,11 @@ function campaignsHost(): string {
 // long-lived). Module scope persists across warm invocations.
 let tokenCache: { token: string; expiresAt: number } | null = null;
 
+// Same bound the Sheets webhook uses. Applied to BOTH Zoho round trips (token
+// refresh, then listsubscribe) because a cold serverless invocation has an
+// empty tokenCache and therefore makes them back to back.
+const ZOHO_TIMEOUT_MS = 8000;
+
 async function getAccessToken(): Promise<string | null> {
   const clientId = process.env.ZOHO_CLIENT_ID;
   const clientSecret = process.env.ZOHO_CLIENT_SECRET;
@@ -42,6 +47,9 @@ async function getAccessToken(): Promise<string | null> {
     method: "POST",
     headers: { "content-type": "application/x-www-form-urlencoded" },
     body: params.toString(),
+    // Matches the Sheets webhook. Without a bound, a hung Zoho response keeps
+    // the serverless invocation alive until the platform kills it.
+    signal: AbortSignal.timeout(ZOHO_TIMEOUT_MS),
   });
   const data = (await res.json().catch(() => ({}))) as {
     access_token?: string;
@@ -133,6 +141,7 @@ export async function addToZohoCampaigns(
           "content-type": "application/x-www-form-urlencoded",
         },
         body: params.toString(),
+        signal: AbortSignal.timeout(ZOHO_TIMEOUT_MS),
       },
     );
     const body = (await res.json().catch(() => ({}))) as {
