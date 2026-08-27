@@ -43,7 +43,6 @@ export default async function AdminOverview() {
       supabase
         .from("lesson_reports")
         .select("*", { count: "exact", head: true })
-        .is("deleted_at", null)
         .gte("created_at", sevenDaysAgo),
       supabase
         .from("sessions")

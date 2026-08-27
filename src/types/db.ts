@@ -286,7 +286,6 @@ export type Database = {
         Row: {
           confidence_level: number
           created_at: string
-          deleted_at: string | null
           duration_minutes: number
           edited_at: string | null
           edited_by: string | null
@@ -310,7 +309,6 @@ export type Database = {
         Insert: {
           confidence_level: number
           created_at?: string
-          deleted_at?: string | null
           duration_minutes: number
           edited_at?: string | null
           edited_by?: string | null
@@ -334,7 +332,6 @@ export type Database = {
         Update: {
           confidence_level?: number
           created_at?: string
-          deleted_at?: string | null
           duration_minutes?: number
           edited_at?: string | null
           edited_by?: string | null

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { AdminReportEditForm } from "@/components/admin/AdminReportEditForm";
+import { ReportAttachmentsManager } from "@/components/teacher/ReportAttachmentsManager";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -136,6 +137,19 @@ export default async function AdminReportEditPage({
         }}
         skills={skills}
       />
+
+      {/* Attachments live outside the form: they're uploaded and linked on
+          their own, so they don't wait on (or get lost by) a form save. This
+          is how an admin fixes a report that went out with the wrong file — or
+          none at all. */}
+      {report.students?.id && (
+        <div className="mt-6">
+          <ReportAttachmentsManager
+            reportId={report.id}
+            studentId={report.students.id}
+          />
+        </div>
+      )}
     </Container>
   );
 }

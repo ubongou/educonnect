@@ -70,7 +70,6 @@ export default async function TeacherReportDetailPage({
       `,
     )
     .eq("id", id)
-    .is("deleted_at", null)
     .maybeSingle();
 
   // RLS scopes what a teacher can read: reports they uploaded, plus reports

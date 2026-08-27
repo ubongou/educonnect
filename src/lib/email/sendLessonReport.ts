@@ -137,8 +137,7 @@ export async function sendLessonReportEmail(
   const { count: reportCount } = await supabase
     .from("lesson_reports")
     .select("*", { count: "exact", head: true })
-    .eq("student_id", report.student_id)
-    .is("deleted_at", null);
+    .eq("student_id", report.student_id);
 
   const showReferral = shouldShowReferral(reportCount ?? 0);
 

@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { ResendReportButton } from "@/components/admin/ResendReportButton";
+import { ReportDeleteButton } from "@/components/admin/ReportDeleteButton";
+import { ReportAttachmentsManager } from "@/components/teacher/ReportAttachmentsManager";
 import {
   LessonReportView,
   type LessonReportViewData,
@@ -101,6 +103,7 @@ export default async function AdminReportDetailPage({
 
   const studentName =
     report.students?.preferred_name?.trim() || report.students?.full_name || "—";
+  const studentId = report.students?.id;
 
   const { attachments, submissions } = await loadReportFiles(supabase, id);
   const messages = await loadReportThread(supabase, id);
@@ -157,6 +160,13 @@ export default async function AdminReportDetailPage({
               Edit report
             </Link>
             <ResendReportButton reportId={report.id} />
+            <ReportDeleteButton
+              reportId={report.id}
+              attachmentCount={attachments.length}
+              submissionCount={submissions.length}
+              messageCount={messages.length}
+              redirectTo="/admin/reports"
+            />
           </div>
         </div>
       </div>
@@ -184,6 +194,12 @@ export default async function AdminReportDetailPage({
           />
         }
       />
+
+      {studentId && (
+        <div className="mt-6">
+          <ReportAttachmentsManager reportId={report.id} studentId={studentId} />
+        </div>
+      )}
     </Container>
   );
 }

@@ -101,9 +101,6 @@ export default async function AdminStudentDetail({
         `,
         )
         .eq("id", id)
-        // Hide soft-deleted reports from the embedded list (filter on the
-        // embedded resource keeps the student row but drops deleted reports).
-        .is("lesson_reports.deleted_at", null)
         .maybeSingle(),
       supabase
         .from("profiles")

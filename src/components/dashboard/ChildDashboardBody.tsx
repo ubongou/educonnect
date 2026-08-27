@@ -102,7 +102,6 @@ export async function ChildDashboardBody({
           `,
         )
         .eq("student_id", studentId)
-        .is("deleted_at", null)
         .order("lesson_date", { ascending: true })
         .order("created_at", { ascending: true })
         .limit(60),

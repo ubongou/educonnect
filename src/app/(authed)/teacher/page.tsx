@@ -54,7 +54,6 @@ export default async function TeacherOverview({
       .from("lesson_reports")
       .select("id", { count: "exact", head: true })
       .eq("uploaded_by", profile.id)
-      .is("deleted_at", null)
       .gte("created_at", sevenDaysAgo.toISOString()),
     supabase
       .from("enrollments")

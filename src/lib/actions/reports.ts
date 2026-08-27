@@ -6,6 +6,8 @@ import { createClient } from "@/lib/supabase/server";
 import { sendLessonReportEmail } from "@/lib/email/sendLessonReport";
 import { sendExtraHomeworkEmail } from "@/lib/email/sendExtraHomework";
 import { promoteStagedAttachments } from "@/lib/uploads/promote";
+import { deleteR2Object } from "@/lib/r2/objects";
+import { getCurrentUserRole } from "@/lib/uploads/core";
 import { runReminderSweep } from "@/lib/payments/reminders";
 import { lessonReportSchema, lessonReportEditSchema } from "@/lib/validation";
 
@@ -196,31 +198,69 @@ export async function updateLessonReport(
 }
 
 /**
- * Admin-only: soft-delete or restore a lesson report. A soft-deleted report
- * disappears from every parent/teacher/admin read surface and the charts, but
- * the row (and the session that links to it) stays put, so restore brings it
- * back exactly as it was. Writes go through lesson_reports_admin_write.
+ * Admin-only: delete a lesson report outright. A report sent by mistake has to
+ * leave no trace — the parent shouldn't see a gap where it used to be, and the
+ * teacher has to be able to file the correct one against the same session.
+ *
+ * All the unwinding (reopening the session, removing the report's attachments
+ * and the parent's submission, cascading skill ratings + thread) happens
+ * inside delete_lesson_report so it can't half-complete. The RPC hands back
+ * the R2 keys of the files it removed; we purge those objects best-effort
+ * afterwards, since an orphaned object is recoverable and an orphaned row
+ * isn't.
  */
-export async function setReportDeleted(
+export async function deleteLessonReport(
   reportId: string,
-  deleted: boolean,
 ): Promise<UpdateReportResult> {
+  if (!reportId) return { ok: false, error: "Missing report id" };
   await requireAdmin();
 
   const supabase = await createClient();
-  const { error } = await supabase
+
+  // Grab the student before the row goes, so we can revalidate their pages.
+  const { data: report } = await supabase
     .from("lesson_reports")
-    .update({ deleted_at: deleted ? new Date().toISOString() : null })
-    .eq("id", reportId);
+    .select("student_id")
+    .eq("id", reportId)
+    .maybeSingle();
+
+  // RPC isn't in the generated db.ts yet (run `supabase gen types` post-
+  // migration to regenerate). Until then call it via an untyped client.
+  const { data, error } = await (
+    supabase as unknown as {
+      rpc: (
+        name: string,
+        args: Record<string, unknown>,
+      ) => Promise<{ data: unknown; error: { message: string } | null }>;
+    }
+  ).rpc("delete_lesson_report", { p_report_id: reportId });
 
   if (error) return { ok: false, error: error.message };
 
+  const keys = Array.isArray(data)
+    ? data.filter((k): k is string => typeof k === "string")
+    : [];
+  for (const key of keys) {
+    try {
+      await deleteR2Object(key);
+    } catch (err) {
+      console.error("[report delete] failed to purge R2 object", key, err);
+    }
+  }
+
   revalidatePath("/admin/reports");
-  revalidatePath(`/admin/reports/${reportId}`);
   revalidatePath("/admin");
+  revalidatePath("/admin/sessions");
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/sessions");
+  revalidatePath("/dashboard/documents");
   revalidatePath("/teacher");
+  revalidatePath("/teacher/sessions");
+  revalidatePath("/teacher/schedule");
+  if (report?.student_id) {
+    revalidatePath(`/admin/students/${report.student_id}`);
+    revalidatePath(`/teacher/students/${report.student_id}`);
+  }
   return { ok: true };
 }
 
@@ -240,10 +280,11 @@ export async function addMaterialsToReport(
   if (ids.length === 0) return { ok: false, error: "No files to attach" };
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Auth required" };
+  const caller = await getCurrentUserRole(supabase);
+  if (!caller) return { ok: false, error: "Auth required" };
+  if (caller.role !== "admin" && caller.role !== "teacher") {
+    return { ok: false, error: "Not authorised" };
+  }
 
   // RLS lets the assigned teacher / admin read the report.
   const { data: report } = await supabase
@@ -256,8 +297,11 @@ export async function addMaterialsToReport(
   const promoted = await promoteStagedAttachments(supabase, {
     reportId,
     studentId: report.student_id,
-    uploaderId: user.id,
+    uploaderId: caller.userId,
     materialIds: ids,
+    // An admin correcting a teacher's report can promote whatever was staged
+    // against the student, not only files they staged themselves.
+    anyUploader: caller.role === "admin",
   });
   if (promoted.length === 0) {
     return { ok: false, error: "No matching files to attach" };
@@ -272,6 +316,8 @@ export async function addMaterialsToReport(
   }
 
   revalidatePath(`/teacher/reports/${reportId}`);
+  revalidatePath(`/admin/reports/${reportId}`);
+  revalidatePath(`/admin/reports/${reportId}/edit`);
   revalidatePath(`/dashboard/reports/${reportId}`);
   revalidatePath("/dashboard/documents");
   revalidatePath("/dashboard/sessions");

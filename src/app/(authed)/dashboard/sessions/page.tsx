@@ -88,7 +88,6 @@ export default async function DashboardSessionsPage({
       .from("lesson_reports")
       .select("student_id")
       .eq("id", reportIdRaw)
-      .is("deleted_at", null)
       .maybeSingle();
     const ownerId = (owner as { student_id: string } | null)?.student_id;
     if (ownerId && ownerId !== selected.id) {
@@ -126,11 +125,16 @@ export default async function DashboardSessionsPage({
       `,
     )
     .eq("student_id", selected.id)
-    .is("deleted_at", null)
     .order("lesson_date", { ascending: false });
 
   const reports = (reportList ?? []) as unknown as ReportListRow[];
-  const activeId = reportIdRaw ?? reports[0]?.id ?? null;
+
+  // A `?report=` that no longer resolves — a deleted report, an old bookmark,
+  // a link forwarded between parents — quietly falls back to the newest report
+  // instead of leaving the pane empty. The parent should never land on a hole
+  // where a report used to be.
+  const targeted = reportIdRaw && reports.some((r) => r.id === reportIdRaw);
+  const activeId = (targeted ? reportIdRaw : reports[0]?.id) ?? null;
 
   const { data: activeReport } = activeId
     ? await supabase
@@ -151,7 +155,6 @@ export default async function DashboardSessionsPage({
         )
         .eq("id", activeId)
         .eq("student_id", selected.id)
-        .is("deleted_at", null)
         .maybeSingle()
     : { data: null };
 
