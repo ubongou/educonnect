@@ -390,6 +390,39 @@ export type Database = {
           },
         ]
       }
+      monnify_events: {
+        Row: {
+          detail: string | null
+          event_type: string | null
+          id: string
+          outcome: string | null
+          payload: Json
+          received_at: string
+          signature_valid: boolean | null
+          transaction_reference: string | null
+        }
+        Insert: {
+          detail?: string | null
+          event_type?: string | null
+          id?: string
+          outcome?: string | null
+          payload: Json
+          received_at?: string
+          signature_valid?: boolean | null
+          transaction_reference?: string | null
+        }
+        Update: {
+          detail?: string | null
+          event_type?: string | null
+          id?: string
+          outcome?: string | null
+          payload?: Json
+          received_at?: string
+          signature_valid?: boolean | null
+          transaction_reference?: string | null
+        }
+        Relationships: []
+      }
       parent_students: {
         Row: {
           created_at: string
@@ -458,6 +491,68 @@ export type Database = {
           },
         ]
       }
+      payment_plan_invoices: {
+        Row: {
+          account_name: string | null
+          account_number: string | null
+          amount_ngn: number
+          amount_paid_ngn: number | null
+          bank_name: string | null
+          checkout_url: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          invoice_reference: string
+          paid_at: string | null
+          plan_id: string
+          settlement_amount_ngn: number | null
+          status: string
+          transaction_reference: string | null
+        }
+        Insert: {
+          account_name?: string | null
+          account_number?: string | null
+          amount_ngn: number
+          amount_paid_ngn?: number | null
+          bank_name?: string | null
+          checkout_url?: string | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          invoice_reference: string
+          paid_at?: string | null
+          plan_id: string
+          settlement_amount_ngn?: number | null
+          status?: string
+          transaction_reference?: string | null
+        }
+        Update: {
+          account_name?: string | null
+          account_number?: string | null
+          amount_ngn?: number
+          amount_paid_ngn?: number | null
+          bank_name?: string | null
+          checkout_url?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          invoice_reference?: string
+          paid_at?: string | null
+          plan_id?: string
+          settlement_amount_ngn?: number | null
+          status?: string
+          transaction_reference?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_plan_invoices_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "payment_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_reminders: {
         Row: {
           id: string
@@ -498,6 +593,7 @@ export type Database = {
           id: string
           notes: string | null
           paid_at: string | null
+          paid_via: string | null
           payer_id: string | null
           payment_reference: string | null
           proof_key: string | null
@@ -519,6 +615,7 @@ export type Database = {
           id?: string
           notes?: string | null
           paid_at?: string | null
+          paid_via?: string | null
           payer_id?: string | null
           payment_reference?: string | null
           proof_key?: string | null
@@ -539,6 +636,7 @@ export type Database = {
           id?: string
           notes?: string | null
           paid_at?: string | null
+          paid_via?: string | null
           payer_id?: string | null
           payment_reference?: string | null
           proof_key?: string | null

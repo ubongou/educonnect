@@ -43,7 +43,7 @@ export function RenewPlanDialog({
 }: {
   onClose: () => void;
   /** Fired right before close, with the new plan's reference and attach count. */
-  onRenewed?: (referenceCode: string, attached: number) => void;
+  onRenewed?: (referenceCode: string, attached: number, invoiceWarning?: string) => void;
   initial: RenewInitial;
   payers: PlanPayerOption[];
 }) {
@@ -104,7 +104,7 @@ export function RenewPlanDialog({
       });
 
       if (res.ok) {
-        onRenewed?.(res.referenceCode, res.attached);
+        onRenewed?.(res.referenceCode, res.attached, res.invoiceWarning);
         onClose();
         router.refresh();
       } else {

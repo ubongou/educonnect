@@ -6,6 +6,7 @@ import {
   usageFor,
   type PlanRow,
 } from "@/lib/payments/plans";
+import { pickLiveInvoice } from "@/lib/payments/invoiceRules";
 
 type Client = Awaited<ReturnType<typeof createClient>>;
 
@@ -16,6 +17,15 @@ type PlanRecord = PlanRow & {
   proof_key: string | null;
   created_at: string;
   adjustments: Array<{ label: string; amount_ngn: number; sort_order: number }>;
+  invoices: Array<{
+    status: string;
+    amount_ngn: number;
+    account_number: string | null;
+    account_name: string | null;
+    bank_name: string | null;
+    checkout_url: string | null;
+    expires_at: string;
+  }>;
 };
 
 /**
@@ -41,7 +51,11 @@ export async function loadParentPlanView(
         `
         id, student_id, sessions_total, status, reference_code, rate_per_session,
         total_ngn, proof_key, created_at,
-        adjustments:payment_plan_adjustments ( label, amount_ngn, sort_order )
+        adjustments:payment_plan_adjustments ( label, amount_ngn, sort_order ),
+        invoices:payment_plan_invoices (
+          status, amount_ngn, account_number, account_name, bank_name,
+          checkout_url, expires_at
+        )
         `,
       )
       .eq("student_id", studentId)
@@ -86,5 +100,9 @@ export async function loadParentPlanView(
       .sort((a, b) => a.sort_order - b.sort_order)
       .map((a) => ({ label: a.label, amount: Number(a.amount_ngn) })),
     hasProof: chosen.proof_key !== null,
+    invoice:
+      chosen.status === "unpaid"
+        ? pickLiveInvoice(chosen.invoices ?? [], Number(chosen.total_ngn))
+        : null,
   };
 }

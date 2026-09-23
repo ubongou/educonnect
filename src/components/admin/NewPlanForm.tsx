@@ -115,7 +115,8 @@ export function NewPlanForm({
           res.attached > 0
             ? ` ${res.attached} existing session${res.attached === 1 ? "" : "s"} attached.`
             : "";
-        setSuccess(`Plan ${res.referenceCode} created (unpaid).${attached}`);
+        const warning = res.invoiceWarning ? ` ${res.invoiceWarning}.` : "";
+        setSuccess(`Plan ${res.referenceCode} created (unpaid).${attached}${warning}`);
         setAdjustments([]);
         setNotes("");
         router.refresh();

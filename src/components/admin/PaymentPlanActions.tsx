@@ -12,6 +12,7 @@ import type { PlanPayerOption } from "@/components/admin/NewPlanForm";
 import type { DraftAdjustment } from "@/components/admin/PlanAdjustmentsEditor";
 import {
   attachSessionsToPlan,
+  issuePlanInvoice,
   markPlanPaid,
   sendPaymentReminderNow,
   unarchivePaymentPlan,
@@ -44,6 +45,7 @@ export function PaymentPlanActions({
   adjustments,
   payers,
   archived = false,
+  invoiceAction = null,
 }: {
   planId: string;
   studentId: string;
@@ -56,6 +58,8 @@ export function PaymentPlanActions({
   adjustments: DraftAdjustment[];
   payers: PlanPayerOption[];
   archived?: boolean;
+  /** Offer to create the plan's Monnify invoice, or replace its live one. */
+  invoiceAction?: "issue" | "reissue" | null;
 }) {
   const router = useRouter();
   const [marking, setMarking] = useState(false);
@@ -160,6 +164,29 @@ export function PaymentPlanActions({
           </button>
         )}
 
+        {invoiceAction && (
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() =>
+              startTransition(async () => {
+                setError(null);
+                setNotice(null);
+                const res = await issuePlanInvoice(planId);
+                if (res.ok) {
+                  setNotice("Monnify invoice issued.");
+                  router.refresh();
+                } else {
+                  setError(res.error);
+                }
+              })
+            }
+            className="font-heading text-[13px] font-semibold text-navy underline-offset-4 hover:underline disabled:opacity-50"
+          >
+            {invoiceAction === "reissue" ? "New invoice" : "Issue invoice"}
+          </button>
+        )}
+
         {hasUnfundedSessions && status === "paid" && (
           <button
             type="button"
@@ -259,11 +286,11 @@ export function PaymentPlanActions({
       {renewOpen && (
         <RenewPlanDialog
           onClose={() => setRenewOpen(false)}
-          onRenewed={(referenceCode, attached) =>
+          onRenewed={(referenceCode, attached, invoiceWarning) =>
             setNotice(
               `Renewed as ${referenceCode}${
                 attached > 0 ? ` · ${attached} session${attached === 1 ? "" : "s"} attached` : ""
-              }.`,
+              }.${invoiceWarning ? ` ${invoiceWarning}.` : ""}`,
             )
           }
           initial={renewInitial}

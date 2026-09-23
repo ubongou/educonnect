@@ -14,6 +14,8 @@ import { FilterSelectClient } from "@/components/admin/FilterSelectClient";
 import { RunRemindersButton } from "@/components/admin/RunRemindersButton";
 import { BANK_DETAILS } from "@/lib/payments/bankDetails";
 import { ADJUSTMENT_OPTIONS } from "@/lib/payments/adjustments";
+import { isMonnifyConfigured } from "@/lib/payments/monnify";
+import { pickLiveInvoice } from "@/lib/payments/invoiceRules";
 import type { DraftAdjustment } from "@/components/admin/PlanAdjustmentsEditor";
 import {
   formatNaira,
@@ -32,6 +34,7 @@ type PlanRecord = PlanRow & {
   subtotal_ngn: number;
   total_ngn: number;
   paid_at: string | null;
+  paid_via: string | null;
   payment_reference: string | null;
   proof_key: string | null;
   proof_uploaded_at: string | null;
@@ -42,6 +45,16 @@ type PlanRecord = PlanRow & {
   students: { id: string; full_name: string; preferred_name: string | null } | null;
   payer: { full_name: string | null; email: string | null } | null;
   adjustments: Array<{ label: string; amount_ngn: number }>;
+  invoices: Array<{
+    status: string;
+    amount_ngn: number;
+    account_number: string | null;
+    account_name: string | null;
+    bank_name: string | null;
+    checkout_url: string | null;
+    expires_at: string;
+    created_at: string;
+  }>;
 };
 
 /**
@@ -120,11 +133,15 @@ export default async function AdminPaymentsPage({
     .select(
       `
       id, student_id, sessions_total, rate_per_session, subtotal_ngn, total_ngn,
-      reference_code, status, paid_at, payment_reference, proof_key,
+      reference_code, status, paid_at, paid_via, payment_reference, proof_key,
       proof_uploaded_at, created_at, archived_at, payer_id, notes,
       students ( id, full_name, preferred_name ),
       payer:profiles!payment_plans_payer_id_fkey ( full_name, email ),
-      adjustments:payment_plan_adjustments ( label, amount_ngn )
+      adjustments:payment_plan_adjustments ( label, amount_ngn ),
+      invoices:payment_plan_invoices (
+        status, amount_ngn, account_number, account_name, bank_name,
+        checkout_url, expires_at, created_at
+      )
       `,
     )
     .order("created_at", { ascending: false });
@@ -169,6 +186,7 @@ export default async function AdminPaymentsPage({
   ]);
 
   const plans = (planRows ?? []) as unknown as PlanRecord[];
+  const monnifyEnabled = isMonnifyConfigured();
   const sessions = sessionResult.rows;
 
   const usage = tallyPlanUsage(sessions);
@@ -274,6 +292,8 @@ export default async function AdminPaymentsPage({
               {BANK_DETAILS.accountNumber}
             </span>
             .
+            {monnifyEnabled &&
+              " Unpaid plans get a Monnify invoice — payments into it are confirmed automatically."}
           </p>
         </div>
         <RunRemindersButton />
@@ -376,6 +396,11 @@ export default async function AdminPaymentsPage({
                   const toDeliver = remainingToDeliver(p, u);
                   const toSchedule = remainingToSchedule(p, u);
                   const student = p.students;
+                  const liveInvoice =
+                    p.status === "unpaid"
+                      ? pickLiveInvoice(p.invoices ?? [], Number(p.total_ngn))
+                      : null;
+                  const hadInvoice = (p.invoices ?? []).length > 0;
                   return (
                     <tr
                       key={p.id}
@@ -410,6 +435,20 @@ export default async function AdminPaymentsPage({
                             Proof uploaded
                           </p>
                         )}
+                        {liveInvoice ? (
+                          <p className="mt-1 text-[12px] font-normal text-g400">
+                            Monnify {liveInvoice.accountNumber} · until{" "}
+                            {formatDate(liveInvoice.expiresAt)}
+                          </p>
+                        ) : (
+                          p.status === "unpaid" &&
+                          monnifyEnabled &&
+                          hadInvoice && (
+                            <p className="mt-1 text-[12px] font-normal text-coral">
+                              Monnify invoice expired
+                            </p>
+                          )
+                        )}
                       </td>
                       <td className="px-5 py-3 text-g600">
                         {p.sessions_total} × {formatNaira(Number(p.rate_per_session))}
@@ -438,6 +477,11 @@ export default async function AdminPaymentsPage({
                         {p.status === "paid" && p.paid_at ? (
                           <>
                             {formatDate(p.paid_at)}
+                            {p.paid_via === "monnify" && (
+                              <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-blue">
+                                Auto-confirmed
+                              </p>
+                            )}
                             {p.payment_reference && (
                               <p className="mt-1 text-[12px] text-g400">
                                 ref {p.payment_reference}
@@ -468,6 +512,13 @@ export default async function AdminPaymentsPage({
                           adjustments={draftAdjustmentsFor(p.adjustments)}
                           payers={payerOptions}
                           archived={Boolean(p.archived_at)}
+                          invoiceAction={
+                            monnifyEnabled && p.status === "unpaid"
+                              ? liveInvoice
+                                ? "reissue"
+                                : "issue"
+                              : null
+                          }
                         />
                       </td>
                     </tr>

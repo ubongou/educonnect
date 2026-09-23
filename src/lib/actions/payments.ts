@@ -9,6 +9,8 @@ import {
   sendPaymentReminderEmail,
 } from "@/lib/email/sendPaymentEmails";
 import { runReminderSweep } from "@/lib/payments/reminders";
+import { isMonnifyConfigured } from "@/lib/payments/monnify";
+import { cancelPendingInvoices, issueInvoiceForPlan } from "@/lib/payments/invoices";
 import {
   ADJUSTMENT_OPTIONS,
   adjustmentOption,
@@ -24,7 +26,14 @@ import {
 
 export type PaymentResult = { ok: true } | { ok: false; error: string };
 export type PlanCreateResult =
-  | { ok: true; planId: string; referenceCode: string; attached: number }
+  | {
+      ok: true;
+      planId: string;
+      referenceCode: string;
+      attached: number;
+      /** Set when the plan saved but its Monnify invoice couldn't be issued. */
+      invoiceWarning?: string;
+    }
   | { ok: false; error: string };
 
 const adjustmentInput = z.object({
@@ -142,12 +151,24 @@ export async function createPaymentPlan(input: unknown): Promise<PlanCreateResul
     attached = res.attached;
   }
 
+  // Issued last, once the total is final (adjustments included). Best-effort:
+  // without an invoice the parent sees the static account, as before.
+  let invoiceWarning: string | undefined;
+  if (isMonnifyConfigured()) {
+    const inv = await issueInvoiceForPlan(plan.id).catch((err: unknown) => ({
+      ok: false as const,
+      error: err instanceof Error ? err.message : "Invoice failed",
+    }));
+    if (!inv.ok) invoiceWarning = `Monnify invoice not issued: ${inv.error}`;
+  }
+
   revalidatePayments(data.student_id);
   return {
     ok: true,
     planId: plan.id,
     referenceCode: plan.reference_code,
     attached,
+    invoiceWarning,
   };
 }
 
@@ -291,11 +312,15 @@ export async function markPlanPaid(input: unknown): Promise<PaymentResult> {
       // stored timestamp on that calendar day for readers either side of UTC.
       paid_at: paid_on ? `${paid_on}T12:00:00Z` : new Date().toISOString(),
       payment_reference: payment_reference?.trim() || null,
+      paid_via: "manual",
       verified_by: admin.id,
     })
     .eq("id", plan_id);
 
   if (error) return { ok: false, error: error.message };
+
+  // Paid outside Monnify, so its invoice must stop taking money.
+  await cancelPendingInvoices(plan_id).catch(() => {});
 
   // Receipt is best-effort and deliberately after the write: neither a Resend
   // outage nor a missing service-role key may roll back a payment that
@@ -420,6 +445,8 @@ export async function voidPaymentPlan(planId: string): Promise<PaymentResult> {
     .eq("payment_plan_id", planId);
   if (unlinkErr) return { ok: false, error: unlinkErr.message };
 
+  await cancelPendingInvoices(planId).catch(() => {});
+
   const { data, error } = await supabase
     .from("payment_plans")
     .update({ status: "void", archived_at: new Date().toISOString() })
@@ -492,11 +519,38 @@ export async function updatePaymentPlan(
     .from("payment_plans")
     .update(update)
     .eq("id", planId)
-    .select("student_id")
+    .select("student_id, status")
     .maybeSingle();
 
   if (error) return { ok: false, error: error.message };
 
+  // A live invoice for the old price would let the parent pay the wrong
+  // amount, so a price change on an unpaid plan swaps it for a fresh one.
+  const priceChanged =
+    update.sessions_total !== undefined || update.rate_per_session !== undefined;
+  if (priceChanged && data?.status === "unpaid" && isMonnifyConfigured()) {
+    const inv = await issueInvoiceForPlan(planId).catch(() => null);
+    if (!inv?.ok) await cancelPendingInvoices(planId).catch(() => {});
+  }
+
   revalidatePayments((data as { student_id: string } | null)?.student_id);
+  return { ok: true };
+}
+
+/**
+ * Admin issues (or reissues) the Monnify invoice for an unpaid plan — for a
+ * plan created before Monnify was set up, one whose invoice expired, or one
+ * whose first attempt failed. Replaces any live invoice.
+ */
+export async function issuePlanInvoice(planId: string): Promise<PaymentResult> {
+  await requireAdmin();
+
+  const res = await issueInvoiceForPlan(planId).catch((err: unknown) => ({
+    ok: false as const,
+    error: err instanceof Error ? err.message : "Invoice failed",
+  }));
+  if (!res.ok) return res;
+
+  revalidatePayments();
   return { ok: true };
 }

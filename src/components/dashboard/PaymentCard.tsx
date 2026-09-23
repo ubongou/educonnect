@@ -9,6 +9,7 @@ import {
 } from "@/lib/actions/paymentProof";
 import { BANK_DETAILS } from "@/lib/payments/bankDetails";
 import { formatNaira } from "@/lib/payments/plans";
+import type { LiveInvoice } from "@/lib/payments/invoiceRules";
 import { acceptAttr, paymentProofPolicy } from "@/lib/uploads/policies";
 
 export type ParentPlanView = {
@@ -21,6 +22,12 @@ export type ParentPlanView = {
   total: number;
   lines: Array<{ label: string; amount: number }>;
   hasProof: boolean;
+  /**
+   * The plan's Monnify invoice, when it has a live one. Its account number is
+   * unique to this payment, so a transfer into it confirms the plan on its own
+   * — no reference to quote, no proof to upload.
+   */
+  invoice: LiveInvoice | null;
 };
 
 /**
@@ -149,17 +156,21 @@ export function PaymentCard({
         </div>
       </dl>
 
-      {(awaitingPayment || remaining <= 1) && (
-        <>
-          <BankBlock reference={plan.referenceCode} />
-          {awaitingPayment && <ProofUpload plan={plan} />}
-        </>
+      {awaitingPayment && plan.invoice ? (
+        <InvoiceBlock invoice={plan.invoice} amount={plan.total} />
+      ) : (
+        (awaitingPayment || remaining <= 1) && (
+          <>
+            <BankBlock reference={plan.referenceCode} />
+            {awaitingPayment && <ProofUpload plan={plan} />}
+          </>
+        )
       )}
     </section>
   );
 }
 
-function BankBlock({ reference }: { reference: string | null }) {
+function useCopy() {
   const [copied, setCopied] = useState<string | null>(null);
 
   const copy = async (value: string, what: string) => {
@@ -172,6 +183,72 @@ function BankBlock({ reference }: { reference: string | null }) {
       // is on screen and selectable either way.
     }
   };
+
+  return { copied, copy };
+}
+
+/**
+ * Payment details for a plan with a live Monnify invoice. The account number
+ * exists only for this payment and settles into our Moniepoint account, so
+ * the transfer is matched and confirmed automatically.
+ */
+function InvoiceBlock({ invoice, amount }: { invoice: LiveInvoice; amount: number }) {
+  const { copied, copy } = useCopy();
+  // Pinned to Lagos so the server render and the browser agree on the day.
+  const validUntil = new Date(invoice.expiresAt).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "Africa/Lagos",
+  });
+
+  return (
+    <div className="mt-5 rounded-2xl bg-paper p-5">
+      <p className="font-heading text-[11px] font-bold uppercase tracking-[0.1em] text-g400">
+        Transfer exactly {formatNaira(amount)} to
+      </p>
+      {invoice.accountName && (
+        <p className="mt-2 font-heading text-[14px] font-semibold text-navy">
+          {invoice.accountName}
+        </p>
+      )}
+      {invoice.bankName && (
+        <p className="mt-1 text-[13px] text-g600">{invoice.bankName}</p>
+      )}
+      <div className="mt-2 flex flex-wrap items-center gap-3">
+        <span className="font-heading text-[18px] font-bold tracking-[0.02em] tabular-nums text-navy">
+          {invoice.accountNumber}
+        </span>
+        <button
+          type="button"
+          onClick={() => copy(invoice.accountNumber, "account")}
+          className="font-heading text-[12px] font-semibold text-blue underline-offset-4 hover:underline"
+        >
+          {copied === "account" ? "Copied" : "Copy"}
+        </button>
+      </div>
+      <p className="mt-3 text-[12px] leading-[1.5] text-g600">
+        This account number is just for this payment, valid until {validUntil}.
+        We&apos;ll confirm it automatically as soon as it lands — no reference or
+        screenshot needed.
+      </p>
+
+      {invoice.checkoutUrl && (
+        <a
+          href={invoice.checkoutUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-flex items-center gap-2 rounded-pill border-2 border-navy bg-white px-4 py-2 font-heading text-[13px] font-bold text-navy transition-colors hover:bg-paper"
+        >
+          Pay by card instead
+        </a>
+      )}
+    </div>
+  );
+}
+
+function BankBlock({ reference }: { reference: string | null }) {
+  const { copied, copy } = useCopy();
 
   return (
     <div className="mt-5 rounded-2xl bg-paper p-5">
