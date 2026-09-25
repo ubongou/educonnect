@@ -67,6 +67,10 @@ export const sourceIds = [
   "ss-guarantee",
   "ss-final",
   "ss-sticky",
+  // Search landing pages (subjects, countries, about).
+  "seo-subject",
+  "seo-country",
+  "about",
   "direct",
 ] as const;
 export type SourceId = (typeof sourceIds)[number];
@@ -84,6 +88,9 @@ const sourceLabels: Record<SourceId, string> = {
   "ss-guarantee": "Strategy session · After the guarantee",
   "ss-final": "Strategy session · Final CTA",
   "ss-sticky": "Strategy session · Sticky mobile bar",
+  "seo-subject": "Subject page (search)",
+  "seo-country": "Country page (search)",
+  about: "About page",
   direct: "Direct visit (no source)",
 };
 

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BrandLogo } from "./BrandLogo";
+import { countryPages, subjectPages } from "@/lib/marketing/seoPages";
 
 type Mode = "marketing" | "authed";
 
@@ -50,7 +51,7 @@ function MarketingFooter() {
                 <Link href="/#why">Why Masani</Link>
               </li>
               <li>
-                <Link href="/#about">About</Link>
+                <Link href="/about">About</Link>
               </li>
               <li>
                 <Link href="/pricing">Pricing</Link>
@@ -58,6 +59,26 @@ function MarketingFooter() {
               <li>
                 <Link href="/#contact">Contact</Link>
               </li>
+            </ul>
+          </div>
+          <div className="footer-col">
+            <h4>Subjects</h4>
+            <ul>
+              {subjectPages.map((s) => (
+                <li key={s.slug}>
+                  <Link href={`/tutoring/${s.slug}`}>{s.name}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="footer-col">
+            <h4>Where we teach</h4>
+            <ul>
+              {countryPages.map((c) => (
+                <li key={c.slug}>
+                  <Link href={`/online-tutoring/${c.slug}`}>{c.areaServed}</Link>
+                </li>
+              ))}
             </ul>
           </div>
           <div className="footer-col">
@@ -93,7 +114,7 @@ function MarketingFooter() {
         </div>
         <div className="footer-bottom">
           <span>© 2025 Masani · joinmasani.com</span>
-          <span>Backed by MIT</span>
+          <span>Selected for the MIT Social Innovation Fellowship, 2025</span>
         </div>
       </div>
     </footer>

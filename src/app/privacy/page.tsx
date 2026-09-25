@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { pageMetadata } from "@/lib/seo";
 import "../../styles/strategy-session.css";
 
-export const metadata: Metadata = {
-  title: "Privacy Notice | Masani",
+export const metadata: Metadata = pageMetadata({
+  title: "Privacy Notice",
   description:
     "How Masani collects and uses information when you visit our site and book a strategy session.",
-};
+  path: "/privacy",
+});
 
 // Concise, honest privacy notice covering what the marketing pages actually do
 // (booking, analytics, and advertising pixels). Have counsel review before any

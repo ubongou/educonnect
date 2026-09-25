@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { SignupForm } from "./SignupForm";
+
+// Private or account pages: kept out of search results (robots.txt also
+// blocks crawling them).
+export const metadata: Metadata = {
+  title: "Sign up",
+  robots: { index: false, follow: false },
+};
 
 export default function SignupPage() {
   return (

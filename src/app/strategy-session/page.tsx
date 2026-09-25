@@ -3,6 +3,7 @@ import "../../styles/strategy-session.css";
 import { ClarityScript } from "@/components/ClarityScript";
 import { MarketingScrollReveal } from "@/components/marketing/MarketingScrollReveal";
 import { bundledAssets } from "@/lib/marketing/defaults";
+import { pageMetadata } from "@/lib/seo";
 import { StrategyBookingProvider } from "./StrategyBooking";
 import { StrategyCTA } from "./StrategyCTA";
 import { StrategyFAQ, type FaqItem } from "./StrategyFAQ";
@@ -25,11 +26,12 @@ const HERO_HEADLINES: Record<"A" | "B" | "C", string> = {
   C: "Give us 15 minutes about your child. We will write the plan that fits them.",
 };
 
-export const metadata: Metadata = {
-  title: "Your Child's Free Personalised Learning Plan | Masani",
+export const metadata: Metadata = pageMetadata({
+  title: "Your Child's Free Personalised Learning Plan",
   description:
     "Give us 15 minutes and we'll help you uncover how your child learns best, then hand you a personalised plan to build confidence and improve results",
-};
+  path: "/strategy-session",
+});
 
 // ---- Copy (kept dash-free per brand rules) ----------------------------------
 

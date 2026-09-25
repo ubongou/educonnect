@@ -1,15 +1,17 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { Nav } from "@/components/ui/Nav";
 import { Footer } from "@/components/ui/Footer";
 import { MarketingScrollReveal } from "@/components/marketing/MarketingScrollReveal";
 import { BookingFormRoute } from "@/components/booking/BookingFormRoute";
 
-export const metadata: Metadata = {
-  title: "Book a free trial — Masani",
+export const metadata: Metadata = pageMetadata({
+  title: "Book a Free Session",
   description:
     "Tell us about your child and we'll match you with a tutor for a free trial session.",
-};
+  path: "/book",
+});
 
 export default function BookPage() {
   return (

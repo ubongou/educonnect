@@ -6,9 +6,10 @@ import { getGlobals } from "@/lib/marketing/content";
 import { PickSessionButton } from "@/components/booking/PickSessionButton";
 
 export const metadata: Metadata = {
-  title: "One more step — Masani",
+  title: "One more step",
   description:
     "Pick a session time on the calendar to confirm your free trial booking.",
+  robots: { index: false, follow: false },
 };
 
 export default function BookThanksPage() {

@@ -1,4 +1,5 @@
 import { Nav } from "@/components/ui/Nav";
+import { pageMetadata } from "@/lib/seo";
 import { Footer } from "@/components/ui/Footer";
 import { Hero } from "@/components/marketing/Hero";
 import { Marquee } from "@/components/marketing/Marquee";
@@ -9,6 +10,14 @@ import { FoundersAbout } from "@/components/marketing/FoundersAbout";
 import { Contact } from "@/components/marketing/Contact";
 import { MarketingScrollReveal } from "@/components/marketing/MarketingScrollReveal";
 import { getHomeContent } from "@/lib/marketing/content";
+
+export const metadata = pageMetadata({
+  title: "Masani | Online Tutoring for Nigerian Families Abroad",
+  absoluteTitle: true,
+  description:
+    "Private, one to one online tutoring from vetted Nigerian teachers for children in the UK, US and Canada. Maths, English, science, 11+ and SAT. Selected for the MIT Social Innovation Fellowship 2025.",
+  path: "/",
+});
 
 export default function Home() {
   const home = getHomeContent();

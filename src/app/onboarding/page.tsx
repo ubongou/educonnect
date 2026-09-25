@@ -1,7 +1,15 @@
+import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { IntakeForm } from "@/components/intake/IntakeForm";
 import { requireParent } from "@/lib/auth";
+
+// Private or account pages: kept out of search results (robots.txt also
+// blocks crawling them).
+export const metadata: Metadata = {
+  title: "Get started",
+  robots: { index: false, follow: false },
+};
 
 export default async function OnboardingPage() {
   await requireParent("/onboarding");

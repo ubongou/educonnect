@@ -1,0 +1,423 @@
+/*
+  Search landing pages (/tutoring/*, /online-tutoring/*, /about). Scoped under
+  `.mkt-root .lp` and built on the tokens in marketing.css, so these pages
+  look like the rest of the marketing site without touching it.
+*/
+
+.mkt-root .lp {
+  padding-bottom: 0;
+}
+
+.mkt-root .lp-hero {
+  padding: clamp(40px, 7vw, 88px) 0 clamp(40px, 6vw, 72px);
+}
+.mkt-root .lp-hero h1 {
+  font-size: clamp(36px, 5.4vw, 64px);
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+  margin: 18px 0 22px;
+  max-width: 18ch;
+}
+.mkt-root .lp-intro {
+  font-size: clamp(17px, 1.4vw, 19px);
+  color: var(--ink-2);
+  max-width: 62ch;
+}
+.mkt-root .lp-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 30px;
+}
+.mkt-root .lp-trust {
+  list-style: none;
+  padding: 0;
+  margin: 28px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  font-size: 14px;
+  color: var(--ink-3);
+}
+.mkt-root .lp-trust li::before {
+  content: "✓";
+  color: var(--coral);
+  font-weight: 700;
+  margin-right: 8px;
+}
+
+.mkt-root .lp-crumbs ol {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+.mkt-root .lp-crumbs li + li::before {
+  content: "/";
+  margin-right: 6px;
+  opacity: 0.5;
+}
+.mkt-root .lp-crumbs a:hover {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.mkt-root .lp-section {
+  padding: clamp(48px, 7vw, 88px) 0;
+}
+.mkt-root .lp-tint {
+  background: var(--paper-2);
+}
+.mkt-root .lp-h2 {
+  font-size: clamp(28px, 3.4vw, 42px);
+  margin-bottom: 28px;
+}
+.mkt-root .lp-sub {
+  color: var(--ink-2);
+  max-width: 62ch;
+  margin: -12px 0 28px;
+}
+.mkt-root .lp-sub:last-child {
+  margin: 24px 0 0;
+}
+.mkt-root .lp-link {
+  font-weight: 500;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.mkt-root .lp-narrow {
+  max-width: 860px;
+}
+
+/* Two list cards side by side */
+.mkt-root .lp-two {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+}
+.mkt-root .lp-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: clamp(24px, 3vw, 36px);
+}
+.mkt-root .lp-card h2 {
+  font-size: clamp(22px, 2.4vw, 28px);
+  margin-bottom: 18px;
+}
+.mkt-root .lp-checks {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+.mkt-root .lp-checks li {
+  position: relative;
+  padding-left: 30px;
+  color: var(--ink-2);
+}
+.mkt-root .lp-checks li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.3em;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--sky-soft)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2304131c' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E")
+    center / 11px no-repeat;
+}
+
+/* Numbered approach list */
+.mkt-root .lp-approach {
+  list-style: none;
+  counter-reset: lp;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 16px;
+  max-width: 820px;
+}
+.mkt-root .lp-approach li {
+  counter-increment: lp;
+  position: relative;
+  padding: 4px 0 4px 56px;
+  color: var(--ink-2);
+  font-size: 18px;
+}
+.mkt-root .lp-approach li::before {
+  content: counter(lp);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--yellow);
+  color: var(--ink);
+  font-family: var(--f-display);
+  font-weight: 600;
+}
+
+/* Feature tiles */
+.mkt-root .lp-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+}
+.mkt-root .lp-tile {
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 24px;
+  border: 1px solid var(--line);
+}
+.mkt-root .lp-tile h3 {
+  font-size: 19px;
+  margin-bottom: 8px;
+}
+.mkt-root .lp-tile p {
+  color: var(--ink-2);
+  font-size: 15.5px;
+}
+
+/* Steps */
+.mkt-root .lp-steps {
+  list-style: none;
+  counter-reset: step;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+}
+.mkt-root .lp-steps li {
+  counter-increment: step;
+  border-top: 2px solid var(--ink);
+  padding-top: 18px;
+}
+.mkt-root .lp-steps li::before {
+  content: "0" counter(step);
+  display: block;
+  font-family: var(--f-display);
+  font-size: 14px;
+  color: var(--coral);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.mkt-root .lp-steps h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+.mkt-root .lp-steps p {
+  color: var(--ink-2);
+  font-size: 15.5px;
+}
+
+/* Prices */
+.mkt-root .lp-prices {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+}
+.mkt-root .lp-price {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+}
+.mkt-root .lp-price-sessions {
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.mkt-root .lp-price-total {
+  font-family: var(--f-display);
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  margin: 8px 0 6px;
+}
+.mkt-root .lp-price-per {
+  color: var(--ink-2);
+  font-size: 15px;
+}
+.mkt-root .lp-price-free {
+  margin-top: 12px;
+  display: inline-block;
+  background: var(--yellow-soft);
+  border-radius: var(--radius-pill);
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Quotes */
+.mkt-root .lp-quotes {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+}
+.mkt-root .lp-quote {
+  margin: 0;
+  background: var(--navy);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.mkt-root .lp-quote blockquote {
+  margin: 0;
+  font-size: 16.5px;
+  line-height: 1.55;
+}
+.mkt-root .lp-quote figcaption {
+  font-size: 14px;
+  color: var(--cyan);
+  margin-top: auto;
+}
+
+/* FAQ */
+.mkt-root .lp-faq {
+  display: grid;
+  gap: 12px;
+}
+.mkt-root .lp-faq details {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0 22px;
+}
+.mkt-root .lp-faq summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 20px 32px 20px 0;
+  position: relative;
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 18px;
+}
+.mkt-root .lp-faq summary::-webkit-details-marker {
+  display: none;
+}
+.mkt-root .lp-faq summary::after {
+  content: "+";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--ink-3);
+}
+.mkt-root .lp-faq details[open] summary::after {
+  content: "−";
+}
+.mkt-root .lp-faq details p {
+  padding: 0 0 22px;
+  color: var(--ink-2);
+}
+
+/* Related links */
+.mkt-root .lp-related {
+  display: grid;
+  gap: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+}
+.mkt-root .lp-related h2 {
+  font-size: 20px;
+  margin-bottom: 14px;
+}
+.mkt-root .lp-related ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.mkt-root .lp-related a {
+  color: var(--ink-2);
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 4px;
+}
+.mkt-root .lp-related a:hover {
+  color: var(--ink);
+  text-decoration-color: currentColor;
+}
+
+/* Final CTA */
+.mkt-root .lp-final {
+  background: var(--navy);
+  color: #fff;
+  padding: clamp(56px, 8vw, 96px) 0;
+  text-align: center;
+}
+.mkt-root .lp-final h2 {
+  font-size: clamp(28px, 3.6vw, 44px);
+  max-width: 22ch;
+  margin: 0 auto 18px;
+}
+.mkt-root .lp-final p {
+  color: rgba(255, 255, 255, 0.75);
+  max-width: 60ch;
+  margin: 0 auto 30px;
+}
+
+/* About page */
+.mkt-root .lp-founders {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+}
+.mkt-root .lp-founder {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.mkt-root .lp-founder img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  object-position: top;
+}
+.mkt-root .lp-founder div {
+  padding: 24px 28px 28px;
+}
+.mkt-root .lp-founder h3 {
+  font-size: 24px;
+}
+.mkt-root .lp-founder .role {
+  color: var(--coral);
+  font-size: 14px;
+  font-weight: 500;
+  margin: 4px 0 12px;
+}
+.mkt-root .lp-founder p:not(.role) {
+  color: var(--ink-2);
+  font-size: 15.5px;
+}
+.mkt-root .lp-prose {
+  max-width: 70ch;
+  display: grid;
+  gap: 16px;
+  color: var(--ink-2);
+  font-size: 18px;
+}
+.mkt-root .lp-prose h2 {
+  color: var(--ink);
+  margin-bottom: 8px;
+}

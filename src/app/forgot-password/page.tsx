@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { ForgotPasswordForm } from "./ForgotPasswordForm";
+
+// Private or account pages: kept out of search results (robots.txt also
+// blocks crawling them).
+export const metadata: Metadata = {
+  title: "Forgot password",
+  robots: { index: false, follow: false },
+};
 
 export default async function ForgotPasswordPage({
   searchParams,

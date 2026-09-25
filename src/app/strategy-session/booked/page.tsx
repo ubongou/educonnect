@@ -6,7 +6,7 @@ import { BookedCalendar } from "./BookedCalendar";
 // navigation from StrategyBooking's onDone) — not meant to be indexed,
 // bookmarked, or linked to directly.
 export const metadata: Metadata = {
-  title: "One last step: pick your time | Masani",
+  title: "One last step: pick your time",
   robots: { index: false, follow: false },
 };
 
