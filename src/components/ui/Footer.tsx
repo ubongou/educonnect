@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WhatsAppButton } from "@/components/marketing/WhatsAppButton";
 import { BrandLogo } from "./BrandLogo";
 import { countryPages, subjectPages } from "@/lib/marketing/seoPages";
 
@@ -31,6 +32,8 @@ export function Footer({
 
 function MarketingFooter() {
   return (
+    <>
+    <WhatsAppButton />
     <footer className="footer" aria-label="Site footer">
       <div className="container">
         <div className="footer-top">
@@ -60,9 +63,7 @@ function MarketingFooter() {
                 <Link href="/our-promise">Our promise</Link>
               </li>
               <li>
-                <Link href="/guides/online-tutoring-for-nigerian-families-abroad">
-                  Choosing a tutor
-                </Link>
+                <Link href="/guides">Guides for parents</Link>
               </li>
               <li>
                 <Link href="/#contact">Contact</Link>
@@ -121,11 +122,17 @@ function MarketingFooter() {
           </div>
         </div>
         <div className="footer-bottom">
-          <span>© 2025 Masani · joinmasani.com</span>
+          <span>© {new Date().getFullYear()} Masani · joinmasani.com</span>
+          <span className="footer-legal">
+            <Link href="/terms">Terms</Link>
+            <Link href="/privacy">Privacy</Link>
+            <Link href="/safeguarding">Safeguarding</Link>
+          </span>
           <span>Selected for the MIT Social Innovation Fellowship, 2025</span>
         </div>
       </div>
     </footer>
+    </>
   );
 }
 
@@ -148,7 +155,7 @@ function AuthedFooter({ role }: { role?: "parent" | "admin" }) {
           ))}
         </ul>
         <p className="text-[12px] text-white/20">
-          © 2026 Masani · joinmasani.com
+          © {new Date().getFullYear()} Masani · joinmasani.com
         </p>
       </div>
     </footer>

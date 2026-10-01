@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { defaultPricingTiers } from "@/lib/marketing/defaults";
 import { everyFamilyGets } from "@/lib/marketing/seoPages";
-import { GUIDE_PATH, PROMISE_PATH, homeFaqs, promiseSummary } from "@/lib/marketing/promise";
+import { GUIDE_PATH, PROMISE_PATH, homeFaqs, promiseSummary, proofStats } from "@/lib/marketing/promise";
 
 /**
  * Homepage sections added for search, AI answers and conversion. Server
@@ -51,18 +51,7 @@ export function PricePromise() {
               See all prices
             </Link>
           </div>
-          <div className="pp-promise">
-            <p className="pp-seal">The Masani Promise</p>
-            <h3>Happy in your first 90 days, or your money back</h3>
-            <ul>
-              {promiseSummary.map((line) => (
-                <li key={line}>{line}</li>
-              ))}
-            </ul>
-            <Link href={PROMISE_PATH} className="lp-link">
-              How our promise works, and its terms
-            </Link>
-          </div>
+          <PromiseCard />
         </div>
       </div>
     </section>
@@ -102,6 +91,42 @@ export function HomeFaq() {
             Book your free call
           </Link>
         </p>
+      </div>
+    </section>
+  );
+}
+
+/** The promise summary card. Used on the homepage and the pricing page. */
+export function PromiseCard() {
+  return (
+    <div className="pp-promise">
+      <p className="pp-seal">The Masani Promise</p>
+      <h3>Happy in your first 90 days, or your money back</h3>
+      <ul>
+        {promiseSummary.map((line) => (
+          <li key={line}>{line}</li>
+        ))}
+      </ul>
+      <Link href={PROMISE_PATH} className="lp-link">
+        How our promise works, and its terms
+      </Link>
+    </div>
+  );
+}
+
+/** Real numbers from the admin portal, right under the hero. */
+export function ProofStrip() {
+  return (
+    <section className="proof-strip" aria-label="Masani in numbers">
+      <div className="container">
+        <ul>
+          {proofStats.map((s) => (
+            <li key={s.label}>
+              <strong>{s.value}</strong>
+              <span>{s.label}</span>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

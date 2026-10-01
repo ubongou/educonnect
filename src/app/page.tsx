@@ -2,7 +2,7 @@ import "../styles/landing.css";
 import { Nav } from "@/components/ui/Nav";
 import { JsonLdScript, faqJsonLd, pageMetadata } from "@/lib/seo";
 import { homeFaqs } from "@/lib/marketing/promise";
-import { FamilyGets, HomeFaq, PricePromise } from "@/components/marketing/HomeExtras";
+import { FamilyGets, HomeFaq, PricePromise, ProofStrip } from "@/components/marketing/HomeExtras";
 import { Footer } from "@/components/ui/Footer";
 import { Hero } from "@/components/marketing/Hero";
 import { Marquee } from "@/components/marketing/Marquee";
@@ -36,6 +36,7 @@ export default function Home() {
       <main id="main-content">
         <Hero content={home.hero} />
         <Marquee content={home.marquee} />
+        <ProofStrip />
         <FamilyGets />
         <WhyGrid content={home.whyGrid} />
         <HowItWorks content={home.howItWorks} />

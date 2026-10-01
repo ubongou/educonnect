@@ -8,6 +8,7 @@ import {
   requestPaymentProofUpload,
 } from "@/lib/actions/paymentProof";
 import { BANK_DETAILS } from "@/lib/payments/bankDetails";
+import { START_NOW_NOTICE } from "@/lib/payments/startNow";
 import { formatNaira } from "@/lib/payments/plans";
 import type { LiveInvoice } from "@/lib/payments/invoiceRules";
 import { acceptAttr, paymentProofPolicy } from "@/lib/uploads/policies";
@@ -296,6 +297,7 @@ function BankBlock({ reference }: { reference: string | null }) {
           </p>
         </div>
       )}
+      <p className="mt-3 text-[11.5px] leading-[1.5] text-g400">{START_NOW_NOTICE}</p>
     </div>
   );
 }

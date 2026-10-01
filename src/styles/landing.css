@@ -517,3 +517,158 @@
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+
+/* Policy pages */
+.mkt-root .legal-body {
+  display: grid;
+  gap: 28px;
+  color: var(--ink-2);
+  font-size: 16.5px;
+  line-height: 1.7;
+}
+.mkt-root .legal-body h2 {
+  font-size: 22px;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.mkt-root .legal-body p + p {
+  margin-top: 10px;
+}
+.mkt-root .legal-body ul {
+  padding-left: 20px;
+  display: grid;
+  gap: 8px;
+}
+.mkt-root .legal-related a {
+  color: var(--coral-deep);
+  font-weight: 500;
+}
+
+
+/* Proof strip under the hero */
+.mkt-root .proof-strip {
+  padding: clamp(28px, 4vw, 44px) 0 0;
+}
+.mkt-root .proof-strip ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+}
+.mkt-root .proof-strip li {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  display: grid;
+  gap: 2px;
+}
+.mkt-root .proof-strip strong {
+  font-family: var(--f-display);
+  font-size: clamp(28px, 3vw, 36px);
+  line-height: 1.1;
+  color: var(--ink);
+}
+.mkt-root .proof-strip span {
+  color: var(--ink-2);
+  font-size: 14.5px;
+}
+
+/* Parent guides */
+.mkt-root .gd-byline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 22px;
+}
+.mkt-root .gd-byline img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.mkt-root .gd-byline div {
+  display: grid;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+.mkt-root .gd-byline strong {
+  color: var(--ink);
+}
+.mkt-root .gd-body {
+  display: grid;
+  gap: 36px;
+  color: var(--ink-2);
+  font-size: 17px;
+  line-height: 1.75;
+}
+.mkt-root .gd-body h2 {
+  font-size: clamp(24px, 2.6vw, 30px);
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+.mkt-root .gd-body p + p,
+.mkt-root .gd-body p + .gd-list,
+.mkt-root .gd-body .gd-list + p,
+.mkt-root .gd-body .gd-table-wrap + p,
+.mkt-root .gd-body p + .gd-table-wrap {
+  margin-top: 14px;
+}
+.mkt-root .gd-list {
+  padding-left: 22px;
+  display: grid;
+  gap: 10px;
+}
+.mkt-root .gd-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #fff;
+}
+.mkt-root .gd-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.mkt-root .gd-table caption {
+  text-align: left;
+  padding: 12px 14px 4px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.mkt-root .gd-table th,
+.mkt-root .gd-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 10px 14px;
+  border-top: 1px solid var(--line);
+}
+.mkt-root .gd-table thead th {
+  border-top: 0;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-3);
+}
+.mkt-root .gd-table tbody th {
+  color: var(--ink);
+  font-weight: 600;
+}
+.mkt-root .gd-sources a,
+.mkt-root .gd-body p a {
+  color: var(--coral-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.mkt-root .gd-sources ul {
+  padding-left: 20px;
+  display: grid;
+  gap: 6px;
+  font-size: 15px;
+}
+.mkt-root .lp-tile h3 a:hover {
+  color: var(--coral-deep);
+}

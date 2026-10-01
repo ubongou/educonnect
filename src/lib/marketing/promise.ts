@@ -25,6 +25,21 @@ const minPerSession = (c: "GBP" | "USD" | "CAD") =>
 /** "£9.63 / $13.13 / C$18.38", always in step with the pricing table. */
 export const FROM_PRICES = `£${minPerSession("GBP")} / $${minPerSession("USD")} / C$${minPerSession("CAD")}`;
 
+/**
+ * Proof points shown under the hero and in llms.txt. Source: the admin portal.
+ * Lessons per week = lesson reports filed in a typical recent week (30 in the
+ * week of 21 Sept 2026; about 30 a week on average from mid August to the end
+ * of September). Countries = where active families live. The satisfaction
+ * figure was supplied by Masani; keep the survey or ratings it is based on.
+ * Update these when the numbers move.
+ */
+export const proofStats = [
+  { value: "30", label: "lessons taught every week" },
+  { value: "5", label: "countries our families live in" },
+  { value: "98%", label: "parent satisfaction" },
+  { value: "Top 3%", label: "of teachers who apply are accepted" },
+];
+
 export const PROMISE_PATH = "/our-promise";
 export const GUIDE_PATH = "/guides/online-tutoring-for-nigerian-families-abroad";
 

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Nunito, Nunito_Sans, Outfit, Inter } from "next/font/google";
+import { Outfit, Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import "../styles/marketing.css";
@@ -14,20 +14,6 @@ import {
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 const GA4_ID = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
-
-const nunito = Nunito({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-nunito",
-  display: "swap",
-});
-
-const nunitoSans = Nunito_Sans({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  variable: "--font-nunito-sans",
-  display: "swap",
-});
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -78,7 +64,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${nunito.variable} ${nunitoSans.variable} ${outfit.variable} ${inter.variable} h-full`}
+      className={`${outfit.variable} ${inter.variable} h-full`}
     >
       <body className="min-h-full flex flex-col font-sans text-navy bg-white antialiased">
         <Script id="meta-pixel" strategy="afterInteractive">

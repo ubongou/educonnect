@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import clsx from "clsx";
 import Link from "next/link";
-import { CurrencyToggle, currencySymbols, type Currency } from "./CurrencyToggle";
+import { CurrencyToggle, currencySymbols, guessCurrency, type Currency } from "./CurrencyToggle";
 import type {
   PricingIntroContent,
   PricingTiersContent,
@@ -31,6 +31,8 @@ function fmt(value: number, currency: Currency): string {
   );
 }
 
+const noopSubscribe = () => () => {};
+
 export function PricingTable({
   intro,
   tiers,
@@ -38,7 +40,12 @@ export function PricingTable({
   intro: PricingIntroContent;
   tiers: PricingTiersContent;
 }) {
-  const [currency, setCurrency] = useState<Currency>("USD");
+  // Show the visitor's own currency first. Guessed from the browser's time
+  // zone: no network call, no server work, so it cannot slow the page down.
+  // The server renders USD; the browser switches after hydration.
+  const guessed = useSyncExternalStore(noopSubscribe, guessCurrency, () => "USD" as Currency);
+  const [picked, setCurrency] = useState<Currency | null>(null);
+  const currency = picked ?? guessed;
 
   return (
     <section className="pricing-hero" aria-labelledby="pricing-heading">

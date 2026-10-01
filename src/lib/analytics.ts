@@ -24,6 +24,7 @@ type TrackEventMap = {
   /** The visitor picked a slot on /booked — the real business conversion. */
   strategy_session_booked: { source: string };
   scroll_depth: { percent: 25 | 50 | 75 | 100 };
+  click_whatsapp: { source: string };
 };
 
 export function trackEvent<K extends keyof TrackEventMap>(

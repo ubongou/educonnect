@@ -1,4 +1,6 @@
+import "../../styles/landing.css";
 import { Nav } from "@/components/ui/Nav";
+import { PromiseCard } from "@/components/marketing/HomeExtras";
 import { Footer } from "@/components/ui/Footer";
 import { PricingTable } from "@/components/marketing/PricingTable";
 import { PricingFAQ } from "@/components/marketing/PricingFAQ";
@@ -38,6 +40,11 @@ export default function PricingPage() {
       <Nav mode="marketing" activeHref="/pricing" />
       <main id="main-content">
         <PricingTable intro={pricing.intro} tiers={pricing.tiers} />
+        <section className="lp-section" aria-label="The Masani Promise">
+          <div className="container lp-narrow">
+            <PromiseCard />
+          </div>
+        </section>
         <PricingFAQ content={pricing.faq} />
       </main>
       <Footer mode="marketing" />

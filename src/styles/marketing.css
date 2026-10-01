@@ -1691,3 +1691,39 @@
     font-size: 36px;
   }
 }
+
+/* Floating WhatsApp button on marketing pages */
+.wa-float {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 60;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #25d366;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 8px 24px -6px rgba(4, 19, 28, 0.35);
+  transition: transform 0.15s ease;
+}
+.wa-float:hover {
+  transform: scale(1.06);
+}
+.wa-float:focus-visible {
+  outline: 3px solid #04131c;
+  outline-offset: 3px;
+}
+@media print {
+  .wa-float {
+    display: none;
+  }
+}
+.mkt-root .footer-legal {
+  display: inline-flex;
+  gap: 18px;
+}
+.mkt-root .footer-legal a:hover {
+  color: #fff;
+}

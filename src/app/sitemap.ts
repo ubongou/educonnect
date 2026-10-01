@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { countryPages, subjectPages } from "@/lib/marketing/seoPages";
 import { absoluteUrl } from "@/lib/seo";
+import { guides } from "@/lib/marketing/guides";
 
 /** Every public, indexable page. New landing pages appear here automatically. */
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -19,8 +20,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...countryPages.map((c) => page(`/online-tutoring/${c.slug}`, 0.8)),
     page("/about", 0.7),
     page("/our-promise", 0.7),
+    page("/guides", 0.7),
     page("/guides/online-tutoring-for-nigerian-families-abroad", 0.7),
+    ...guides.map((g) => page(`/guides/${g.slug}`, 0.7)),
     page("/book", 0.6),
     page("/privacy", 0.2, "yearly"),
+    page("/terms", 0.2, "yearly"),
+    page("/safeguarding", 0.5, "yearly"),
   ];
 }

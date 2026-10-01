@@ -1,4 +1,5 @@
 import { BANK_DETAILS } from "@/lib/payments/bankDetails";
+import { START_NOW_NOTICE } from "@/lib/payments/startNow";
 import { formatNaira } from "@/lib/payments/plans";
 
 const BRAND_NAVY = "#04131C";
@@ -110,6 +111,9 @@ const bankBlockHtml = (reference: string) => `
       <p style="margin:0;font:400 13px Arial,sans-serif;color:#4A5560;">
         Please quote <strong style="color:${BRAND_NAVY};">${escapeHtml(reference)}</strong> as the transfer reference so we can match your payment straight away.
       </p>
+      <p style="margin:10px 0 0;font:400 12px Arial,sans-serif;line-height:1.5;color:#8A93A0;">
+        ${escapeHtml(START_NOW_NOTICE)}
+      </p>
     </td></tr>
   </table>`;
 
@@ -120,6 +124,8 @@ const bankBlockText = (reference: string) =>
     BANK_DETAILS.bankName,
     BANK_DETAILS.accountNumber,
     `Reference: ${reference}`,
+    "",
+    START_NOW_NOTICE,
   ].join("\n");
 
 const greetingFor = (name: string | null) =>
