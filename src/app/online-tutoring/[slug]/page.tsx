@@ -79,6 +79,13 @@ export default async function CountryPage({
         faqs={page.faqs}
         related={[
           {
+            title: "For parents",
+            links: [
+              { href: "/guides/online-tutoring-for-nigerian-families-abroad", label: "How to choose an online tutor" },
+              { href: "/our-promise", label: "The Masani Promise" },
+            ],
+          },
+          {
             title: "Subjects we teach",
             links: subjectPages.map((s) => ({
               href: `/tutoring/${s.slug}`,

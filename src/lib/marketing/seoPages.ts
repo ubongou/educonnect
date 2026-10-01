@@ -59,7 +59,7 @@ export type CountryPage = {
 export const everyFamilyGets = [
   {
     title: "A teacher from the top 3%",
-    body: "We accept around three in every hundred teachers who apply, then match one to your child. You never have to browse profiles.",
+    body: "Only the top 3% of teachers who apply are accepted, and we match one to your child. You never have to browse profiles.",
   },
   {
     title: "A written report after every lesson",
@@ -78,8 +78,8 @@ export const everyFamilyGets = [
     body: "Sessions run across UK, US, Canada and Australia hours, and every time shows in your own local time.",
   },
   {
-    title: "Flexible terms",
-    body: "Pause or cancel with 48 hours' notice, and change teacher at no extra cost if the fit is not right.",
+    title: "Change your teacher any time",
+    body: "Free, no questions asked. You can also pause or cancel with 48 hours' notice, and unused sessions are always refunded.",
   },
 ];
 

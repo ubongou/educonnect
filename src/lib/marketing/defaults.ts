@@ -45,20 +45,26 @@ export const defaultGlobals: GlobalsContent = {
 // -----------------------------------------------------------------------------
 
 export const defaultHero: HeroContent = {
-  headingPart1: "Personal Tutoring from ",
-  headingAccent: "World Class",
-  headingPart2: " Teachers",
+  headingPart1: "Personal tutoring from",
+  headingAccent: "Nigeria's best",
+  headingPart2: "teachers",
+  tagline:
+    "Private one to one online lessons for Nigerian families in the UK, US and Canada. Only the top 3% of teachers who apply are accepted.",
   subheading:
-    "Masani provides your children with private, one-on-one instruction from the finest educators — rigorously vetted, carefully matched, and deeply invested in every child they teach.",
+    "Rigorously vetted, carefully matched, and deeply invested in every child they teach.",
   primaryCtaLabel: "Book a free session",
   secondaryCtaLabel: "Pricing",
   microcopy: "No commitment. Booking takes 2 minutes.",
+  assurances: [
+    { label: "90 day money back guarantee", href: "/our-promise" },
+    { label: "Change your teacher any time", href: "/our-promise" },
+  ],
   card1Title: "Vetted teachers",
   card1Body: "Top 3% of applicants",
   card2Title: "Families worldwide",
   card2Body: "UK · US · Canada",
-  heroImageAlt: "Masani student engaged in a one-on-one lesson",
-  mitBadgeAlt: "Backed by MIT — Massachusetts Institute of Technology",
+  heroImageAlt: "Masani student engaged in a one to one lesson",
+  mitBadgeAlt: "Backed by MIT, Massachusetts Institute of Technology",
 };
 
 export const defaultMarquee: MarqueeContent = {
@@ -107,7 +113,7 @@ export const defaultTestimonials: TestimonialsContent = {
   title: "Real results, real families",
   quotes: [
     {
-      body: "The tutors have been outstanding — patient, professional, and deeply committed. I would wholeheartedly recommend Masani to any parent looking to see tangible improvement in their children's learning journey.",
+      body: "The tutors have been outstanding, patient, professional, and deeply committed. I would wholeheartedly recommend Masani to any parent looking to see tangible improvement in their children's learning journey.",
       author: "Mr. Ugbehe",
       where: "Scotland, UK",
       initial: "U",
@@ -180,7 +186,7 @@ export const defaultPricingTiers: PricingTiersContent = {
       sessions: 8,
       duration: "~1 month at 2x/week",
       badge: "popular",
-      noCommitmentMessage: "Standard rate — no commitment",
+      noCommitmentMessage: "Standard rate, no commitment",
       prices: {
         NGN: { perSession: 20000, total: 160000, saving: 0, free: 0 },
         USD: { perSession: 15, total: 120, saving: 0, free: 0 },
@@ -192,7 +198,7 @@ export const defaultPricingTiers: PricingTiersContent = {
       sessions: 24,
       duration: "~3 months at 2x/week",
       badge: null,
-      noCommitmentMessage: "Standard rate — no commitment",
+      noCommitmentMessage: "Standard rate, no commitment",
       prices: {
         NGN: { perSession: 18333, total: 440000, saving: 40000, free: 2 },
         USD: { perSession: 13.75, total: 330, saving: 30, free: 2 },
@@ -204,7 +210,7 @@ export const defaultPricingTiers: PricingTiersContent = {
       sessions: 48,
       duration: "~6 months at 2x/week",
       badge: "economical",
-      noCommitmentMessage: "Standard rate — no commitment",
+      noCommitmentMessage: "Standard rate, no commitment",
       prices: {
         NGN: { perSession: 17500, total: 840000, saving: 120000, free: 6 },
         USD: { perSession: 13.13, total: 630, saving: 90, free: 6 },
@@ -233,7 +239,12 @@ export const defaultPricingFaq: PricingFaqContent = {
     {
       question: "Can I change my child's teacher if it's not working out?",
       answer:
-        "Absolutely. We match students and teachers carefully, but if it's not the right fit, we'll work with you to find a better match at no extra cost. Your child's progress and confidence matter most to us.",
+        "Yes, at any time. Changing teacher is free, no questions asked. Just tell us and we will match your child with someone new.",
+    },
+    {
+      question: "Is there a money back guarantee?",
+      answer:
+        "Yes. In your first 90 days, if something is not right, tell us and we will fix it within 14 days. If you are still not happy, you choose a full refund or up to 30 days of free lessons. Unused sessions are refunded at any time. Full terms are on our promise page at joinmasani.com/our-promise.",
     },
     {
       question: "Do you offer corporate or group discounts?",

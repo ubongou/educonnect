@@ -104,7 +104,7 @@ export function organizationJsonLd(): JsonLd {
     logo: absoluteUrl("/brand/logo-blue-bg.png"),
     image: absoluteUrl("/brand-v2/student-hero.webp"),
     description: ORG_DESCRIPTION,
-    slogan: "Personal Tutoring from World Class Teachers",
+    slogan: "Personal tutoring from Nigeria's best teachers",
     email: defaultGlobals.adminEmail,
     telephone: `+${defaultGlobals.whatsappNumber}`,
     sameAs: [defaultGlobals.instagramUrl, defaultGlobals.facebookUrl],

@@ -1,5 +1,8 @@
+import "../styles/landing.css";
 import { Nav } from "@/components/ui/Nav";
-import { pageMetadata } from "@/lib/seo";
+import { JsonLdScript, faqJsonLd, pageMetadata } from "@/lib/seo";
+import { homeFaqs } from "@/lib/marketing/promise";
+import { FamilyGets, HomeFaq, PricePromise } from "@/components/marketing/HomeExtras";
 import { Footer } from "@/components/ui/Footer";
 import { Hero } from "@/components/marketing/Hero";
 import { Marquee } from "@/components/marketing/Marquee";
@@ -25,6 +28,7 @@ export default function Home() {
   return (
     <div className="mkt-root">
       <MarketingScrollReveal />
+      <JsonLdScript data={faqJsonLd(homeFaqs)} />
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
@@ -32,9 +36,12 @@ export default function Home() {
       <main id="main-content">
         <Hero content={home.hero} />
         <Marquee content={home.marquee} />
+        <FamilyGets />
         <WhyGrid content={home.whyGrid} />
         <HowItWorks content={home.howItWorks} />
         <Testimonials content={home.testimonials} />
+        <PricePromise />
+        <HomeFaq />
         <FoundersAbout content={home.founders} />
         <Contact content={home.contact} />
       </main>

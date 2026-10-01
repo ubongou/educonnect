@@ -177,7 +177,11 @@ export function LandingPage({
             </h2>
             <p className="lp-sub">
               Pay per package, not per month. No hidden fees, and you can pause or
-              cancel with 48 hours&apos; notice.
+              cancel with 48 hours&apos; notice. Your first 90 days are covered by{" "}
+              <Link href="/our-promise" className="lp-link">
+                our money back promise
+              </Link>
+              .
             </p>
             <div className="lp-prices">
               {defaultPricingTiers.tiers.map((t) => {

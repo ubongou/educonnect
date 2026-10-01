@@ -35,12 +35,12 @@ function MarketingFooter() {
       <div className="container">
         <div className="footer-top">
           <div className="footer-col">
-            <Link href="/" className="brand" aria-label="Masani — go to home">
+            <Link href="/" className="brand" aria-label="Masani, go to home">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/brand/logo-navy-bg.png" alt="Masani" loading="lazy" />
             </Link>
             <p>
-              Personal tutoring from Nigeria&apos;s best teachers — for families
+              Personal tutoring from Nigeria&apos;s best teachers, for families
               everywhere.
             </p>
           </div>
@@ -55,6 +55,14 @@ function MarketingFooter() {
               </li>
               <li>
                 <Link href="/pricing">Pricing</Link>
+              </li>
+              <li>
+                <Link href="/our-promise">Our promise</Link>
+              </li>
+              <li>
+                <Link href="/guides/online-tutoring-for-nigerian-families-abroad">
+                  Choosing a tutor
+                </Link>
               </li>
               <li>
                 <Link href="/#contact">Contact</Link>

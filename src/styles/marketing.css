@@ -394,6 +394,40 @@
   border-radius: 4px;
   transform: skewX(-6deg);
 }
+.mkt-root .hero p.hero-tagline {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: clamp(17px, 1.5vw, 20px);
+  line-height: 1.45;
+  color: var(--ink);
+  max-width: 560px;
+  margin-bottom: 14px;
+}
+.mkt-root .hero-assurances {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.mkt-root .hero-assurances li::before {
+  content: "✓";
+  color: #1f9d55;
+  font-weight: 700;
+  margin-right: 7px;
+}
+.mkt-root .hero-assurances a {
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 3px;
+}
+.mkt-root .hero-assurances a:hover {
+  text-decoration-color: var(--coral);
+}
 .mkt-root .hero p.lead {
   font-size: 15.5px;
   line-height: 1.6;

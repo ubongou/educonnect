@@ -77,6 +77,13 @@ export default async function SubjectPage({
         faqs={page.faqs}
         related={[
           {
+            title: "For parents",
+            links: [
+              { href: "/guides/online-tutoring-for-nigerian-families-abroad", label: "How to choose an online tutor" },
+              { href: "/our-promise", label: "The Masani Promise" },
+            ],
+          },
+          {
             title: "Other subjects",
             links: subjectPages
               .filter((s) => s.slug !== page.slug)

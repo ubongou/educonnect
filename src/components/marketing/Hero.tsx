@@ -22,6 +22,7 @@ export function Hero({ content }: { content: HeroContent }) {
             {content.headingAccent && content.headingPart2 ? " " : null}
             {content.headingPart2}
           </h1>
+          <p className="hero-tagline reveal delay-2">{content.tagline}</p>
           <p className="lead reveal delay-2">{content.subheading}</p>
           <div className="hero-ctas reveal delay-3">
             <Link
@@ -41,6 +42,15 @@ export function Hero({ content }: { content: HeroContent }) {
           <div className="hero-microcopy reveal delay-3">
             <span className="dot" aria-hidden="true" /> {content.microcopy}
           </div>
+          {content.assurances.length > 0 && (
+            <ul className="hero-assurances reveal delay-3">
+              {content.assurances.map((a) => (
+                <li key={a.label}>
+                  {a.href ? <Link href={a.href}>{a.label}</Link> : a.label}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className="hero-visual reveal delay-2">

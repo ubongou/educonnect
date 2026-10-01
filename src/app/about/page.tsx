@@ -91,15 +91,15 @@ export default function AboutPage() {
             <h2 className="lp-h2">How we choose teachers</h2>
             <p>
               We do not list tutors for parents to browse. We select, vet and place
-              the right teacher for each child, and only around three in every
-              hundred teachers who apply are accepted.
+              the right teacher for each child, and only the top 3% of teachers who
+              apply are accepted.
             </p>
             <p>
               Teachers are chosen for subject expertise, for empathy, and for their
               ability to build a child&apos;s confidence. After every lesson they
               write a report for parents, every class is recorded, and we stay
-              accountable for every teacher we place. If a match is not working, we
-              change teacher at no extra cost.
+              accountable for every teacher we place. Families can change teacher at any
+              time, free, no questions asked.
             </p>
           </div>
         </section>

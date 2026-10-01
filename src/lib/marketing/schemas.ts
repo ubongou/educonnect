@@ -29,10 +29,14 @@ export type HeroContent = {
   headingPart1: string;
   headingAccent: string;
   headingPart2: string;
+  /** Line under the H1: who teaches, who it is for, and the proof behind "best". */
+  tagline: string;
   subheading: string;
   primaryCtaLabel: string;
   secondaryCtaLabel: string;
   microcopy: string;
+  /** Short reassurances under the CTAs. Each one with an href links to its terms. */
+  assurances: Array<{ label: string; href?: string }>;
   card1Title: string;
   card1Body: string;
   card2Title: string;

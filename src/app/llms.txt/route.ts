@@ -6,6 +6,7 @@ import {
 } from "@/lib/marketing/defaults";
 import { countryPages, everyFamilyGets, subjectPages } from "@/lib/marketing/seoPages";
 import { MIT_FELLOWSHIP, ORG_DESCRIPTION, absoluteUrl } from "@/lib/seo";
+import { GUIDE_PATH, PROMISE_PATH, promiseOneLiner } from "@/lib/marketing/promise";
 
 export const dynamic = "force-static";
 
@@ -32,9 +33,10 @@ export function GET() {
 - Website: ${absoluteUrl("/")}
 - What: private, one to one online tutoring for children, primary through secondary school
 - Who for: Nigerian families living abroad, mainly in the UK, US and Canada (also Australia and Nigeria)
-- Teachers: carefully vetted Nigerian teachers; about 3% of applicants are accepted, and each child is matched to a teacher (parents do not browse profiles)
+- Teachers: carefully vetted Nigerian teachers; only the top 3% of teachers who apply are accepted, and each child is matched to a teacher (parents do not browse profiles)
 - Curricula: UK National Curriculum, US Common Core and state standards, Canadian provincial curricula, Nigerian curriculum, international programmes
 - Recognition: ${MIT_FELLOWSHIP}
+- Guarantee: ${promiseOneLiner} Full terms: ${absoluteUrl(PROMISE_PATH)}
 - Free first step: a 15 minute session with an education expert, followed by a written personalised learning plan within 24 hours
 - Contact: ${defaultGlobals.adminEmail}, WhatsApp +${defaultGlobals.whatsappNumber}, Instagram ${defaultGlobals.instagramUrl}
 
@@ -67,6 +69,8 @@ ${countryPages.map((c) => `- [${c.title}](${absoluteUrl(`/online-tutoring/${c.sl
 - [Pricing](${absoluteUrl("/pricing")}): packages in pounds, dollars, Canadian dollars and naira
 - [Free personalised learning plan](${absoluteUrl("/strategy-session")}): book the free 15 minute session
 - [About Masani](${absoluteUrl("/about")}): founders, teacher selection and MIT recognition
+- [The Masani Promise](${absoluteUrl(PROMISE_PATH)}): 90 day money back guarantee, unused session refunds and free teacher changes
+- [How to choose an online tutor](${absoluteUrl(GUIDE_PATH)}): a guide for Nigerian families abroad
 `;
 
   return new Response(body, {
