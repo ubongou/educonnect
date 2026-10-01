@@ -512,3 +512,8 @@
   color: var(--coral-deep);
   margin-bottom: 2px;
 }
+.mkt-root .gd-at a {
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

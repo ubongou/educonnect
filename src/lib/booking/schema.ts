@@ -71,6 +71,8 @@ export const sourceIds = [
   "seo-subject",
   "seo-country",
   "about",
+  "guide",
+  "promise",
   "direct",
 ] as const;
 export type SourceId = (typeof sourceIds)[number];
@@ -91,6 +93,8 @@ const sourceLabels: Record<SourceId, string> = {
   "seo-subject": "Subject page (search)",
   "seo-country": "Country page (search)",
   about: "About page",
+  guide: "Parent guide page",
+  promise: "Our promise page",
   direct: "Direct visit (no source)",
 };
 
