@@ -104,4 +104,9 @@ describe("normalizeSource", () => {
     expect(normalizeSource(undefined)).toBe("direct");
     expect(normalizeSource(null)).toBe("direct");
   });
+
+  it("groups every guide-<slug> under 'guide'", () => {
+    expect(normalizeSource("guide-how-much-does-a-tutor-cost")).toBe("guide");
+    expect(normalizeSource("404")).toBe("404");
+  });
 });

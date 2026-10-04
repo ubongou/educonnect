@@ -34,8 +34,12 @@ export const FROM_PRICES = `£${minPerSession("GBP")} / $${minPerSession("USD")}
  * Update these when the numbers move.
  */
 export const proofStats = [
-  { value: "30", label: "lessons taught every week" },
-  { value: "5", label: "countries our families live in" },
+  // "30+": reports filed undercount lessons taught, so 30 is a floor.
+  { value: "30+", label: "one to one lessons taught every week" },
+  // US, Canada, Trinidad and Tobago, UK, Nigeria: North America, Europe, Africa.
+  { value: "5", label: "countries, across 3 continents" },
+  // Confirmed by Ubong on 3 Oct 2026 as backed by Masani's own parent
+  // feedback. Keep that evidence on file; it's a published claim.
   { value: "98%", label: "parent satisfaction" },
   { value: "Top 3%", label: "of teachers who apply are accepted" },
 ];

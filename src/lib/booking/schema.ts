@@ -73,6 +73,7 @@ export const sourceIds = [
   "about",
   "guide",
   "promise",
+  "404",
   "direct",
 ] as const;
 export type SourceId = (typeof sourceIds)[number];
@@ -95,6 +96,7 @@ const sourceLabels: Record<SourceId, string> = {
   about: "About page",
   guide: "Parent guide page",
   promise: "Our promise page",
+  "404": "Page not found",
   direct: "Direct visit (no source)",
 };
 
@@ -109,6 +111,8 @@ export function normalizeSource(raw: unknown): SourceId {
   if (typeof raw === "string" && (sourceIds as readonly string[]).includes(raw)) {
     return raw as SourceId;
   }
+  // Each parent guide passes guide-<slug>; they all report as "guide".
+  if (typeof raw === "string" && raw.startsWith("guide-")) return "guide";
   return "direct";
 }
 
