@@ -19,6 +19,7 @@ const teacherLinks: SidebarLink[] = [
   { href: "/teacher", label: "Overview", icon: <IconGrid /> },
   { href: "/teacher/sessions", label: "Sessions", icon: <IconCalendar /> },
   { href: "/teacher/students", label: "Students", icon: <IconUsers /> },
+  { href: "/teacher/packages", label: "Packages", icon: <IconClipboard /> },
 ];
 
 const adminLinks: SidebarLink[] = [
@@ -31,6 +32,7 @@ const adminLinks: SidebarLink[] = [
   { href: "/admin/subjects", label: "Subjects", icon: <IconBook /> },
   { href: "/admin/sessions", label: "Sessions", icon: <IconClock /> },
   { href: "/admin/payments", label: "Payments", icon: <IconWallet /> },
+  { href: "/admin/packages", label: "Packages", icon: <IconClipboard /> },
   { href: "/admin/sessions/import", label: "Import", icon: <IconCalendar /> },
 ];
 

@@ -1055,11 +1055,154 @@ export type Database = {
           },
         ]
       }
+      teacher_package_sessions: {
+        Row: {
+          added_at: string
+          package_id: string
+          session_id: string
+        }
+        Insert: {
+          added_at?: string
+          package_id: string
+          session_id: string
+        }
+        Update: {
+          added_at?: string
+          package_id?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teacher_package_sessions_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "teacher_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teacher_package_sessions_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teacher_packages: {
+        Row: {
+          completed_at: string | null
+          completion_note: string | null
+          created_at: string
+          enrollment_id: string
+          id: string
+          note: string | null
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          size: number
+          status: string
+          student_id: string
+          teacher_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completion_note?: string | null
+          created_at?: string
+          enrollment_id: string
+          id?: string
+          note?: string | null
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          size: number
+          status?: string
+          student_id: string
+          teacher_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          completion_note?: string | null
+          created_at?: string
+          enrollment_id?: string
+          id?: string
+          note?: string | null
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          size?: number
+          status?: string
+          student_id?: string
+          teacher_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teacher_packages_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "enrollments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teacher_packages_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teacher_packages_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "teacher_packages_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      admin_package_review: {
+        Args: { p_package_id: string; p_action: string; p_note: string | null }
+        Returns: undefined
+      }
+      teacher_package_create: {
+        Args: {
+          p_enrollment_id: string
+          p_size: number
+          p_note: string | null
+          p_session_ids: string[]
+        }
+        Returns: string
+      }
+      teacher_package_add_sessions: {
+        Args: { p_package_id: string; p_session_ids: string[] }
+        Returns: undefined
+      }
+      teacher_package_remove_session: {
+        Args: { p_package_id: string; p_session_id: string }
+        Returns: undefined
+      }
+      teacher_package_update: {
+        Args: { p_package_id: string; p_size: number; p_note: string | null }
+        Returns: undefined
+      }
+      teacher_package_confirm: {
+        Args: { p_package_id: string; p_note: string | null }
+        Returns: undefined
+      }
+      teacher_package_cancel: {
+        Args: { p_package_id: string }
+        Returns: undefined
+      }
       attach_payment_proof: {
         Args: {
           p_key: string

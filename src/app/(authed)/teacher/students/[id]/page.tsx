@@ -15,6 +15,8 @@ import { StudentTabsNav } from "@/components/teacher/StudentTabsNav";
 import { isViewableMime } from "@/lib/uploads/viewable";
 import { ChildDashboardBody } from "@/components/dashboard/ChildDashboardBody";
 import { TableScroll } from "@/components/ui/TableScroll";
+import { loadPackages } from "@/lib/packages/load";
+import { runwayLabel } from "@/lib/packages/progress";
 
 type ReportRow = {
   id: string;
@@ -79,11 +81,17 @@ export default async function TeacherStudentDetail({
   // RLS), so it stays identical to the parent and admin views.
   const { data: enrollmentData } = await supabase
     .from("enrollments")
-    .select("id")
+    .select("id, status, subjects ( name )")
     .eq("student_id", id)
-    .eq("teacher_id", profile.id)
-    .limit(1);
+    .eq("teacher_id", profile.id);
   if ((enrollmentData ?? []).length === 0) notFound();
+  const myEnrollments = (
+    (enrollmentData ?? []) as unknown as Array<{
+      id: string;
+      status: string;
+      subjects: { name: string } | null;
+    }>
+  ).filter((e) => e.status === "approved");
 
   const { data: student } = await supabase
     .from("students")
@@ -98,7 +106,7 @@ export default async function TeacherStudentDetail({
     .maybeSingle();
   if (!student) notFound();
 
-  const [{ data: reports }, { data: documents }] = await Promise.all([
+  const [{ data: reports }, { data: documents }, { packages: openPackages }] = await Promise.all([
     supabase
       .from("lesson_reports")
       .select(
@@ -119,6 +127,7 @@ export default async function TeacherStudentDetail({
       // Homework submissions surface on the lesson report, not this list.
       .neq("kind", "homework_submission")
       .order("uploaded_at", { ascending: false }),
+    loadPackages(supabase, { teacherId: profile.id, studentId: id, statuses: ["open"] }),
   ]);
 
   const reportRows = (reports ?? []) as unknown as ReportRow[];
@@ -165,6 +174,49 @@ export default async function TeacherStudentDetail({
       </div>
 
       <StudentTabsNav id={id} active="overview" />
+
+      {myEnrollments.length > 0 && (
+        <section className="mt-10">
+          <h2 className="mb-4 font-heading text-[11px] font-bold uppercase tracking-[0.12em] text-g400">
+            Packages
+          </h2>
+          <ul className="flex flex-col gap-2">
+            {myEnrollments.map((e) => {
+              const pkg = openPackages.find((p) => p.enrollmentId === e.id);
+              return (
+                <li
+                  key={e.id}
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-[28px] border border-line bg-white px-5 py-3"
+                >
+                  <div>
+                    <p className="font-heading text-[14px] font-semibold text-navy">
+                      {e.subjects?.name ?? "Subject"}
+                    </p>
+                    <p className="mt-1 text-[13px] tabular-nums text-g600">
+                      {pkg
+                        ? `${pkg.tally.done} of ${pkg.size} done · ${pkg.tally.booked} booked · ${pkg.tally.toBook} still to book`
+                        : "No open package"}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {pkg && pkg.runway !== "running" && (
+                      <StatusBadge tone={pkg.runway === "out" ? "coral" : "amber"}>
+                        {runwayLabel(pkg.runway)}
+                      </StatusBadge>
+                    )}
+                    <Link
+                      href={pkg ? `/teacher/packages/${pkg.id}` : `/teacher/packages/new?enrollment=${e.id}`}
+                      className="font-heading text-[13px] font-semibold text-blue underline-offset-4 hover:underline"
+                    >
+                      {pkg ? "Open package" : "Start package"}
+                    </Link>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
 
       <section className="mt-10">
         <h2 className="mb-4 font-heading text-[11px] font-bold uppercase tracking-[0.12em] text-g400">

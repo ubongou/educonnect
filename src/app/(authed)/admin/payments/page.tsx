@@ -16,6 +16,8 @@ import { BANK_DETAILS } from "@/lib/payments/bankDetails";
 import { ADJUSTMENT_OPTIONS } from "@/lib/payments/adjustments";
 import { isMonnifyConfigured } from "@/lib/payments/monnify";
 import { pickLiveInvoice } from "@/lib/payments/invoiceRules";
+import { loadPackages, type PackageView } from "@/lib/packages/load";
+import { compareByUrgency, runwayLabel } from "@/lib/packages/progress";
 import type { DraftAdjustment } from "@/components/admin/PlanAdjustmentsEditor";
 import {
   formatNaira,
@@ -154,6 +156,7 @@ export default async function AdminPaymentsPage({
     sessionResult,
     { data: studentList },
     { data: parentList },
+    openPackages,
   ] = await Promise.all([
     plansQuery,
     // Every plan-linked session, plus the unfunded ones, so both the usage
@@ -183,6 +186,9 @@ export default async function AdminPaymentsPage({
       .eq("role", "parent")
       .is("deactivated_at", null)
       .order("full_name"),
+    // Teachers' own package counts — the heads-up for when a family is due to
+    // be billed again. Read-only here; managed on /admin/packages.
+    loadPackages(supabase, { statuses: ["open", "complete"] }),
   ]);
 
   // A failed read must never pass for "no plans" — that's how a missing
@@ -193,6 +199,21 @@ export default async function AdminPaymentsPage({
   const sessions = sessionResult.rows;
 
   const usage = tallyPlanUsage(sessions);
+
+  // Per child, the open package closest to running out (or one the teacher
+  // has confirmed and is waiting on the office).
+  const packageByStudent = new Map<string, PackageView>();
+  for (const pkg of openPackages.packages) {
+    const cur = packageByStudent.get(pkg.studentId);
+    const rank = (p: PackageView) => (p.status === "complete" ? -1 : 0);
+    if (
+      !cur ||
+      rank(pkg) < rank(cur) ||
+      (rank(pkg) === rank(cur) && compareByUrgency(pkg.tally, cur.tally) < 0)
+    ) {
+      packageByStudent.set(pkg.studentId, pkg);
+    }
+  }
 
   // Which students still have sessions on no plan at all — drives the "Attach
   // sessions" affordance on their paid plans.
@@ -441,6 +462,7 @@ export default async function AdminPaymentsPage({
                             paid by {p.payer.full_name}
                           </p>
                         )}
+                        <PackageHint pkg={packageByStudent.get(p.student_id)} />
                       </td>
                       <td className="px-5 py-3 font-heading font-bold tabular-nums text-navy">
                         {p.reference_code}
@@ -544,6 +566,28 @@ export default async function AdminPaymentsPage({
         )}
       </section>
     </Container>
+  );
+}
+
+/** The teacher's package status for this child, linking to the packages page. */
+function PackageHint({ pkg }: { pkg: PackageView | undefined }) {
+  if (!pkg) return null;
+  const text =
+    pkg.status === "complete"
+      ? `Teacher confirmed ${pkg.subjectName} package (${pkg.tally.done}/${pkg.size})`
+      : `${pkg.subjectName} package: ${pkg.tally.done}/${pkg.size}${
+          pkg.runway === "running" ? "" : ` · ${runwayLabel(pkg.runway).toLowerCase()}`
+        }`;
+  const urgent = pkg.status === "complete" || pkg.runway !== "running";
+  return (
+    <Link
+      href="/admin/packages"
+      className={`mt-1 block text-[12px] underline-offset-4 hover:underline ${
+        urgent ? "font-semibold text-coral" : "text-g400"
+      }`}
+    >
+      {text}
+    </Link>
   );
 }
 
