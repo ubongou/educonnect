@@ -672,3 +672,131 @@
 .mkt-root .lp-tile h3 a:hover {
   color: var(--coral-deep);
 }
+
+/* ---------------------------------------------------------------------------
+   Subjects, exams and guides: linked cards and tag chips
+   --------------------------------------------------------------------------- */
+.mkt-root .lp-tile-link {
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.mkt-root .lp-tile-link:hover {
+  border-color: var(--ink);
+}
+.mkt-root .lp-tile h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+.mkt-root .lp-tile h3 a::after {
+  content: " \2192";
+  color: var(--coral-deep);
+}
+.mkt-root .lp-tile-meta {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+  margin-bottom: 8px;
+}
+.mkt-root .lp-chips {
+  list-style: none;
+  padding: 0;
+  margin: 14px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.mkt-root .lp-chips a,
+.mkt-root .lp-chips span {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #fff;
+  font-size: 14px;
+  color: var(--ink);
+  text-decoration: none;
+}
+.mkt-root .lp-chips a,
+.mkt-root .lp-chips span {
+  font-weight: 500;
+}
+.mkt-root .lp-chips a {
+  text-decoration-color: transparent;
+}
+.mkt-root .lp-chips-nowrap a {
+  white-space: nowrap;
+}
+.mkt-root .lp-chips a:hover {
+  border-color: var(--ink);
+}
+.mkt-root .lp-also {
+  margin-top: 28px;
+}
+.mkt-root .lp-also h3 {
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+.mkt-root .lp-any {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+}
+.mkt-root .lp-any h3,
+.mkt-root .lp-any p {
+  color: #fff;
+}
+.mkt-root .lp-any .btn {
+  align-self: flex-start;
+}
+.mkt-root .lp-exam-groups {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+.mkt-root .lp-exam-group h3 {
+  font-size: 17px;
+  margin-bottom: 4px;
+}
+.mkt-root .lp-exam-group h3 a {
+  color: inherit;
+}
+.mkt-root .lp-exam-country {
+  scroll-margin-top: 110px;
+}
+.mkt-root .lp-exam-country + .lp-exam-country {
+  margin-top: 40px;
+}
+.mkt-root .lp-tile {
+  scroll-margin-top: 110px;
+}
+
+/* Subject cards: two to a row on phones, without the blurb, so eight
+   subjects don't become a very long scroll. */
+@media (max-width: 600px) {
+  .mkt-root .lp-grid-subjects {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .mkt-root .lp-grid-subjects .lp-tile {
+    padding: 16px;
+  }
+  .mkt-root .lp-grid-subjects .lp-tile h3 {
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  .mkt-root .lp-grid-subjects .lp-tile-meta {
+    font-size: 11px;
+    margin-bottom: 0;
+  }
+  .mkt-root .lp-grid-subjects .lp-tile-blurb {
+    display: none;
+  }
+  .mkt-root .lp-grid-subjects .lp-any {
+    grid-column: 1 / -1;
+  }
+}

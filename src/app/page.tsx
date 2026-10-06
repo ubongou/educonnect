@@ -4,6 +4,7 @@ import { JsonLdScript, faqJsonLd, pageMetadata } from "@/lib/seo";
 import { homeFaqs } from "@/lib/marketing/promise";
 import { FamilyGets, HomeFaq, PricePromise, ProofStrip } from "@/components/marketing/HomeExtras";
 import { Footer } from "@/components/ui/Footer";
+import { ExamsOverview, GuidesSection, SubjectsSection } from "@/components/marketing/SubjectsAndExams";
 import { Hero } from "@/components/marketing/Hero";
 import { Marquee } from "@/components/marketing/Marquee";
 import { WhyGrid } from "@/components/marketing/WhyGrid";
@@ -40,9 +41,12 @@ export default function Home() {
         <FamilyGets />
         <WhyGrid content={home.whyGrid} />
         <HowItWorks content={home.howItWorks} />
+        <SubjectsSection bookingSource="home" />
+        <ExamsOverview tint />
         <Testimonials content={home.testimonials} />
         <PricePromise />
         <HomeFaq />
+        <GuidesSection tint />
         <FoundersAbout content={home.founders} />
         <Contact content={home.contact} />
       </main>

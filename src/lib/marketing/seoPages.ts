@@ -31,6 +31,11 @@ export type SubjectPage = {
   faqs: Faq[];
   /** Currency for prices on the page. Defaults to USD; UK-only exams use GBP. */
   currency?: "GBP" | "USD" | "CAD";
+  /**
+   * "exam" for exam preparation pages (11+, SAT and ACT). They share this
+   * template and URL space, but are listed under Exams, not Subjects.
+   */
+  kind?: "exam";
 };
 
 export type CountryPage = {
@@ -217,52 +222,197 @@ export const subjectPages: SubjectPage[] = [
     slug: "science",
     name: "Science",
     linkLabel: "Science tutoring",
-    title: "Online Science Tutor: Biology, Chemistry and Physics",
+    title: "Online Science Tutor for Primary School Children",
     description:
-      "One to one online science tutoring with vetted Nigerian teachers. Biology, chemistry and physics from primary to secondary school, following your child's curriculum.",
-    h1: "Online science tutoring that makes sense of the world",
+      "One to one online science tutoring for children aged 5 to 11 with vetted Nigerian teachers. Curious questions, simple experiments and your child's own curriculum.",
+    h1: "Online science tutoring for curious young minds",
     intro:
-      "One to one science lessons with a vetted Nigerian teacher, covering biology, chemistry and physics at your child's level and in line with their school curriculum. We focus on understanding the ideas, not memorising facts the night before a test.",
+      "One to one science lessons for children aged 5 to 11, with a vetted Nigerian teacher who follows your child's primary or elementary school curriculum. We turn questions into understanding, with everyday examples and simple experiments your child can try at home.",
     whoFor: [
-      "Children who find science confusing or hard to remember",
-      "Students moving from general science to separate sciences",
-      "Children preparing for science exams and tests",
-      "Curious students who want to go further than the syllabus",
+      "Children aged 5 to 11, in primary or elementary school",
+      "Curious children who ask why about everything",
+      "Children who find science topics hard to remember or explain",
+      "Children getting ready for science at secondary or middle school",
     ],
     coversTitle: "What we cover",
     covers: [
-      "Biology: cells, the human body, ecosystems and genetics",
-      "Chemistry: atoms, reactions, the periodic table and equations",
-      "Physics: forces, energy, electricity and waves",
-      "Scientific method, experiments and data",
-      "Maths skills for science",
-      "Exam technique and extended answers",
+      "Living things: plants, animals and habitats",
+      "The human body, health and the senses",
+      "Materials and their properties",
+      "Forces, magnets, light and sound",
+      "Earth, space, weather and the seasons",
+      "Working scientifically: questions, predictions and simple experiments",
     ],
     approach: [
-      "Ideas are explained with everyday examples before the technical terms, so they stick.",
-      "Your child practises explaining concepts back, which is exactly what exam questions ask for.",
-      "We connect topics across biology, chemistry and physics so science feels like one subject, not a list of facts.",
+      "Every idea starts with something your child already knows, from the kitchen, the garden or the sky, before any new words.",
+      "Simple experiments with things you already have at home make lessons hands on, even online.",
+      "Your child explains what they think will happen and why, which builds the reasoning secondary school science depends on.",
     ],
     faqs: [
       {
-        question: "Do you teach biology, chemistry and physics separately?",
+        question: "What ages is this science tutoring for?",
         answer:
-          "Yes. We teach combined science for younger students and separate sciences for older ones, matched to what your child's school follows.",
+          "Children aged 5 to 11: Years 1 to 6 in England, Primary 1 to 7 in Scotland, and Kindergarten to Grade 5 in the US and Canada. From around age 11 we teach biology, chemistry and physics as separate subjects.",
       },
       {
-        question: "Can online lessons work for a practical subject like science?",
+        question: "Can young children learn science online?",
         answer:
-          "Yes. Most of what is tested is understanding, explanation and working with data, which online lessons handle well. Teachers use diagrams, simulations and household examples to make ideas concrete.",
+          "Yes. Lessons are short, lively and full of things to look at and try. Teachers use pictures, videos and household experiments, and keep young children talking rather than just listening.",
       },
       {
-        question: "Which curricula do your science teachers cover?",
+        question: "Which curricula do your teachers follow?",
         answer:
-          "The UK National Curriculum, US state standards, Canadian provincial curricula, the Nigerian curriculum and international programmes, from primary through secondary school.",
+          "Your child's own: the UK National Curriculum at Key Stages 1 and 2, US state science standards, Canadian provincial curricula and international programmes.",
+      },
+    ],
+  },
+  {
+    slug: "biology",
+    name: "Biology",
+    linkLabel: "Biology tutoring",
+    title: "Online Biology Tutor: GCSE, A Level, AP and IB",
+    description:
+      "One to one online biology tutoring for ages 11 to 18 with vetted Nigerian teachers. Secondary and high school biology, GCSE, A level, AP and IB.",
+    h1: "Online biology tutoring for secondary and high school",
+    intro:
+      "Private biology lessons for students aged 11 to 18, with a vetted Nigerian teacher who follows your child's course and exam board. We make sense of the content first, then build the precise answers and exam technique that biology marks reward.",
+    whoFor: [
+      "Students aged 11 to 18 studying biology at secondary, middle or high school",
+      "Students preparing for GCSE, A level, AP or IB biology",
+      "Students who understand the ideas but lose marks on written answers",
+      "Students aiming for medicine, nursing or other health careers",
+    ],
+    coversTitle: "What we cover",
+    covers: [
+      "Cells, microscopy and transport in cells",
+      "Human body systems, health and disease",
+      "Genetics, DNA and inheritance",
+      "Evolution, classification and biodiversity",
+      "Ecology and the environment",
+      "Required practicals, data analysis and extended answers",
+    ],
+    approach: [
+      "Big topics are broken into small, connected ideas, so your child sees how the body, cells and genes fit together.",
+      "Your child practises writing answers the way examiners want them, using the right keywords in the right order.",
+      "Regular recall practice means content is remembered at exam time, not just the night before.",
+    ],
+    faqs: [
+      {
+        question: "Which biology courses and exams do you cover?",
+        answer:
+          "Key Stage 3, GCSE and A level biology in England, National 5 and Highers in Scotland, middle and high school biology and AP Biology in the US, provincial biology courses in Canada, and IB Biology.",
+      },
+      {
+        question: "Can online lessons cover biology practicals?",
+        answer:
+          "Yes. Exams test whether students understand the method, the results and the conclusions of practicals, and teachers cover this with diagrams, videos and real data.",
+      },
+      {
+        question: "My child is younger than 11. What should they take?",
+        answer:
+          "Our primary science tutoring, for ages 5 to 11, covers living things and the human body alongside the rest of primary science.",
+      },
+    ],
+  },
+  {
+    slug: "chemistry",
+    name: "Chemistry",
+    linkLabel: "Chemistry tutoring",
+    title: "Online Chemistry Tutor: GCSE, A Level, AP and IB",
+    description:
+      "One to one online chemistry tutoring for ages 11 to 18 with vetted Nigerian teachers. Secondary and high school chemistry, GCSE, A level, AP and IB.",
+    h1: "Online chemistry tutoring for secondary and high school",
+    intro:
+      "Private chemistry lessons for students aged 11 to 18, with a vetted Nigerian teacher who follows your child's course and exam board. We build the foundations properly, from atoms to equations, so the harder topics stop feeling like guesswork.",
+    whoFor: [
+      "Students aged 11 to 18 studying chemistry at secondary, middle or high school",
+      "Students preparing for GCSE, A level, AP or IB chemistry",
+      "Students who struggle with equations, moles and calculations",
+      "Students aiming for medicine, pharmacy, engineering or science degrees",
+    ],
+    coversTitle: "What we cover",
+    covers: [
+      "Atomic structure and the periodic table",
+      "Bonding, structure and properties",
+      "Chemical reactions, equations and moles",
+      "Acids, bases, salts and electrolysis",
+      "Rates, energy changes and equilibrium",
+      "Organic chemistry and chemical analysis",
+    ],
+    approach: [
+      "We find the missing foundation first, because most chemistry struggles go back to atoms, bonding or balancing equations.",
+      "Calculations are taught step by step, with the same method every time, until your child can do them without help.",
+      "Your child explains reactions in their own words, which is what exam questions reward.",
+    ],
+    faqs: [
+      {
+        question: "Which chemistry courses and exams do you cover?",
+        answer:
+          "Key Stage 3, GCSE and A level chemistry in England, National 5 and Highers in Scotland, high school chemistry and AP Chemistry in the US, provincial chemistry courses in Canada, and IB Chemistry.",
+      },
+      {
+        question: "My child finds the maths in chemistry hard. Can you help?",
+        answer:
+          "Yes. Moles, concentrations and yields trip up many students. Teachers go through each type of calculation slowly, then practise it until it becomes routine.",
+      },
+      {
+        question: "My child is younger than 11. What should they take?",
+        answer:
+          "Our primary science tutoring, for ages 5 to 11, covers materials and how they change alongside the rest of primary science.",
+      },
+    ],
+  },
+  {
+    slug: "physics",
+    name: "Physics",
+    linkLabel: "Physics tutoring",
+    title: "Online Physics Tutor: GCSE, A Level, AP and IB",
+    description:
+      "One to one online physics tutoring for ages 11 to 18 with vetted Nigerian teachers. Secondary and high school physics, GCSE, A level, AP and IB.",
+    h1: "Online physics tutoring for secondary and high school",
+    intro:
+      "Private physics lessons for students aged 11 to 18, with a vetted Nigerian teacher who follows your child's course and exam board. We connect the ideas to the real world and to the maths, so equations make sense instead of being memorised.",
+    whoFor: [
+      "Students aged 11 to 18 studying physics at secondary, middle or high school",
+      "Students preparing for GCSE, A level, AP or IB physics",
+      "Students who understand the ideas but get stuck on the equations",
+      "Students aiming for engineering, physics or other STEM degrees",
+    ],
+    coversTitle: "What we cover",
+    covers: [
+      "Forces, motion and momentum",
+      "Energy, work and power",
+      "Electricity and circuits",
+      "Waves, light and sound",
+      "Magnetism and electromagnetism",
+      "Particles, radioactivity and space",
+    ],
+    approach: [
+      "Every topic starts with what your child can see in the world, a moving car or a light bulb, before the equations.",
+      "We practise choosing and rearranging equations until it becomes automatic, because that is where most marks are lost.",
+      "Your child explains each step out loud, so the teacher fixes the misunderstanding, not just the answer.",
+    ],
+    faqs: [
+      {
+        question: "Which physics courses and exams do you cover?",
+        answer:
+          "Key Stage 3, GCSE and A level physics in England, National 5 and Highers in Scotland, high school physics and AP Physics in the US, provincial physics courses in Canada, and IB Physics.",
+      },
+      {
+        question: "Does my child need to be good at maths for physics?",
+        answer:
+          "Physics uses a lot of maths, especially rearranging equations. Teachers build those maths skills inside the physics lessons, and many students find their maths improves too.",
+      },
+      {
+        question: "My child is younger than 11. What should they take?",
+        answer:
+          "Our primary science tutoring, for ages 5 to 11, covers forces, light, sound and magnets alongside the rest of primary science.",
       },
     ],
   },
   {
     slug: "11-plus",
+    kind: "exam",
     name: "11+ Prep",
     linkLabel: "11+ preparation",
     currency: "GBP",
@@ -311,6 +461,7 @@ export const subjectPages: SubjectPage[] = [
   },
   {
     slug: "sat-act",
+    kind: "exam",
     name: "SAT & ACT Prep",
     linkLabel: "SAT and ACT prep",
     title: "SAT and ACT Prep Online: One to One Tutoring",
@@ -593,6 +744,12 @@ export const countryPages: CountryPage[] = [
     ],
   },
 ];
+
+/** Subject pages proper, without the exam preparation pages. */
+export const subjectOnlyPages = subjectPages.filter((s) => s.kind !== "exam");
+
+/** Exam preparation pages (11+, SAT and ACT). */
+export const examPrepPages = subjectPages.filter((s) => s.kind === "exam");
 
 export function subjectBySlug(slug: string): SubjectPage | undefined {
   return subjectPages.find((s) => s.slug === slug);

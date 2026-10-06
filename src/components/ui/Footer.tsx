@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { WhatsAppButton } from "@/components/marketing/WhatsAppButton";
 import { BrandLogo } from "./BrandLogo";
-import { countryPages, subjectPages } from "@/lib/marketing/seoPages";
+import { countryPages, examPrepPages, subjectOnlyPages } from "@/lib/marketing/seoPages";
 
 type Mode = "marketing" | "authed";
 
@@ -73,11 +73,24 @@ function MarketingFooter() {
           <div className="footer-col">
             <h4>Subjects</h4>
             <ul>
-              {subjectPages.map((s) => (
+              {subjectOnlyPages.map((s) => (
                 <li key={s.slug}>
                   <Link href={`/tutoring/${s.slug}`}>{s.name}</Link>
                 </li>
               ))}
+            </ul>
+          </div>
+          <div className="footer-col">
+            <h4>Exams</h4>
+            <ul>
+              {examPrepPages.map((s) => (
+                <li key={s.slug}>
+                  <Link href={`/tutoring/${s.slug}`}>{s.name}</Link>
+                </li>
+              ))}
+              <li>
+                <Link href="/exams">All exams</Link>
+              </li>
             </ul>
           </div>
           <div className="footer-col">

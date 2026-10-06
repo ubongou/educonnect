@@ -29,6 +29,18 @@ export function fromPrice(currency: Currency): string {
 
 export type ListBlock = { title: string; items: string[] };
 
+/** A card that may link somewhere, with optional detail lines and tags. */
+export type LinkCard = {
+  id?: string;
+  title: string;
+  href?: string;
+  meta?: string;
+  body?: string;
+  tags?: Array<{ label: string; href?: string }>;
+};
+
+export type LinkSection = { title: string; intro?: string; cards: LinkCard[] };
+
 /**
  * The shared layout for search landing pages (subjects and countries).
  *
@@ -49,6 +61,7 @@ export function LandingPage({
   testimonialMatch,
   faqs,
   related,
+  linkSections = [],
 }: {
   breadcrumb: Array<{ name: string; path: string }>;
   eyebrow: string;
@@ -61,6 +74,8 @@ export function LandingPage({
   testimonialMatch?: RegExp;
   faqs: Faq[];
   related: Array<{ title: string; links: Array<{ href: string; label: string }> }>;
+  /** Linked card grids after the lists, e.g. "Exams we prepare for". */
+  linkSections?: LinkSection[];
 }) {
   const bookHref = `/book?source=${bookingSource}`;
   const matched = testimonialMatch
@@ -125,6 +140,16 @@ export function LandingPage({
             ))}
           </div>
         </section>
+
+        {linkSections.map((section) => (
+          <section key={section.title} className="lp-section">
+            <div className="container">
+              <h2 className="lp-h2">{section.title}</h2>
+              {section.intro && <p className="lp-sub">{section.intro}</p>}
+              <LinkCardGrid cards={section.cards} />
+            </div>
+          </section>
+        ))}
 
         {approach && (
           <section className="lp-section">
@@ -277,6 +302,32 @@ export function LandingPage({
         </section>
       </main>
       <Footer mode="marketing" />
+    </div>
+  );
+}
+
+/**
+ * Cards that link to a page when they have one. Tags inside a card are links
+ * of their own, so a linked card keeps its link on the title rather than
+ * wrapping the whole card (links can't nest).
+ */
+export function LinkCardGrid({ cards }: { cards: LinkCard[] }) {
+  return (
+    <div className="lp-grid">
+      {cards.map((c) => (
+        <article key={c.id ?? c.title} id={c.id} className={`lp-tile${c.href ? " lp-tile-link" : ""}`}>
+          <h3>{c.href ? <Link href={c.href}>{c.title}</Link> : c.title}</h3>
+          {c.meta && <p className="lp-tile-meta">{c.meta}</p>}
+          {c.body && <p>{c.body}</p>}
+          {c.tags && c.tags.length > 0 && (
+            <ul className="lp-chips" aria-label={`${c.title} covers`}>
+              {c.tags.map((t) => (
+                <li key={t.label}>{t.href ? <Link href={t.href}>{t.label}</Link> : <span>{t.label}</span>}</li>
+              ))}
+            </ul>
+          )}
+        </article>
+      ))}
     </div>
   );
 }

@@ -12,6 +12,8 @@ type NavLink = { href: string; label: string };
 const marketingLinks: NavLink[] = [
   { href: "/#why", label: "Why Masani" },
   { href: "/tutoring", label: "Subjects" },
+  { href: "/exams", label: "Exams" },
+  { href: "/guides", label: "Guides" },
   { href: "/about", label: "About" },
   { href: "/pricing", label: "Pricing" },
   { href: "/#contact", label: "Contact" },

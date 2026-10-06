@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { LandingPage } from "@/components/marketing/LandingPage";
-import { countryBySlug, countryPages, subjectPages } from "@/lib/marketing/seoPages";
+import { countryBySlug, countryPages, subjectOnlyPages } from "@/lib/marketing/seoPages";
+import { examHref, examsForCountryPage, subjectLink } from "@/lib/marketing/exams";
+import { guidesForCountry } from "@/lib/marketing/related";
 import {
   JsonLdScript,
   breadcrumbJsonLd,
@@ -77,20 +79,45 @@ export default async function CountryPage({
         ]}
         testimonialMatch={page.testimonialMatch}
         faqs={page.faqs}
+        linkSections={[
+          {
+            title: `Exams we prepare for in ${page.country}`,
+            intro:
+              "Each exam lists the subjects it covers. Tap a subject to see how we teach it.",
+            cards: examsForCountryPage(page.slug).map((e) => ({
+              id: e.id,
+              title: e.name,
+              href: examHref(e),
+              meta: e.when,
+              body: e.summary,
+              tags: e.subjects.slice(0, 6).map(subjectLink),
+            })),
+          },
+        ]}
         related={[
           {
             title: "For parents",
             links: [
+              ...guidesForCountry(page.slug),
               { href: "/guides/online-tutoring-for-nigerian-families-abroad", label: "How to choose an online tutor" },
               { href: "/our-promise", label: "The Masani Promise" },
             ],
           },
           {
             title: "Subjects we teach",
-            links: subjectPages.map((s) => ({
+            links: subjectOnlyPages.map((s) => ({
               href: `/tutoring/${s.slug}`,
               label: s.linkLabel,
             })),
+          },
+          {
+            title: "Exams",
+            links: [
+              ...examsForCountryPage(page.slug)
+                .filter((e) => examHref(e))
+                .map((e) => ({ href: examHref(e)!, label: `${e.name} preparation` })),
+              { href: "/exams", label: "All exams we prepare for" },
+            ],
           },
           {
             title: "Other countries",

@@ -4,7 +4,8 @@ import {
   defaultPricingFaq,
   defaultPricingTiers,
 } from "@/lib/marketing/defaults";
-import { countryPages, everyFamilyGets, subjectPages } from "@/lib/marketing/seoPages";
+import { countryPages, everyFamilyGets, examPrepPages, subjectOnlyPages } from "@/lib/marketing/seoPages";
+import { EXAMS, EXTRA_SUBJECTS } from "@/lib/marketing/exams";
 import { MIT_FELLOWSHIP, ORG_DESCRIPTION, absoluteUrl } from "@/lib/seo";
 import { GUIDE_PATH, PROMISE_PATH, promiseOneLiner, proofStats } from "@/lib/marketing/promise";
 import { guides } from "@/lib/marketing/guides";
@@ -60,7 +61,17 @@ ${defaultFounders.founders.map((f) => `- ${f.name}, ${f.role}: ${f.bio}`).join("
 
 ## Subjects
 
-${subjectPages.map((s) => `- [${s.linkLabel}](${absoluteUrl(`/tutoring/${s.slug}`)}): ${s.description}`).join("\n")}
+${subjectOnlyPages.map((s) => `- [${s.linkLabel}](${absoluteUrl(`/tutoring/${s.slug}`)}): ${s.description}`).join("\n")}
+
+We also teach: ${EXTRA_SUBJECTS.map((e) => e.label).join(", ")}, and any other subject a family needs.
+
+## Exams
+
+- [All exams we prepare for](${absoluteUrl("/exams")}): every exam by country, with the subjects each one covers
+${examPrepPages.map((s) => `- [${s.linkLabel}](${absoluteUrl(`/tutoring/${s.slug}`)}): ${s.description}`).join("\n")}
+${EXAMS.filter((e) => !e.pageSlug)
+  .map((e) => `- ${e.name} (${e.countries.join(", ")}): ${e.summary}`)
+  .join("\n")}
 
 ## Countries
 

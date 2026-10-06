@@ -31,3 +31,23 @@ export const GUIDE_AUTHOR = {
   bio: "Unyime holds a Master's in International Education from the University of Manchester. A third generation educator with more than 15 years in teaching and education leadership, she was named one of Nigeria's 50 Most Inspirational Teachers in 2023.",
   photo: "/brand-v2/founder-unyime.webp",
 };
+
+/** Rough reading time, at about 220 words a minute. */
+export function readMinutes(g: Guide): number {
+  const words = [
+    g.intro,
+    ...g.sections.flatMap((s) => [
+      s.heading,
+      ...s.blocks.map((b) => {
+        if (b.type === "p") return b.text;
+        if (b.type === "list") return b.items.join(" ");
+        if (b.type === "table") return [...b.head, ...b.rows.flat()].join(" ");
+        return `${b.title} ${b.text}`;
+      }),
+    ]),
+  ]
+    .join(" ")
+    .split(/\s+/)
+    .filter(Boolean).length;
+  return Math.max(1, Math.round(words / 220));
+}

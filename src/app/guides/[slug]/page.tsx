@@ -6,6 +6,7 @@ import { Nav } from "@/components/ui/Nav";
 import { Footer } from "@/components/ui/Footer";
 import { GUIDE_AUTHOR, guideBySlug, guides } from "@/lib/marketing/guides";
 import type { GuideBlock } from "@/lib/marketing/guides/types";
+import { relatedForGuide } from "@/lib/marketing/related";
 import {
   JsonLdScript,
   ORG_ID,
@@ -102,7 +103,16 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
     { name: "Guides", path: "/guides" },
     { name: g.shortTitle, path },
   ];
-  const others = guides.filter((o) => o.slug !== g.slug).slice(0, 4);
+  // Hand-picked related guides first, then the rest, so every guide links to
+  // every other one at least from here.
+  const related = relatedForGuide(g.slug);
+  const relatedSlugs = new Set(related.guides.map((l) => l.href));
+  const others = [
+    ...related.guides,
+    ...guides
+      .filter((o) => o.slug !== g.slug && !relatedSlugs.has(`/guides/${o.slug}`))
+      .map((o) => ({ href: `/guides/${o.slug}`, label: o.shortTitle })),
+  ];
 
   return (
     <div className="mkt-root">
@@ -240,8 +250,8 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
               <h2>More guides for parents</h2>
               <ul>
                 {others.map((o) => (
-                  <li key={o.slug}>
-                    <Link href={`/guides/${o.slug}`}>{o.shortTitle}</Link>
+                  <li key={o.href}>
+                    <Link href={o.href}>{o.label}</Link>
                   </li>
                 ))}
                 <li>
@@ -249,6 +259,30 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
                 </li>
               </ul>
             </nav>
+            {related.subjectsAndExams.length > 0 && (
+              <nav aria-label="Related subjects and exams">
+                <h2>Subjects and exams</h2>
+                <ul>
+                  {related.subjectsAndExams.map((l) => (
+                    <li key={l.href}>
+                      <Link href={l.href}>{l.label}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            )}
+            {related.countries.length > 0 && (
+              <nav aria-label="Where we teach">
+                <h2>Where we teach</h2>
+                <ul>
+                  {related.countries.map((l) => (
+                    <li key={l.href}>
+                      <Link href={l.href}>{l.label}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            )}
           </div>
         </section>
       </main>
