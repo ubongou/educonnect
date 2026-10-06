@@ -78,7 +78,7 @@ export async function submitIntake(formData: FormData): Promise<OnboardingResult
     {
       p_full_name: v.childInfo.full_name,
       p_preferred_name: v.childInfo.preferred_name ?? "",
-      p_age: v.childInfo.age,
+      p_date_of_birth: v.childInfo.date_of_birth,
       p_gender: v.childInfo.gender,
       p_current_school: v.childInfo.current_school ?? "",
       p_curriculum: v.childInfo.curriculum,

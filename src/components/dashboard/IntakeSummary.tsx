@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { displayAge, formatDayMonth } from "@/lib/birthdays";
 import type { IntakeFileKind, IntakeJson } from "@/types/domain";
 import { formatDate } from "@/lib/format";
 
@@ -128,6 +129,7 @@ export type IntakeSummaryProps = {
     full_name: string;
     preferred_name: string | null;
     age: number | null;
+    date_of_birth?: string | null;
     gender: string | null;
     current_school: string | null;
     curriculum: string | null;
@@ -153,7 +155,11 @@ export function IntakeSummary({ child, intake, files }: IntakeSummaryProps) {
         <dl className="grid gap-5 md:grid-cols-2">
           <Field label="Full name" value={child.full_name} />
           <Field label="Preferred name" value={child.preferred_name ?? "—"} />
-          <Field label="Age" value={child.age ?? "—"} />
+          <Field label="Age" value={displayAge(child) ?? "—"} />
+          <Field
+            label="Birthday"
+            value={child.date_of_birth ? formatDayMonth(child.date_of_birth) : "—"}
+          />
           <Field label="Gender" value={child.gender ? humanize(child.gender) : "—"} />
           <Field label="Current school" value={child.current_school ?? "—"} />
           <Field

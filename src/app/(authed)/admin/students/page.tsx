@@ -2,19 +2,24 @@ import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { createClient } from "@/lib/supabase/server";
 import { StudentsTable, type StudentRow } from "@/components/admin/StudentsTable";
+import { displayAge, officeToday } from "@/lib/birthdays";
 
 export default async function AdminStudentsPage() {
   const supabase = await createClient();
   const { data } = await supabase
     .from("students")
     .select(
-      "id, registration_number, full_name, preferred_name, age, current_school, curriculum, intake_submitted_at, archived_at, is_test",
+      "id, registration_number, full_name, preferred_name, age, date_of_birth, current_school, curriculum, intake_submitted_at, archived_at, is_test",
     )
     // Active first, then archived; newest within each group.
     .order("archived_at", { ascending: true, nullsFirst: true })
     .order("created_at", { ascending: false });
 
-  const rows = (data ?? []) as StudentRow[];
+  // Age from the date of birth where we have it — the stored age goes stale.
+  const today = officeToday();
+  const rows: StudentRow[] = ((data ?? []) as Array<StudentRow & { date_of_birth: string | null }>).map(
+    ({ date_of_birth, ...r }) => ({ ...r, age: displayAge({ age: r.age, date_of_birth }, today) }),
+  );
 
   return (
     <Container>

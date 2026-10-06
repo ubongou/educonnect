@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { dateOfBirthError } from "@/lib/birthdays";
 
 // -----------------------------------------------------------------------------
 // Auth
@@ -212,6 +213,16 @@ export type IntakeInput = z.infer<typeof intakeSchema>;
 // and the create_student_with_intake RPC signature.
 // -----------------------------------------------------------------------------
 
+// Required on new registrations. Checked again by the database.
+const dateOfBirthSchema = z
+  .string({ message: "Date of birth is required" })
+  .trim()
+  .min(1, "Date of birth is required")
+  .superRefine((v, ctx) => {
+    const error = dateOfBirthError(v);
+    if (error) ctx.addIssue({ code: "custom", message: error });
+  });
+
 export const childInfoSchema = z.object({
   full_name: z.string().trim().min(1, "Child's full name is required"),
   preferred_name: z
@@ -219,7 +230,7 @@ export const childInfoSchema = z.object({
     .trim()
     .optional()
     .transform((v) => (v ? v : undefined)),
-  age: z.coerce.number().int().nonnegative(),
+  date_of_birth: dateOfBirthSchema,
   gender: z.enum(["male", "female", "prefer_not_to_say"]),
   current_school: z
     .string()
@@ -235,6 +246,20 @@ export const childInfoSchema = z.object({
 });
 
 export type ChildInfoInput = z.infer<typeof childInfoSchema>;
+
+// Admin edits a student. Date of birth may be left blank so a child registered
+// before birthdays were collected can still be edited; once given it's checked
+// the same way, and a blank field never clears a stored date.
+export const adminStudentUpdateSchema = childInfoSchema.extend({
+  date_of_birth: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => (v ? v : undefined))
+    .pipe(dateOfBirthSchema.optional()),
+});
+
+export type AdminStudentUpdateInput = z.infer<typeof adminStudentUpdateSchema>;
 
 // Admin creates a student directly (optionally linked to an existing parent).
 // Reuses the child-info fields; intake starts empty and is filled later.

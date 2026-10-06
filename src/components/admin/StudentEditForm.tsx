@@ -50,7 +50,7 @@ export function StudentEditForm({
       onSubmit={onSubmit}
       className="mt-4 flex flex-col gap-5 rounded-2xl border border-line bg-white p-6"
     >
-      <StudentFormFields values={values} onChange={onChange} />
+      <StudentFormFields values={values} onChange={onChange} dateOfBirthRequired={false} />
 
       {error && (
         <p

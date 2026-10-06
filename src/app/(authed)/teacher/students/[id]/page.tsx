@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { displayAge } from "@/lib/birthdays";
+import { BirthdayBadge } from "@/components/ui/BirthdayBadge";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -97,7 +99,7 @@ export default async function TeacherStudentDetail({
     .from("students")
     .select(
       `
-      id, registration_number, full_name, preferred_name, age, gender,
+      id, registration_number, full_name, preferred_name, age, date_of_birth, gender,
       current_school, curriculum, curriculum_other, intake, intake_submitted_at,
       intake_files ( id, kind, original_filename, size_bytes, uploaded_at )
       `,
@@ -165,10 +167,13 @@ export default async function TeacherStudentDetail({
           <h1 className="mt-3 font-heading text-[clamp(28px,3.4vw,40px)] font-semibold leading-tight text-navy">
             {displayName}
           </h1>
+          <div className="mt-2 empty:hidden">
+            <BirthdayBadge dateOfBirth={student.date_of_birth} />
+          </div>
           <p className="mt-2 text-[14px] text-g600">
             {student.current_school ?? "School not set"}
             {student.curriculum && ` · ${student.curriculum} curriculum`}
-            {typeof student.age === "number" && ` · age ${student.age}`}
+            {displayAge(student) !== null && ` · age ${displayAge(student)}`}
           </p>
         </div>
       </div>
@@ -360,6 +365,7 @@ export default async function TeacherStudentDetail({
             full_name: student.full_name,
             preferred_name: student.preferred_name,
             age: student.age,
+            date_of_birth: student.date_of_birth,
             gender: student.gender,
             current_school: student.current_school,
             curriculum: student.curriculum,

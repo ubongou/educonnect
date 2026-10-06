@@ -877,6 +877,7 @@ export type Database = {
           current_school: string | null
           curriculum: string | null
           curriculum_other: string | null
+          date_of_birth: string | null
           full_name: string
           gender: string | null
           id: string
@@ -894,6 +895,7 @@ export type Database = {
           current_school?: string | null
           curriculum?: string | null
           curriculum_other?: string | null
+          date_of_birth?: string | null
           full_name: string
           gender?: string | null
           id?: string
@@ -911,6 +913,7 @@ export type Database = {
           current_school?: string | null
           curriculum?: string | null
           curriculum_other?: string | null
+          date_of_birth?: string | null
           full_name?: string
           gender?: string | null
           id?: string
@@ -1051,6 +1054,41 @@ export type Database = {
             columns: ["uploaded_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      birthday_reminders: {
+        Row: {
+          birthday: string
+          id: string
+          kind: string
+          recipients: string[]
+          sent_at: string
+          student_id: string
+        }
+        Insert: {
+          birthday: string
+          id?: string
+          kind: string
+          recipients?: string[]
+          sent_at?: string
+          student_id: string
+        }
+        Update: {
+          birthday?: string
+          id?: string
+          kind?: string
+          recipients?: string[]
+          sent_at?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "birthday_reminders_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
             referencedColumns: ["id"]
           },
         ]
@@ -1310,10 +1348,10 @@ export type Database = {
       }
       admin_create_student: {
         Args: {
-          p_age: number
           p_current_school: string
           p_curriculum: string
           p_curriculum_other: string
+          p_date_of_birth: string
           p_full_name: string
           p_gender: string
           p_parent_id: string | null
@@ -1344,10 +1382,10 @@ export type Database = {
       }
       create_student_with_intake: {
         Args: {
-          p_age: number
           p_current_school: string
           p_curriculum: string
           p_curriculum_other: string
+          p_date_of_birth: string
           p_full_name: string
           p_gender: string
           p_intake: Json

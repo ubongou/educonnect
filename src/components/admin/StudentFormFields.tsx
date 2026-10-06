@@ -5,7 +5,7 @@ import { FormField, inputBase } from "@/components/ui/FormField";
 export type StudentFieldValues = {
   full_name: string;
   preferred_name: string;
-  age: string;
+  date_of_birth: string;
   gender: string;
   current_school: string;
   curriculum: string;
@@ -15,7 +15,7 @@ export type StudentFieldValues = {
 export const emptyStudentFields: StudentFieldValues = {
   full_name: "",
   preferred_name: "",
-  age: "",
+  date_of_birth: "",
   gender: "",
   current_school: "",
   curriculum: "",
@@ -43,9 +43,12 @@ const curriculumOptions = [
 export function StudentFormFields({
   values,
   onChange,
+  dateOfBirthRequired = true,
 }: {
   values: StudentFieldValues;
   onChange: (patch: Partial<StudentFieldValues>) => void;
+  /** Off on the edit form, so older children without one can still be edited. */
+  dateOfBirthRequired?: boolean;
 }) {
   return (
     <>
@@ -69,14 +72,17 @@ export function StudentFormFields({
       </FormField>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <FormField label="Age" required>
+        <FormField
+          label="Date of birth"
+          required={dateOfBirthRequired}
+          hint={dateOfBirthRequired ? undefined : "Leave blank if you don't have it yet."}
+        >
           <input
-            type="number"
-            min={3}
-            max={25}
-            value={values.age}
-            onChange={(e) => onChange({ age: e.target.value })}
-            required
+            type="date"
+            max={new Date().toISOString().slice(0, 10)}
+            value={values.date_of_birth}
+            onChange={(e) => onChange({ date_of_birth: e.target.value })}
+            required={dateOfBirthRequired}
             className={inputBase}
           />
         </FormField>
@@ -146,7 +152,7 @@ export function toStudentPayload(v: StudentFieldValues) {
   return {
     full_name: v.full_name.trim(),
     preferred_name: v.preferred_name.trim() || undefined,
-    age: Number(v.age),
+    date_of_birth: v.date_of_birth || undefined,
     gender: v.gender,
     current_school: v.current_school.trim() || undefined,
     curriculum: v.curriculum,

@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { BirthdaysThisWeek } from "@/components/dashboard/BirthdaysThisWeek";
+import { officeToday, upcomingBirthdays } from "@/lib/birthdays";
 import { Container } from "@/components/ui/Container";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { createClient } from "@/lib/supabase/server";
@@ -57,7 +59,7 @@ export default async function TeacherOverview({
       .gte("created_at", sevenDaysAgo.toISOString()),
     supabase
       .from("enrollments")
-      .select("student_id")
+      .select("student_id, students ( id, full_name, preferred_name, date_of_birth, archived_at, is_test )")
       .eq("teacher_id", profile.id)
       .eq("status", "approved"),
   ]);
@@ -65,6 +67,25 @@ export default async function TeacherOverview({
   const upcomingRows = (upcoming ?? []) as unknown as SessionRow[];
   const reports7d = reportsSevenDays.count ?? 0;
   const studentSet = new Set((studentsCount.data ?? []).map((r) => r.student_id));
+  // This teacher's children, once each, for the birthdays card.
+  const myStudents = new Map<
+    string,
+    { id: string; full_name: string; preferred_name: string | null; date_of_birth: string | null }
+  >();
+  for (const r of (studentsCount.data ?? []) as unknown as Array<{
+    students: {
+      id: string;
+      full_name: string;
+      preferred_name: string | null;
+      date_of_birth: string | null;
+      archived_at: string | null;
+      is_test: boolean;
+    } | null;
+  }>) {
+    if (r.students && !r.students.archived_at && !r.students.is_test) {
+      myStudents.set(r.students.id, r.students);
+    }
+  }
 
   return (
     <Container>
@@ -142,6 +163,11 @@ export default async function TeacherOverview({
           </Link>
         </div>
       </div>
+
+      <BirthdaysThisWeek
+        birthdays={upcomingBirthdays([...myStudents.values()], officeToday())}
+        hrefFor={(id) => `/teacher/students/${id}`}
+      />
 
       <section>
         <h2 className="mb-4 font-heading text-[11px] font-bold uppercase tracking-[0.12em] text-g400">

@@ -8,7 +8,7 @@ import type { Curriculum, Gender, IntakeFileKind } from "@/types/domain";
 export type ChildInfoValues = {
   full_name: string;
   preferred_name: string;
-  age: string;
+  date_of_birth: string;
   gender: Gender | "";
   current_school: string;
   curriculum: Curriculum | "";
@@ -19,7 +19,7 @@ export type ChildInfoValues = {
 export const emptyChildInfo: ChildInfoValues = {
   full_name: "",
   preferred_name: "",
-  age: "",
+  date_of_birth: "",
   gender: "",
   current_school: "",
   curriculum: "",
@@ -84,12 +84,13 @@ export function ChildInfoSection({
             className={inputBase}
           />
         </FormField>
-        <FormField label="Age" required>
+        <FormField label="Date of birth" required>
           <input
-            type="number"
+            type="date"
             required
-            value={value.age}
-            onChange={(e) => patch({ age: e.target.value })}
+            max={new Date().toISOString().slice(0, 10)}
+            value={value.date_of_birth}
+            onChange={(e) => patch({ date_of_birth: e.target.value })}
             className={inputBase}
           />
         </FormField>

@@ -3,6 +3,8 @@ import { Container } from "@/components/ui/Container";
 import { createClient } from "@/lib/supabase/server";
 import { loadPaymentOverview } from "@/lib/payments/overview";
 import { formatNaira } from "@/lib/payments/plans";
+import { BirthdaysThisWeek } from "@/components/dashboard/BirthdaysThisWeek";
+import { officeToday, upcomingBirthdays } from "@/lib/birthdays";
 
 type StatCard = {
   label: string;
@@ -28,7 +30,7 @@ export default async function AdminOverview() {
   in7Days.setDate(in7Days.getDate() + 7);
   const weekAhead = in7Days.toISOString().slice(0, 10);
 
-  const [students, pendingEnrollments, recentReports, upcomingWeek, overview] =
+  const [students, pendingEnrollments, recentReports, upcomingWeek, overview, birthdayStudents] =
     await Promise.all([
       // Active, real students only — exclude archived (soft-deleted) and test accounts.
       supabase
@@ -51,6 +53,14 @@ export default async function AdminOverview() {
         .gte("session_date", today)
         .lte("session_date", weekAhead),
       loadPaymentOverview(supabase),
+      // Active, real children — for this week's birthdays and the ones whose
+      // birthday the office still needs to fill in.
+      supabase
+        .from("students")
+        .select("id, full_name, preferred_name, date_of_birth")
+        .is("archived_at", null)
+        .eq("is_test", false)
+        .order("full_name"),
     ]);
 
   const cards: StatCard[] = [
@@ -99,6 +109,14 @@ export default async function AdminOverview() {
       hint: "Lesson reports submitted in the past week",
     },
   ];
+
+  const birthdayRows = (birthdayStudents.data ?? []) as Array<{
+    id: string;
+    full_name: string;
+    preferred_name: string | null;
+    date_of_birth: string | null;
+  }>;
+  const missingBirthdays = birthdayRows.filter((s) => !s.date_of_birth);
 
   return (
     <Container>
@@ -151,6 +169,35 @@ export default async function AdminOverview() {
           </Link>
         ))}
       </div>
+
+      <BirthdaysThisWeek
+        birthdays={upcomingBirthdays(birthdayRows, officeToday())}
+        hrefFor={(id) => `/admin/students/${id}`}
+      />
+
+      {missingBirthdays.length > 0 && (
+        <section className="mb-10">
+          <h2 className="mb-1 font-heading text-[11px] font-bold uppercase tracking-[0.12em] text-g400">
+            Missing birthdays · {missingBirthdays.length}
+          </h2>
+          <p className="mb-4 text-[13px] text-g600">
+            Children registered before birthdays were collected. Open one and use Edit to add their
+            date of birth.
+          </p>
+          <ul className="flex flex-wrap gap-2">
+            {missingBirthdays.map((s) => (
+              <li key={s.id}>
+                <Link
+                  href={`/admin/students/${s.id}`}
+                  className="inline-flex items-center rounded-pill border border-line bg-white px-3 py-1.5 text-[13px] font-semibold text-navy hover:border-navy"
+                >
+                  {s.preferred_name ?? s.full_name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section>
         <div className="mb-4 flex items-end justify-between gap-4">

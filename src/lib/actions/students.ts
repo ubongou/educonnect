@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { adminStudentCreateSchema, childInfoSchema } from "@/lib/validation";
+import { adminStudentCreateSchema, adminStudentUpdateSchema } from "@/lib/validation";
+import { ageOn, officeToday } from "@/lib/birthdays";
 
 export type StudentMutationResult =
   | { ok: true; studentId: string }
@@ -32,7 +33,7 @@ export async function createStudentAsAdmin(
   const { data, error } = await supabase.rpc("admin_create_student", {
     p_full_name: v.full_name,
     p_preferred_name: v.preferred_name ?? "",
-    p_age: v.age,
+    p_date_of_birth: v.date_of_birth,
     p_gender: v.gender,
     p_current_school: v.current_school ?? "",
     p_curriculum: v.curriculum,
@@ -52,7 +53,7 @@ export async function createStudentAsAdmin(
 
 /**
  * Admin-only: edit a student's core profile fields (the child-info block —
- * name, age, school, curriculum). The intake questionnaire JSON is not touched
+ * name, date of birth, school, curriculum). The intake questionnaire JSON is not touched
  * here. Writes go through the students_admin_write RLS policy.
  */
 export async function updateStudent(
@@ -61,7 +62,7 @@ export async function updateStudent(
 ): Promise<SimpleStudentResult> {
   await requireAdmin();
 
-  const parsed = childInfoSchema.safeParse(input);
+  const parsed = adminStudentUpdateSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
@@ -73,7 +74,11 @@ export async function updateStudent(
     .update({
       full_name: v.full_name,
       preferred_name: v.preferred_name ?? null,
-      age: v.age,
+      // A blank date of birth leaves the stored one (and the age) alone. A new
+      // one also refreshes the stored age, which older screens still read.
+      ...(v.date_of_birth
+        ? { date_of_birth: v.date_of_birth, age: ageOn(v.date_of_birth, officeToday()) }
+        : {}),
       gender: v.gender,
       current_school: v.current_school ?? null,
       curriculum: v.curriculum,

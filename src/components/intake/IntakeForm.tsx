@@ -91,7 +91,7 @@ const stepTitles = [
 function childInfoComplete(v: ChildInfoValues): boolean {
   return (
     v.full_name.trim().length > 0 &&
-    v.age.trim().length > 0 &&
+    v.date_of_birth.trim().length > 0 &&
     v.gender !== "" &&
     v.curriculum !== "" &&
     (v.curriculum !== "other" || v.curriculum_other.trim().length > 0)
@@ -165,7 +165,7 @@ export function IntakeForm() {
         childInfo: {
           full_name: childInfo.full_name,
           preferred_name: childInfo.preferred_name || undefined,
-          age: childInfo.age,
+          date_of_birth: childInfo.date_of_birth,
           gender: childInfo.gender,
           current_school: childInfo.current_school || undefined,
           curriculum: childInfo.curriculum,
