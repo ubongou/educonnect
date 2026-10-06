@@ -98,7 +98,7 @@ export default async function SubjectPage({
   const guideLinks = isExam && exam ? guidesForExam(exam.id) : guidesForSubject(page.slug);
   const crumbs = [
     { name: "Home", path: "/" },
-    { name: "Online tutoring", path: "/tutoring" },
+    isExam ? { name: "Exams", path: "/exams" } : { name: "Online tutoring", path: "/tutoring" },
     { name: page.name, path },
   ];
 

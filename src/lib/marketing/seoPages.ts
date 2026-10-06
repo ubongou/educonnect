@@ -11,6 +11,8 @@
  * House style: no dashes in customer-facing copy.
  */
 
+import { examPages } from "./examPages";
+
 export type Faq = { question: string; answer: string };
 
 export type SubjectPage = {
@@ -111,7 +113,7 @@ export const howItWorks = [
 // Subjects
 // -----------------------------------------------------------------------------
 
-export const subjectPages: SubjectPage[] = [
+const baseSubjectPages: SubjectPage[] = [
   {
     slug: "maths",
     name: "Maths",
@@ -744,6 +746,12 @@ export const countryPages: CountryPage[] = [
     ],
   },
 ];
+
+/**
+ * Every page under /tutoring/[slug]: subjects, then exam preparation pages
+ * (examPages.ts, plus 11+ and SAT/ACT above).
+ */
+export const subjectPages: SubjectPage[] = [...baseSubjectPages, ...examPages];
 
 /** Subject pages proper, without the exam preparation pages. */
 export const subjectOnlyPages = subjectPages.filter((s) => s.kind !== "exam");

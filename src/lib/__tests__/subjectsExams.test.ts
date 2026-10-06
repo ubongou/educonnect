@@ -22,7 +22,24 @@ import {
 
 describe("subjects and exams", () => {
   it("keeps exam prep pages out of the subject list", () => {
-    expect(examPrepPages.map((p) => p.slug).sort()).toEqual(["11-plus", "sat-act"]);
+    expect(examPrepPages.map((p) => p.slug).sort()).toEqual(
+      [
+        "11-plus",
+        "a-level",
+        "alberta-pats-diplomas",
+        "ap-exams",
+        "common-entrance",
+        "eqao-osslt",
+        "gcse",
+        "gifted-and-talented",
+        "ib",
+        "ks2-sats",
+        "national-5-highers",
+        "sat-act",
+        "shsat",
+        "ssat-isee",
+      ].sort(),
+    );
     expect(subjectOnlyPages.some((p) => p.kind === "exam")).toBe(false);
   });
 

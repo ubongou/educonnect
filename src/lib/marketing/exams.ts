@@ -84,6 +84,7 @@ export const EXAMS: Exam[] = [
     summary:
       "National tests in reading, maths, and grammar, punctuation and spelling at the end of primary school in England. Results go to your child's secondary school.",
     subjects: ["maths", "english"],
+    pageSlug: "ks2-sats",
   },
   {
     id: "11-plus",
@@ -106,6 +107,7 @@ export const EXAMS: Exam[] = [
       "Entrance assessments for independent senior schools: the ISEB Common Pre Test, usually taken around Year 6 or 7, and Common Entrance exams at 13.",
     subjects: ["maths", "english", "science", "french"],
     alsoTests: "Verbal and non verbal reasoning",
+    pageSlug: "common-entrance",
   },
   {
     id: "gcse",
@@ -127,6 +129,7 @@ export const EXAMS: Exam[] = [
       "spanish",
       "economics",
     ],
+    pageSlug: "gcse",
   },
   {
     id: "a-level",
@@ -145,6 +148,7 @@ export const EXAMS: Exam[] = [
       "english-literature",
       "computer-science",
     ],
+    pageSlug: "a-level",
   },
   {
     id: "scottish-qualifications",
@@ -154,6 +158,7 @@ export const EXAMS: Exam[] = [
     summary:
       "Scotland's main school qualifications. National 5s are usually taken in S4 and Highers in S5, and universities use Highers for offers.",
     subjects: ["maths", "english", "biology", "chemistry", "physics"],
+    pageSlug: "national-5-highers",
   },
 
   // ----- United States -------------------------------------------------------
@@ -167,6 +172,7 @@ export const EXAMS: Exam[] = [
       "Tests such as the CogAT, NNAT and OLSAT used to place children in gifted and talented programs. They focus on reasoning as much as school knowledge.",
     subjects: ["maths", "english"],
     alsoTests: "Verbal, quantitative and non verbal reasoning",
+    pageSlug: "gifted-and-talented",
   },
   {
     id: "state-tests",
@@ -186,6 +192,7 @@ export const EXAMS: Exam[] = [
       "Admission tests for private and independent schools in the US and Canada, covering verbal skills, reading, math and a writing sample.",
     subjects: ["maths", "english"],
     alsoTests: "Verbal reasoning",
+    pageSlug: "ssat-isee",
   },
   {
     id: "shsat",
@@ -195,6 +202,7 @@ export const EXAMS: Exam[] = [
     summary:
       "The entrance test for New York City's specialized high schools, with an English language arts section and a math section.",
     subjects: ["maths", "english"],
+    pageSlug: "shsat",
   },
   {
     id: "sat-act",
@@ -225,6 +233,7 @@ export const EXAMS: Exam[] = [
       "spanish",
       "french",
     ],
+    pageSlug: "ap-exams",
   },
 
   // ----- Canada --------------------------------------------------------------
@@ -237,6 +246,7 @@ export const EXAMS: Exam[] = [
     summary:
       "Ontario's provincial assessments in reading, writing and math, and the Ontario Secondary School Literacy Test needed to graduate.",
     subjects: ["maths", "english"],
+    pageSlug: "eqao-osslt",
   },
   {
     id: "alberta",
@@ -247,6 +257,7 @@ export const EXAMS: Exam[] = [
     summary:
       "Provincial Achievement Tests in Grades 6 and 9, and Diploma exams in Grade 12 courses such as Math 30, Biology 30, Chemistry 30, Physics 30 and English 30.",
     subjects: ["maths", "english", "science", "biology", "chemistry", "physics"],
+    pageSlug: "alberta-pats-diplomas",
   },
   {
     id: "bc-assessments",
@@ -318,6 +329,7 @@ export const EXAMS: Exam[] = [
       "spanish",
       "computer-science",
     ],
+    pageSlug: "ib",
   },
 ];
 
