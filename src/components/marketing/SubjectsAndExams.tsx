@@ -97,7 +97,7 @@ export function ExamsOverview({ tint = false }: { tint?: boolean }) {
           {examsByCountry().map((g) => (
             <div key={g.id} className="lp-tile lp-exam-group">
               <h3>
-                <span aria-hidden="true">{g.flag}</span> {g.label}
+                {g.label}
               </h3>
               <ul className="lp-chips lp-chips-nowrap" aria-label={`Exams in ${g.label}`}>
                 {g.exams.map((e) => (
@@ -132,7 +132,7 @@ export function ExamsByCountry() {
         >
           <div className="container">
             <h2 id={`exams-${g.id}`} className="lp-h2">
-              <span aria-hidden="true">{g.flag}</span> {g.label}
+              {g.label}
             </h2>
             {g.countryPageSlug && (
               <p className="lp-sub">

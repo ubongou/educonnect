@@ -57,16 +57,17 @@ export default async function SubjectPage({
 
   // Subject pages show the exams they prepare for, grouped by country; exam
   // pages show the subjects they cover. Both come from the same table.
-  const flags = (e: Exam) =>
+  // Country names rather than emoji, which Windows shows as letter pairs.
+  const countries = (e: Exam) =>
     e.countries
-      .map((c) => EXAM_COUNTRIES.find((x) => x.id === c)?.flag)
+      .map((c) => EXAM_COUNTRIES.find((x) => x.id === c)?.short)
       .filter(Boolean)
-      .join(" ");
+      .join(", ");
   const examCard = (e: Exam) => ({
     id: e.id,
     title: e.name,
     href: examHref(e) ?? `/exams#${e.id}`,
-    meta: `${flags(e)} ${e.when}`,
+    meta: `${countries(e)} · ${e.when}`,
     body: e.summary,
   });
   const linkSections: LinkSection[] = isExam

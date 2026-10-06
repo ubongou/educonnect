@@ -18,14 +18,15 @@ export const EXAM_COUNTRIES: Array<{
   label: string;
   /** How the country reads mid sentence: "families in the UK". */
   inSentence: string;
-  flag: string;
+  /** Short name for compact labels: "UK", "US". */
+  short: string;
   /** The matching /online-tutoring/[slug] page, if there is one. */
   countryPageSlug?: string;
 }> = [
-  { id: "uk", label: "United Kingdom", inSentence: "the UK", flag: "🇬🇧", countryPageSlug: "uk" },
-  { id: "us", label: "United States", inSentence: "the US", flag: "🇺🇸", countryPageSlug: "usa" },
-  { id: "canada", label: "Canada", inSentence: "Canada", flag: "🇨🇦", countryPageSlug: "canada" },
-  { id: "international", label: "International", inSentence: "international schools", flag: "🌍" },
+  { id: "uk", label: "United Kingdom", inSentence: "the UK", short: "UK", countryPageSlug: "uk" },
+  { id: "us", label: "United States", inSentence: "the US", short: "US", countryPageSlug: "usa" },
+  { id: "canada", label: "Canada", inSentence: "Canada", short: "Canada", countryPageSlug: "canada" },
+  { id: "international", label: "International", inSentence: "international schools", short: "International" },
 ];
 
 /**
