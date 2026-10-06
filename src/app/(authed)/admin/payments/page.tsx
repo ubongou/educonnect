@@ -150,7 +150,7 @@ export default async function AdminPaymentsPage({
   if (!showHidden) plansQuery = plansQuery.is("archived_at", null);
 
   const [
-    { data: planRows },
+    { data: planRows, error: plansError },
     sessionResult,
     { data: studentList },
     { data: parentList },
@@ -185,6 +185,9 @@ export default async function AdminPaymentsPage({
       .order("full_name"),
   ]);
 
+  // A failed read must never pass for "no plans" — that's how a missing
+  // migration once hid every plan behind an empty-state message.
+  const loadError = plansError?.message ?? sessionResult.error ?? null;
   const plans = (planRows ?? []) as unknown as PlanRecord[];
   const monnifyEnabled = isMonnifyConfigured();
   const sessions = sessionResult.rows;
@@ -368,7 +371,18 @@ export default async function AdminPaymentsPage({
           </div>
         </div>
 
-        {visible.length === 0 ? (
+        {loadError ? (
+          <div
+            role="alert"
+            className="rounded-[28px] border border-coral/40 bg-coral/10 p-6 text-[14px] text-navy"
+          >
+            <p className="font-heading font-bold">Couldn&apos;t load payment plans.</p>
+            <p className="mt-2 text-g600">
+              The database returned an error, so the list below may be incomplete:
+            </p>
+            <p className="mt-2 font-mono text-[13px]">{loadError}</p>
+          </div>
+        ) : visible.length === 0 ? (
           <div className="rounded-[28px] border border-dashed border-line bg-white p-12 text-center">
             <p className="text-[14px] text-g600">
               No plans match these filters. Create one above to bring a child onto

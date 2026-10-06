@@ -44,7 +44,7 @@ export async function loadParentPlanView(
   supabase: Client,
   studentId: string,
 ): Promise<ParentPlanView | null> {
-  const [{ data: planRows }, { data: sessionRows }] = await Promise.all([
+  const [{ data: planRows, error: planErr }, { data: sessionRows }] = await Promise.all([
     supabase
       .from("payment_plans")
       .select(
@@ -68,6 +68,9 @@ export async function loadParentPlanView(
       .not("payment_plan_id", "is", null),
   ]);
 
+  // Logged rather than thrown: a broken payment card mustn't take down the
+  // whole parent dashboard, but it mustn't fail silently either.
+  if (planErr) console.error("loadParentPlanView: plans query failed", planErr.message);
   const plans = (planRows ?? []) as unknown as PlanRecord[];
   if (plans.length === 0) return null;
 
