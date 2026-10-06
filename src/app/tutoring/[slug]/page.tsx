@@ -130,7 +130,7 @@ export default async function SubjectPage({
         ]}
         approach={{ title: "How lessons work", items: page.approach }}
         faqs={page.faqs}
-        linkSections={linkSections}
+        linkSections={linkSections.filter((s) => s.cards.length > 0)}
         related={[
           {
             title: "For parents",

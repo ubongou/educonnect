@@ -9,7 +9,7 @@
 }
 
 .mkt-root .lp-hero {
-  padding: clamp(40px, 7vw, 88px) 0 clamp(40px, 6vw, 72px);
+  padding: clamp(40px, 7vw, 88px) 0 clamp(28px, 4vw, 48px);
 }
 .mkt-root .lp-hero h1 {
   font-size: clamp(36px, 5.4vw, 64px);
@@ -68,7 +68,7 @@
 }
 
 .mkt-root .lp-section {
-  padding: clamp(48px, 7vw, 88px) 0;
+  padding: clamp(40px, 5vw, 64px) 0;
 }
 .mkt-root .lp-tint {
   background: var(--paper-2);
@@ -362,7 +362,7 @@
 .mkt-root .lp-final {
   background: var(--navy);
   color: #fff;
-  padding: clamp(56px, 8vw, 96px) 0;
+  padding: clamp(44px, 6vw, 72px) 0;
   text-align: center;
 }
 .mkt-root .lp-final h2 {
@@ -768,9 +768,6 @@
 .mkt-root .lp-exam-country {
   scroll-margin-top: 110px;
 }
-.mkt-root .lp-exam-country + .lp-exam-country {
-  margin-top: 40px;
-}
 .mkt-root .lp-tile {
   scroll-margin-top: 110px;
 }
@@ -799,4 +796,52 @@
   .mkt-root .lp-grid-subjects .lp-any {
     grid-column: 1 / -1;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Spacing between sections
+   Two sections on the same background used to stack their padding into a
+   tall empty band (about 160px on desktop). When neighbours share a
+   background, the second drops its top padding so the gap is one section's
+   worth, not two.
+   --------------------------------------------------------------------------- */
+.mkt-root .lp-hero + .lp-section:not(.lp-tint),
+.mkt-root .lp-section:not(.lp-tint) + .lp-section:not(.lp-tint),
+.mkt-root .lp-section.lp-tint + .lp-section.lp-tint {
+  padding-top: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Whole card clickable
+   A card's link sits on its title; this stretches that link over the whole
+   card so a tap anywhere opens it. Links inside the card (subject tags) sit
+   above the stretched area so they still go to their own page.
+   --------------------------------------------------------------------------- */
+.mkt-root .lp-tile {
+  position: relative;
+}
+.mkt-root .lp-tile h3 a::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.mkt-root .lp-tile .lp-chips,
+.mkt-root .lp-tile .btn {
+  position: relative;
+  z-index: 1;
+}
+.mkt-root .lp-tile:has(h3 a) {
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+.mkt-root .lp-tile:has(h3 a):hover {
+  border-color: var(--ink);
+}
+.mkt-root .lp-tile h3 a:focus-visible {
+  outline: none;
+}
+.mkt-root .lp-tile:has(h3 a:focus-visible) {
+  outline: 2px solid var(--coral-deep);
+  outline-offset: 2px;
 }

@@ -141,7 +141,7 @@ export function LandingPage({
           </div>
         </section>
 
-        {linkSections.map((section) => (
+        {linkSections.filter((s) => s.cards.length > 0).map((section) => (
           <section key={section.title} className="lp-section">
             <div className="container">
               <h2 className="lp-h2">{section.title}</h2>
