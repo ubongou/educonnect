@@ -3,7 +3,7 @@ import type { Guide } from "./types";
 export const movingWithChildrenGuide: Guide = {
   slug: "moving-from-nigeria-with-children-school-checklist",
   shortTitle: "Moving from Nigeria with children",
-  title: "Moving to the UK or Canada from Nigeria with Children: School Checklist",
+  title: "Moving from Nigeria with Children: School Checklist",
   description:
     "What to pack, when to apply and how your child will be placed in school when you relocate from Nigeria to the UK or Canada, plus how to keep learning on track during the move.",
   h1: "Moving to the UK or Canada from Nigeria with children: a school checklist",
