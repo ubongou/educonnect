@@ -51,6 +51,8 @@ export type Database = {
           parent_phone: string
           source: string
           subject: string
+          subject_other: string | null
+          subjects: string[] | null
         }
         Insert: {
           child_age: number
@@ -68,6 +70,8 @@ export type Database = {
           parent_phone: string
           source?: string
           subject: string
+          subject_other?: string | null
+          subjects?: string[] | null
         }
         Update: {
           child_age?: number
@@ -85,6 +89,8 @@ export type Database = {
           parent_phone?: string
           source?: string
           subject?: string
+          subject_other?: string | null
+          subjects?: string[] | null
         }
         Relationships: []
       }

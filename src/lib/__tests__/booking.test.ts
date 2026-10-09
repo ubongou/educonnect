@@ -2,10 +2,12 @@ import { describe, expect, it } from "vitest";
 import {
   bookHref,
   bookingRequestSchema,
+  describeSubjects,
   formatSource,
   normalizeSource,
   normalizeSubject,
   pricingPlanFromSource,
+  primarySubject,
 } from "@/lib/booking/schema";
 
 const valid = {
@@ -14,7 +16,8 @@ const valid = {
   child_grade: "Year 4",
   curriculum: "british",
   curriculum_other: "",
-  subject: "mathematics",
+  subjects: ["mathematics"],
+  subject_other: "",
   learning_needs: "Help with fractions and decimals.",
   current_performance: "average",
   concerns: "",
@@ -80,6 +83,41 @@ describe("bookingRequestSchema", () => {
     const r = bookingRequestSchema.safeParse(rest);
     expect(r.success).toBe(true);
     if (r.success) expect(r.data.current_performance).toBe("not_sure");
+  });
+
+  it("accepts several subjects", () => {
+    const r = bookingRequestSchema.safeParse({
+      ...valid,
+      subjects: ["mathematics", "science"],
+    });
+    expect(r.success).toBe(true);
+  });
+
+  it("rejects no subjects", () => {
+    const r = bookingRequestSchema.safeParse({ ...valid, subjects: [] });
+    expect(r.success).toBe(false);
+    if (!r.success) {
+      expect(r.error.issues.some((i) => i.path[0] === "subjects")).toBe(true);
+    }
+  });
+
+  it("requires subject_other when Other is ticked", () => {
+    const missing = bookingRequestSchema.safeParse({
+      ...valid,
+      subjects: ["other"],
+      subject_other: "",
+    });
+    expect(missing.success).toBe(false);
+    if (!missing.success) {
+      expect(missing.error.issues.some((i) => i.path[0] === "subject_other")).toBe(true);
+    }
+    expect(
+      bookingRequestSchema.safeParse({
+        ...valid,
+        subjects: ["other"],
+        subject_other: "Yoruba",
+      }).success,
+    ).toBe(true);
   });
 
   it("rejects bad email", () => {
@@ -177,5 +215,21 @@ describe("subject pre-selection", () => {
     );
     expect(bookHref("seo-subject", "11-plus")).toBe("/book?source=seo-subject");
     expect(bookHref("seo-country")).toBe("/book?source=seo-country");
+  });
+});
+
+describe("subject helpers", () => {
+  it("describes the ticked subjects in words", () => {
+    expect(describeSubjects(["mathematics"])).toBe("Mathematics");
+    expect(describeSubjects(["english", "science"])).toBe("English and Science");
+    expect(describeSubjects(["mathematics", "science", "other"], "Yoruba")).toBe(
+      "Mathematics, Science and Yoruba",
+    );
+    expect(describeSubjects(["other"], "  ")).toBe("");
+  });
+
+  it("picks the first standard subject for the single subject column", () => {
+    expect(primarySubject(["other", "science", "english"])).toBe("science");
+    expect(primarySubject(["other"])).toBe("other");
   });
 });

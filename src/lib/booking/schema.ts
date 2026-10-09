@@ -16,6 +16,10 @@ export type Curriculum = (typeof curriculumValues)[number];
 export const subjectValues = ["english", "mathematics", "science"] as const;
 export type Subject = (typeof subjectValues)[number];
 
+/** What the form offers: the standard subjects plus "Other" (free text). */
+export const subjectChoiceValues = [...subjectValues, "other"] as const;
+export type SubjectChoice = (typeof subjectChoiceValues)[number];
+
 export const performanceValues = [
   "excellent",
   "good",
@@ -38,6 +42,35 @@ export const subjectLabel: Record<Subject, string> = {
   mathematics: "Mathematics",
   science: "Science",
 };
+
+export const subjectChoiceLabel: Record<SubjectChoice, string> = {
+  ...subjectLabel,
+  other: "Other",
+};
+
+/**
+ * The ticked subjects in words, with "Other" replaced by what the parent
+ * typed: "Mathematics, Science and Yoruba".
+ */
+export function describeSubjects(
+  subjects: readonly string[],
+  other?: string,
+): string {
+  const names = subjects.flatMap((s) => {
+    if (s === "other") return other?.trim() ? [other.trim()] : [];
+    return s in subjectLabel ? [subjectLabel[s as Subject]] : [];
+  });
+  if (names.length <= 1) return names[0] ?? "";
+  return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+}
+
+/** The single `subject` column: the first standard subject ticked, else "other". */
+export function primarySubject(subjects: readonly string[]): SubjectChoice {
+  const standard = subjects.find((s): s is Subject =>
+    (subjectValues as readonly string[]).includes(s),
+  );
+  return standard ?? "other";
+}
 
 export const performanceLabel: Record<Performance, string> = {
   excellent: "Excellent",
@@ -175,7 +208,10 @@ export const bookingRequestSchema = z
     child_grade: z.string().trim().min(1, "Class / grade is required").max(80),
     curriculum: z.enum(curriculumValues, { message: "Pick a curriculum" }),
     curriculum_other: z.string().trim().max(120).default(""),
-    subject: z.enum(subjectValues, { message: "Pick a subject" }),
+    subjects: z
+      .array(z.enum(subjectChoiceValues), { message: "Pick at least one subject" })
+      .min(1, "Pick at least one subject"),
+    subject_other: z.string().trim().max(120).default(""),
     // Optional since the form was shortened: one free-text box replaced the
     // separate learning-needs and concerns boxes. Stored as "" when skipped
     // (the column is NOT NULL).
@@ -200,6 +236,10 @@ export const bookingRequestSchema = z
   .refine(
     (data) => data.curriculum !== "other" || data.curriculum_other.length > 0,
     { message: "Specify the curriculum", path: ["curriculum_other"] },
+  )
+  .refine(
+    (data) => !data.subjects.includes("other") || data.subject_other.length > 0,
+    { message: "Tell us which subject", path: ["subject_other"] },
   );
 
 export type BookingRequestInput = z.infer<typeof bookingRequestSchema>;
