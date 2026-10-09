@@ -20,20 +20,23 @@ const adminLinks = [
 export function Footer({
   mode = "marketing",
   role,
+  showWhatsApp = true,
 }: {
   mode?: Mode;
   role?: "parent" | "admin";
+  /** Floating WhatsApp bubble. Off on /book, which has its own WhatsApp button. */
+  showWhatsApp?: boolean;
 }) {
   if (mode === "marketing") {
-    return <MarketingFooter />;
+    return <MarketingFooter showWhatsApp={showWhatsApp} />;
   }
   return <AuthedFooter role={role} />;
 }
 
-function MarketingFooter() {
+function MarketingFooter({ showWhatsApp }: { showWhatsApp: boolean }) {
   return (
     <>
-    <WhatsAppButton />
+    {showWhatsApp && <WhatsAppButton />}
     <footer className="footer" aria-label="Site footer">
       <div className="container">
         <div className="footer-top">
@@ -110,7 +113,7 @@ function MarketingFooter() {
                 <Link href="/login">Log in</Link>
               </li>
               <li>
-                <Link href="/book?source=footer">Book a free session</Link>
+                <Link href="/book?source=footer">Book a free consultation</Link>
               </li>
             </ul>
           </div>

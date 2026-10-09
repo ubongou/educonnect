@@ -24,7 +24,7 @@ export default function NotFound() {
             </p>
             <div className="lp-ctas">
               <Link href="/book?source=404" className="btn btn-coral">
-                Book a free session
+                Book a free consultation
               </Link>
               <Link href="/" className="btn btn-ghost">
                 Go to the homepage

@@ -16,8 +16,8 @@ export type SubmitBookingRequestState =
       formError?: string;
       values: Record<string, string>;
     }
-  // Returned only in "inline" mode (e.g. /strategy-session), where the caller
-  // reveals the calendar on-page instead of navigating to /book/thanks.
+  // Returned only in "inline" mode (/book), where the form reveals the
+  // calendar on-page instead of navigating to /book/thanks.
   | { status: "success" };
 
 /**
@@ -67,7 +67,12 @@ export async function submitBookingRequest(
     source: normalizeSource(formData.get("source")),
   };
 
-  const parsed = bookingRequestSchema.safeParse(raw);
+  // current_performance is no longer on the /book form; let the schema
+  // default it rather than failing the enum on an empty string.
+  const parsed = bookingRequestSchema.safeParse({
+    ...raw,
+    current_performance: raw.current_performance || undefined,
+  });
   if (!parsed.success) {
     const fieldErrors: Record<string, string> = {};
     for (const issue of parsed.error.issues) {
@@ -107,9 +112,13 @@ export async function submitBookingRequest(
     };
   }
 
-  // 4. Best-effort email
+  // 4. Best-effort email. `channel` is which /book button was pressed; it
+  // only changes the email (so the team knows to reply on WhatsApp), not
+  // the stored row.
+  const channel =
+    String(formData.get("channel") ?? "") === "whatsapp" ? "whatsapp" : "calendar";
   try {
-    const result = await sendBookingRequestEmail(parsed.data);
+    const result = await sendBookingRequestEmail(parsed.data, channel);
     if (!result.ok) {
       console.error("[booking] email send failed:", result.error);
     }

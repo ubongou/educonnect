@@ -1,0 +1,344 @@
+/* /book and /book/thanks: the free consultation booking flow. Builds on the
+   .field / .contact-form rules in marketing.css. */
+
+.mkt-root .booking {
+  padding: 56px 0 80px;
+}
+.mkt-root .booking-layout {
+  max-width: 720px;
+}
+.mkt-root .booking-container {
+  min-width: 0;
+  /* Clears the sticky nav when the flow scrolls back to the top. */
+  scroll-margin-top: 120px;
+}
+.mkt-root .booking-title {
+  font-size: clamp(30px, 4.2vw, 46px);
+  letter-spacing: -0.03em;
+  margin-top: 14px;
+}
+.mkt-root .booking-lead {
+  color: var(--ink-2);
+  font-size: 17px;
+  line-height: 1.55;
+  margin-top: 12px;
+  max-width: 560px;
+}
+.mkt-root .booking-plan-note {
+  margin-top: 18px;
+  padding: 12px 16px;
+  background: var(--sky-soft);
+  border-radius: var(--radius-sm);
+  font-size: 14.5px;
+  color: var(--ink);
+}
+
+/* ---------- Step indicator ---------- */
+.mkt-root .booking-steps {
+  display: flex;
+  gap: 8px;
+  list-style: none;
+  margin: 28px 0 20px;
+  padding: 0;
+}
+.mkt-root .booking-steps li {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 3px solid var(--line);
+  font-size: 13.5px;
+  color: var(--ink-3);
+}
+.mkt-root .booking-steps li.is-current {
+  border-top-color: var(--coral);
+  color: var(--ink);
+  font-weight: 600;
+}
+.mkt-root .booking-steps li.is-done {
+  border-top-color: var(--ink);
+  color: var(--ink-2);
+}
+.mkt-root .booking-steps-num {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--paper-2);
+  color: var(--ink-2);
+}
+.mkt-root .booking-steps li.is-current .booking-steps-num {
+  background: var(--coral);
+  color: #fff;
+}
+.mkt-root .booking-steps li.is-done .booking-steps-num {
+  background: var(--ink);
+  color: #fff;
+}
+
+/* ---------- Form ---------- */
+.mkt-root .booking-form {
+  display: block;
+}
+.mkt-root .booking-hp {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.mkt-root .booking-required-note {
+  font-size: 13px;
+  color: var(--ink-3);
+  margin-bottom: 18px;
+}
+.mkt-root .booking-step-title {
+  font-size: 20px;
+  letter-spacing: -0.01em;
+  margin-bottom: 18px;
+}
+.mkt-root .booking-row {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 16px;
+}
+.mkt-root .booking-optional {
+  color: var(--ink-3);
+  font-weight: 400;
+}
+.mkt-root .booking-hint {
+  font-size: 12.5px;
+  color: var(--ink-3);
+  margin-top: 6px;
+}
+.mkt-root .field .booking-textarea {
+  min-height: 110px;
+}
+
+/* Choice pills: native radios, styled as pills with a clear selected state. */
+.mkt-root .booking-choices {
+  border: none;
+  padding: 0;
+  margin: 0 0 20px;
+  min-width: 0;
+}
+.mkt-root .booking-choices legend {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-2);
+  letter-spacing: 0.02em;
+  margin-bottom: 10px;
+  padding: 0;
+}
+.mkt-root .booking-choice-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.mkt-root .booking-choice {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 18px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--paper);
+  font-size: 14.5px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.mkt-root .booking-choice:hover {
+  border-color: var(--ink-3);
+}
+.mkt-root .booking-choice input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.mkt-root .booking-choice:has(input:checked) {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+  font-weight: 600;
+}
+.mkt-root .booking-choice:has(input:focus-visible) {
+  box-shadow: 0 0 0 4px rgba(62, 190, 255, 0.35);
+}
+.mkt-root .booking-choices.error .booking-choice {
+  border-color: var(--coral);
+}
+
+.mkt-root .booking-form-error {
+  background: #fdecea;
+  border: 1px solid #f5b7b1;
+  color: #a83a2a;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  margin-top: 8px;
+  font-size: 14px;
+}
+.mkt-root .contact-form .booking-next {
+  margin-top: 16px;
+}
+.mkt-root .booking-back {
+  display: block;
+  margin: 14px auto 0;
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink-2);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ---------- Calendar (step 3) ---------- */
+.mkt-root .booking-calendar {
+  margin-top: 8px;
+}
+.mkt-root .booking-calendar-done {
+  margin-bottom: 16px;
+  padding: 14px 18px;
+  background: #eaf8f0;
+  border: 1px solid #b8e2c8;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+.mkt-root .booking-calendar-frame {
+  width: 100%;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+/* Cal auto-resizes its iframe, so the page scrolls, not an inner box. */
+.mkt-root .booking-cal-embed {
+  display: block;
+  width: 100%;
+  min-height: 620px;
+  overflow: visible;
+}
+.mkt-root .booking-cal-embed iframe {
+  display: block;
+  width: 100%;
+  border: 0;
+}
+.mkt-root .booking-calendar-fallback {
+  margin-top: 18px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-3);
+  text-align: center;
+}
+.mkt-root .booking-calendar-fallback a {
+  color: var(--ink-2);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.mkt-root .booking-calendar-fallback.is-urgent {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  color: var(--ink);
+  font-size: 15px;
+}
+
+/* ---------- Step 2 choice: WhatsApp or calendar ---------- */
+.mkt-root .booking-choose {
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.mkt-root .booking-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+.mkt-root .contact-form .booking-actions .btn {
+  margin-top: 0;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.2;
+}
+.mkt-root .booking-btn-sub {
+  font-size: 12.5px;
+  font-weight: 500;
+  opacity: 0.85;
+}
+.mkt-root .booking-wa-btn {
+  background: #25d366;
+  color: #04131c;
+  border: none;
+}
+.mkt-root .booking-wa-btn:hover {
+  background: #1ebe5a;
+}
+.mkt-root .booking-saving {
+  margin-top: 10px;
+  font-size: 13.5px;
+  color: var(--ink-3);
+  text-align: center;
+}
+
+/* ---------- After "Talk to us now" ---------- */
+.mkt-root .booking-wa-ready {
+  margin-top: 8px;
+  padding: 28px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+.mkt-root .booking-wa-ready .booking-wa-btn {
+  width: 100%;
+  justify-content: center;
+  padding: 16px;
+}
+.mkt-root .booking-wa-alt {
+  margin-top: 16px;
+  font-size: 14.5px;
+  color: var(--ink-2);
+}
+.mkt-root .booking-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+@media (max-width: 560px) {
+  .mkt-root .booking {
+    padding: 32px 0 56px;
+  }
+  .mkt-root .booking-row,
+  .mkt-root .booking-actions {
+    grid-template-columns: 1fr;
+  }
+  .mkt-root .booking-row {
+    gap: 0;
+  }
+  .mkt-root .booking-steps-label {
+    font-size: 12px;
+  }
+  .mkt-root .booking-cal-embed {
+    min-height: 560px;
+  }
+}

@@ -124,6 +124,7 @@ export default async function SubjectPage({
         h1={page.h1}
         intro={page.intro}
         bookingSource="seo-subject"
+        bookingPageSlug={page.slug}
         currency={page.currency ?? "USD"}
         blocks={[
           { title: "Who it's for", items: page.whoFor },

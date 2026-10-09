@@ -19,6 +19,8 @@ type TrackEventMap = {
   click_book_session: { source: "nav" | "hero" | "pricing"; tier?: string };
   booking_form_submit: { source: string };
   booking_complete: Record<string, never>;
+  /** A slot was picked in the /book calendar — a consultation now exists. */
+  consultation_booked: { source: string };
   // Strategy-session landing page (/strategy-session)
   book_strategy_session: { source: string };
   /** The visitor picked a slot on /booked — the real business conversion. */

@@ -171,7 +171,7 @@ function MarketingNav({ activeHref }: { activeHref?: string }) {
               className="btn btn-coral"
               onClick={() => trackEvent("click_book_session", { source: "nav" })}
             >
-              Book a Free Session
+              Book a Free Consultation
             </Link>
           </div>
           <button
@@ -207,7 +207,7 @@ function MarketingNav({ activeHref }: { activeHref?: string }) {
               trackEvent("click_book_session", { source: "nav" });
             }}
           >
-            Book a Free Session
+            Book a Free Consultation
           </Link>
         </div>
       </header>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { bookHref } from "@/lib/booking/schema";
 import "../../styles/landing.css";
 import { Nav } from "@/components/ui/Nav";
 import { Footer } from "@/components/ui/Footer";
@@ -55,6 +56,7 @@ export function LandingPage({
   h1,
   intro,
   bookingSource,
+  bookingPageSlug,
   currency,
   blocks,
   approach,
@@ -68,6 +70,8 @@ export function LandingPage({
   h1: string;
   intro: string;
   bookingSource: string;
+  /** /tutoring/[slug] slug, used to pre-select the subject on /book. */
+  bookingPageSlug?: string;
   currency: Currency;
   blocks: ListBlock[];
   approach?: { title: string; items: string[] };
@@ -77,7 +81,7 @@ export function LandingPage({
   /** Linked card grids after the lists, e.g. "Exams we prepare for". */
   linkSections?: LinkSection[];
 }) {
-  const bookHref = `/book?source=${bookingSource}`;
+  const bookingHref = bookHref(bookingSource, bookingPageSlug);
   const matched = testimonialMatch
     ? defaultTestimonials.quotes.filter((q) => testimonialMatch.test(q.where))
     : [];
@@ -110,8 +114,8 @@ export function LandingPage({
             <h1 id="lp-h1">{h1}</h1>
             <p className="lp-intro">{intro}</p>
             <div className="lp-ctas">
-              <Link href={bookHref} className="btn btn-coral">
-                Book a free session
+              <Link href={bookingHref} className="btn btn-coral">
+                Book a free consultation
               </Link>
               <Link href="/pricing" className="btn btn-ghost">
                 See pricing
@@ -295,8 +299,8 @@ export function LandingPage({
               Fifteen minutes about your child. A written plan within 24 hours.
               No obligation. {MIT_FELLOWSHIP}
             </p>
-            <Link href={bookHref} className="btn btn-coral">
-              Book a free session
+            <Link href={bookingHref} className="btn btn-coral">
+              Book a free consultation
             </Link>
           </div>
         </section>

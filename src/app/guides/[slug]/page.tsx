@@ -239,7 +239,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
               learning plan within 24 hours.
             </p>
             <Link href={`/book?source=guide-${g.slug}`} className="btn btn-coral">
-              Book a free session
+              Book a free consultation
             </Link>
           </div>
         </section>

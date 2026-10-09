@@ -92,7 +92,7 @@ export const everyFamilyGets = [
 
 export const howItWorks = [
   {
-    title: "Book a free session",
+    title: "Book a free consultation",
     body: "Fifteen minutes with one of our education experts about your child, at a time that suits you.",
   },
   {
@@ -120,7 +120,7 @@ const baseSubjectPages: SubjectPage[] = [
     linkLabel: "Maths tutoring",
     title: "Online Maths Tutor for Nigerian Families Abroad",
     description:
-      "One to one online maths tutoring with vetted Nigerian teachers. Primary to secondary, UK, US, Nigerian and international curricula. Book a free session.",
+      "One to one online maths tutoring with vetted Nigerian teachers. Primary to secondary, UK, US, Nigerian and international curricula. Book a free consultation.",
     h1: "Online maths tutoring that builds real confidence",
     intro:
       "Private, one to one maths lessons with a carefully vetted Nigerian teacher who follows your child's school curriculum, wherever your family lives. We fill the gaps first, then build the fluency and confidence that make maths feel possible again.",

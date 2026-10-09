@@ -32,7 +32,6 @@ export const bundledAssets = {
 // -----------------------------------------------------------------------------
 
 export const defaultGlobals: GlobalsContent = {
-  bookingUrl: "https://calendar.app.google/ZiNbAvQkBaYHMVY69",
   adminEmail: "admin@joinmasani.com",
   websiteUrl: "https://www.joinmasani.com",
   instagramUrl: "https://www.instagram.com/joinmasani/",
@@ -52,7 +51,7 @@ export const defaultHero: HeroContent = {
     "Private one to one online lessons for Nigerian families in the UK, US and Canada. Only the top 3% of teachers who apply are accepted.",
   subheading:
     "Rigorously vetted, carefully matched, and deeply invested in every child they teach.",
-  primaryCtaLabel: "Book a free session",
+  primaryCtaLabel: "Book a free consultation",
   secondaryCtaLabel: "Pricing",
   microcopy: "No commitment. Booking takes 2 minutes.",
   assurances: [

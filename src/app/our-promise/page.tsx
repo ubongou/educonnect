@@ -125,7 +125,7 @@ export default function PromisePage() {
               <a href={`mailto:${defaultContact.email}`}>{defaultContact.email}</a>.
             </p>
             <Link href="/book?source=promise" className="btn btn-coral">
-              Book a free session
+              Book a free consultation
             </Link>
           </div>
         </section>

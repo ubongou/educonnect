@@ -54,7 +54,7 @@ export default function TutoringHubPage() {
             </p>
             <div className="lp-ctas">
               <Link href="/book?source=seo-subject" className="btn btn-coral">
-                Book a free session
+                Book a free consultation
               </Link>
               <Link href="/pricing" className="btn btn-ghost">
                 See pricing

@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import "../../styles/booking.css";
 import { pageMetadata } from "@/lib/seo";
 import { Nav } from "@/components/ui/Nav";
 import { Footer } from "@/components/ui/Footer";
@@ -7,9 +8,9 @@ import { MarketingScrollReveal } from "@/components/marketing/MarketingScrollRev
 import { BookingFormRoute } from "@/components/booking/BookingFormRoute";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Book a Free Session",
+  title: "Book a Free Consultation",
   description:
-    "Tell us about your child and we'll match you with a tutor for a free trial session.",
+    "Book a free 15 minute call with a Masani education expert about your child. Tell us about them, then pick a time that suits you.",
   path: "/book",
 });
 
@@ -27,7 +28,7 @@ export default function BookPage() {
           <BookingFormRoute />
         </Suspense>
       </main>
-      <Footer mode="marketing" />
+      <Footer mode="marketing" showWhatsApp={false} />
     </div>
   );
 }

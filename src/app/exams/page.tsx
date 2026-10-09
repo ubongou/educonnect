@@ -68,7 +68,7 @@ export default function ExamsPage() {
             </p>
             <div className="lp-ctas">
               <Link href="/book?source=exams" className="btn btn-coral">
-                Book a free session
+                Book a free consultation
               </Link>
               <Link href="/tutoring" className="btn btn-ghost">
                 See all subjects

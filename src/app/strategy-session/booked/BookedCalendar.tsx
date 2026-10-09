@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Cal, { getCalApi } from "@calcom/embed-react";
 import { trackBookingCompleted, trackLeadSubmitted } from "@/lib/analytics";
+import { CAL_LINK, bookingUidFrom } from "@/lib/booking/cal";
 import { readLead, takeLeadForConversion, type LeadHandoff } from "../leadHandoff";
 
 // Cal.com replaced the Google Calendar appointment schedule for one reason
@@ -12,21 +13,12 @@ import { readLead, takeLeadForConversion, type LeadHandoff } from "../leadHandof
 // exposes a switcher. Everything else here (prefill, booking tracking) is only
 // possible because Cal talks back to the parent page; the Google iframe never did.
 const CAL_NAMESPACE = "strategy";
-const CAL_LINK = "masani/strategy";
 
 // If Cal hasn't painted an iframe by now, assume it is blocked (privacy
 // extension, corporate proxy, dead connection) and show the manual path
 // instead of leaving the visitor staring at an empty box on the one page
 // where failure costs the entire acquisition.
 const CAL_LOAD_TIMEOUT_MS = 8000;
-
-/** Cal's `bookingSuccessful` payload, read defensively — we only need the uid. */
-function bookingUidFrom(event: unknown): string | undefined {
-  const detail = (event as { detail?: { data?: unknown } } | undefined)?.detail
-    ?.data as { booking?: { uid?: unknown }; uid?: unknown } | undefined;
-  const uid = detail?.booking?.uid ?? detail?.uid;
-  return typeof uid === "string" ? uid : undefined;
-}
 
 export function BookedCalendar() {
   const [lead, setLead] = useState<LeadHandoff | null>(null);
