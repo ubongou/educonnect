@@ -1,5 +1,5 @@
 import { BOOKING_WHATSAPP_URL } from "./cal";
-import { curriculumLabel, subjectLabel, type Curriculum, type Subject } from "./schema";
+import { curriculumLabel, describeSubjects, type Curriculum } from "./schema";
 
 /** The /book answers the WhatsApp message is built from. All optional. */
 export type WhatsAppDraft = {
@@ -9,7 +9,9 @@ export type WhatsAppDraft = {
   child_grade?: string;
   curriculum?: string;
   curriculum_other?: string;
-  subject?: string;
+  /** Ticked subjects; "other" is replaced by subject_other. */
+  subjects?: readonly string[];
+  subject_other?: string;
   learning_needs?: string;
 };
 
@@ -38,10 +40,7 @@ export function whatsappBookingMessage(d: WhatsAppDraft): string {
     curriculum && `${curriculum} curriculum`,
   ].filter(Boolean);
 
-  const subject =
-    d.subject && d.subject in subjectLabel
-      ? subjectLabel[d.subject as Subject]
-      : undefined;
+  const subject = describeSubjects(d.subjects ?? [], d.subject_other) || undefined;
   let help = d.learning_needs?.trim().replace(/\s+/g, " ");
   if (help && help.length > HELP_MAX) help = `${help.slice(0, HELP_MAX - 1).trimEnd()}…`;
 

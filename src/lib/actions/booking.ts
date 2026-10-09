@@ -4,7 +4,10 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
   bookingRequestSchema,
+  describeSubjects,
   normalizeSource,
+  primarySubject,
+  subjectValues,
 } from "@/lib/booking/schema";
 import { sendBookingRequestEmail } from "@/lib/email/sendBookingRequest";
 
@@ -50,14 +53,17 @@ export async function submitBookingRequest(
     redirect("/book/thanks");
   }
 
-  // 2. Zod parse
+  // 2. Zod parse. Subjects are checkboxes (several values under one name);
+  // `raw` keeps them comma-joined so the form can re-tick them on error.
+  const subjects = formData.getAll("subjects").map(String);
   const raw = {
     child_name: String(formData.get("child_name") ?? ""),
     child_age: String(formData.get("child_age") ?? ""),
     child_grade: String(formData.get("child_grade") ?? ""),
     curriculum: String(formData.get("curriculum") ?? ""),
     curriculum_other: String(formData.get("curriculum_other") ?? ""),
-    subject: String(formData.get("subject") ?? ""),
+    subjects: subjects.join(","),
+    subject_other: String(formData.get("subject_other") ?? ""),
     learning_needs: String(formData.get("learning_needs") ?? ""),
     current_performance: String(formData.get("current_performance") ?? ""),
     concerns: String(formData.get("concerns") ?? ""),
@@ -71,6 +77,7 @@ export async function submitBookingRequest(
   // default it rather than failing the enum on an empty string.
   const parsed = bookingRequestSchema.safeParse({
     ...raw,
+    subjects,
     current_performance: raw.current_performance || undefined,
   });
   if (!parsed.success) {
@@ -84,14 +91,17 @@ export async function submitBookingRequest(
 
   // 3. Insert
   const supabase = await createClient();
-  const { error: dbError } = await supabase.from("booking_requests").insert({
+  const hasOther = parsed.data.subjects.includes("other");
+  const row = {
     child_name: parsed.data.child_name,
     child_age: parsed.data.child_age,
     child_grade: parsed.data.child_grade,
     curriculum: parsed.data.curriculum,
     curriculum_other:
       parsed.data.curriculum === "other" ? parsed.data.curriculum_other : null,
-    subject: parsed.data.subject,
+    subject: primarySubject(parsed.data.subjects),
+    subjects: parsed.data.subjects,
+    subject_other: hasOther ? parsed.data.subject_other : null,
     learning_needs: parsed.data.learning_needs,
     current_performance: parsed.data.current_performance,
     concerns: parsed.data.concerns || null,
@@ -99,7 +109,27 @@ export async function submitBookingRequest(
     parent_phone: parsed.data.parent_phone,
     parent_email: parsed.data.parent_email,
     source: parsed.data.source,
-  });
+  };
+  let { error: dbError } = await supabase.from("booking_requests").insert(row);
+
+  // Deployed ahead of migration 0040 (no subjects/subject_other columns yet,
+  // and `subject` can't be 'other'): save the old shape instead, with every
+  // ticked subject written into `concerns` so nothing the parent chose is
+  // lost. Only possible when at least one standard subject was ticked.
+  if (
+    dbError &&
+    (dbError.code === "PGRST204" || dbError.code === "23514") &&
+    parsed.data.subjects.some((s) => (subjectValues as readonly string[]).includes(s))
+  ) {
+    console.warn("[booking] retrying insert without 0040 columns:", dbError.message);
+    const { subjects: _s, subject_other: _o, ...legacy } = row;
+    void _s;
+    void _o;
+    ({ error: dbError } = await supabase.from("booking_requests").insert({
+      ...legacy,
+      concerns: `Subjects: ${describeSubjects(parsed.data.subjects, parsed.data.subject_other)}`,
+    }));
+  }
 
   if (dbError) {
     console.error("[booking] insert failed:", dbError);

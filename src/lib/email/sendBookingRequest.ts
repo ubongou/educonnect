@@ -3,7 +3,7 @@ import { getFromAddress, getResend } from "./client";
 import {
   curriculumLabel,
   formatSource,
-  subjectLabel,
+  describeSubjects,
   type BookingRequestInput,
 } from "@/lib/booking/schema";
 
@@ -43,7 +43,7 @@ export async function sendBookingRequestEmail(
     from: getFromAddress(),
     to: adminEmail,
     replyTo: input.parent_email,
-    subject: `[Masani booking${channel === "whatsapp" ? " · WhatsApp" : ""}] ${input.child_name} — ${subjectLabel[input.subject]} (${sourceLabel})`,
+    subject: `[Masani booking${channel === "whatsapp" ? " · WhatsApp" : ""}] ${input.child_name} — ${describeSubjects(input.subjects, input.subject_other)} (${sourceLabel})`,
     html,
     text,
   });
@@ -80,7 +80,7 @@ function render(
     ["Age", String(i.child_age)],
     ["Class / grade", i.child_grade],
     ["Curriculum", curriculum],
-    ["Subject", subjectLabel[i.subject]],
+    ["Subjects", describeSubjects(i.subjects, i.subject_other)],
     ["Help wanted with", i.learning_needs || "(none provided)"],
     ["Parent's name", i.parent_name],
     ["Parent's phone (WhatsApp)", i.parent_phone],
@@ -100,7 +100,7 @@ function render(
       <body style="margin:0;padding:24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#04131C;background:#FBF9F4;">
         <div style="max-width:620px;margin:0 auto;background:#fff;border:1px solid #e8e3d6;border-radius:18px;padding:32px;">
           <p style="margin:0 0 4px;font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#6b7680;">Masani booking request</p>
-          <h1 style="margin:0 0 20px;font-size:22px;line-height:1.2;color:#04131C;">${esc(i.child_name)} — free consultation, ${esc(subjectLabel[i.subject])}</h1>
+          <h1 style="margin:0 0 20px;font-size:22px;line-height:1.2;color:#04131C;">${esc(i.child_name)} — free consultation, ${esc(describeSubjects(i.subjects, i.subject_other))}</h1>
           <table style="border-collapse:collapse;font-size:14px;color:#3a4750;">${rows}</table>
           <hr style="border:none;border-top:1px solid #e8e3d6;margin:24px 0 16px;" />
           <p style="margin:0;font-size:12px;color:#6b7680;">Reply directly to this email to respond to <strong>${esc(i.parent_name)}</strong>.</p>

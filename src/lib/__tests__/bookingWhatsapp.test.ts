@@ -10,7 +10,7 @@ describe("whatsappBookingMessage", () => {
         child_age: "9",
         child_grade: "Year 4",
         curriculum: "british",
-        subject: "mathematics",
+        subjects: ["mathematics"],
         learning_needs: "mainly fractions",
       }),
     ).toBe(
@@ -20,13 +20,23 @@ describe("whatsappBookingMessage", () => {
 
   it("leaves out anything skipped", () => {
     expect(
-      whatsappBookingMessage({ parent_name: "Adaeze", child_name: "Ada", subject: "english" }),
+      whatsappBookingMessage({ parent_name: "Adaeze", child_name: "Ada", subjects: ["english"] }),
     ).toBe(
       "Hi Masani, I'm Adaeze. I just filled in your booking form for my child Ada and would like help with English. Are you free for a quick call today?",
     );
     expect(whatsappBookingMessage({})).toBe(
       "Hi Masani. I just filled in your booking form for my child. Are you free for a quick call today?",
     );
+  });
+
+  it("lists several subjects, with Other replaced by what was typed", () => {
+    expect(
+      whatsappBookingMessage({
+        child_name: "Ada",
+        subjects: ["mathematics", "science", "other"],
+        subject_other: "Yoruba",
+      }),
+    ).toContain("would like help with Mathematics, Science and Yoruba.");
   });
 
   it("uses the typed curriculum for Other and trims long help text", () => {

@@ -13,8 +13,8 @@ import {
   curriculumLabel,
   curriculumValues,
   pricingPlanFromSource,
-  subjectLabel,
-  subjectValues,
+  subjectChoiceLabel,
+  subjectChoiceValues,
   type Subject,
 } from "@/lib/booking/schema";
 import {
@@ -41,7 +41,8 @@ const ALL_FIELDS = [
   "child_grade",
   "curriculum",
   "curriculum_other",
-  "subject",
+  "subjects",
+  "subject_other",
   "learning_needs",
   "parent_name",
   "parent_phone",
@@ -54,7 +55,8 @@ const CHILD_FIELDS = [
   "child_grade",
   "curriculum",
   "curriculum_other",
-  "subject",
+  "subjects",
+  "subject_other",
   "learning_needs",
 ] as const;
 
@@ -105,6 +107,10 @@ export function BookingForm({ source, subject }: BookingFormProps) {
     state?.status === "error" ? state.values : ({} as Record<string, string>);
 
   const [curriculum, setCurriculum] = useState<string | undefined>(undefined);
+  // Ticked subjects, kept in state only to show/hide "Which subject?".
+  const [subjectsTicked, setSubjectsTicked] = useState<ReadonlySet<string>>(
+    () => new Set(subject ? [subject] : []),
+  );
   const plan = pricingPlanFromSource(source);
 
   // A new server result: on error, return to the step holding the first bad
@@ -115,6 +121,9 @@ export function BookingForm({ source, subject }: BookingFormProps) {
     setEditedFields(new Set());
     if (state?.status === "error") {
       setCurriculum(state.values.curriculum || undefined);
+      setSubjectsTicked(
+        new Set(state.values.subjects?.split(",").filter(Boolean) ?? []),
+      );
       const keys = Object.keys(state.fieldErrors);
       if (keys.length > 0) {
         setStep(
@@ -154,15 +163,17 @@ export function BookingForm({ source, subject }: BookingFormProps) {
    * Validates the given fields with the real schema and shows any errors.
    * Returns the form's values when they pass, or null.
    */
-  function validate(fields: readonly string[]): Record<string, string> | null {
+  function validate(
+    fields: readonly string[],
+  ): { data: Record<string, string>; subjects: string[] } | null {
     const form = formRef.current;
     if (!form) return null;
-    const data = Object.fromEntries(new FormData(form)) as Record<
-      string,
-      string
-    >;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData) as Record<string, string>;
+    const subjects = formData.getAll("subjects").map(String);
     const result = bookingRequestSchema.safeParse({
       ...data,
+      subjects,
       current_performance: undefined,
     });
     const found: Errors = {};
@@ -172,10 +183,13 @@ export function BookingForm({ source, subject }: BookingFormProps) {
         if (fields.includes(key) && !found[key]) found[key] = issue.message;
       }
     }
-    // The schema's "specify the curriculum" refine only runs once every field
-    // parses, so check it here too.
+    // The schema's "Other" refines only run once every field parses, so
+    // check them here too.
     if (data.curriculum === "other" && !data.curriculum_other?.trim()) {
       found.curriculum_other = "Specify the curriculum";
+    }
+    if (subjects.includes("other") && !data.subject_other?.trim()) {
+      found.subject_other = "Tell us which subject";
     }
     setDismissedState(state);
     setClientErrs(found);
@@ -191,7 +205,7 @@ export function BookingForm({ source, subject }: BookingFormProps) {
       setFocusErrorTick((t) => t + 1);
       return null;
     }
-    return data;
+    return { data, subjects };
   }
 
   function continueToDetails() {
@@ -296,12 +310,13 @@ export function BookingForm({ source, subject }: BookingFormProps) {
                   submitter?.value === "whatsapp" ? "whatsapp" : "calendar";
                 // Check everything first, so WhatsApp only opens for a
                 // request we can actually save.
-                const data = validate(ALL_FIELDS);
-                if (!data) {
+                const valid = validate(ALL_FIELDS);
+                if (!valid) {
                   e.preventDefault();
                   return;
                 }
-                const href = whatsappBookingUrl(data);
+                const { data, subjects } = valid;
+                const href = whatsappBookingUrl({ ...data, subjects });
                 setChannel(chosen);
                 setWhatsappHref(href);
                 setLead({
@@ -381,14 +396,43 @@ export function BookingForm({ source, subject }: BookingFormProps) {
                 )}
 
                 <ChoiceGroup
-                  legend="Subject to start with"
-                  name="subject"
-                  options={subjectValues.map(
-                    (v) => [v, subjectLabel[v]] as const,
+                  legend={
+                    <>
+                      Subjects{" "}
+                      <span className="booking-optional">(choose any)</span>
+                    </>
+                  }
+                  name="subjects"
+                  multiple
+                  options={subjectChoiceValues.map(
+                    (v) => [v, subjectChoiceLabel[v]] as const,
                   )}
-                  defaultValue={values.subject || subject}
-                  error={errs.subject}
+                  defaultValues={
+                    values.subjects !== undefined
+                      ? values.subjects.split(",").filter(Boolean)
+                      : subject
+                        ? [subject]
+                        : []
+                  }
+                  error={errs.subjects}
+                  onChange={(value, checked) =>
+                    setSubjectsTicked((prev) => {
+                      const next = new Set(prev);
+                      if (checked) next.add(value);
+                      else next.delete(value);
+                      return next;
+                    })
+                  }
                 />
+                {subjectsTicked.has("other") && (
+                  <Field
+                    label="Which subject?"
+                    name="subject_other"
+                    hint="e.g. Yoruba, Coding, French"
+                    defaultValue={values.subject_other}
+                    error={errs.subject_other}
+                  />
+                )}
 
                 <Field
                   label="What would you like help with?"
@@ -575,20 +619,27 @@ function Field(p: FieldProps) {
   );
 }
 
+/** Pill choices: radios by default, checkboxes with `multiple`. */
 function ChoiceGroup({
   legend,
   name,
   options,
+  multiple = false,
   defaultValue,
+  defaultValues,
   error,
   onChange,
 }: {
   legend: ReactNode;
   name: string;
   options: ReadonlyArray<readonly [string, string]>;
+  multiple?: boolean;
+  /** Single choice (radios). */
   defaultValue?: string;
+  /** Multiple choice (checkboxes). */
+  defaultValues?: readonly string[];
   error?: string;
-  onChange?: (value: string) => void;
+  onChange?: (value: string, checked: boolean) => void;
 }) {
   const errId = error ? `err-${name}` : undefined;
   return (
@@ -602,11 +653,15 @@ function ChoiceGroup({
         {options.map(([value, label]) => (
           <label key={value} className="booking-choice">
             <input
-              type="radio"
+              type={multiple ? "checkbox" : "radio"}
               name={name}
               value={value}
-              defaultChecked={defaultValue === value}
-              onChange={(e) => onChange?.(e.target.value)}
+              defaultChecked={
+                multiple
+                  ? (defaultValues ?? []).includes(value)
+                  : defaultValue === value
+              }
+              onChange={(e) => onChange?.(e.target.value, e.target.checked)}
             />
             <span>{label}</span>
           </label>
