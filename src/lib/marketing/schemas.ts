@@ -9,7 +9,6 @@
 // -----------------------------------------------------------------------------
 
 export type GlobalsContent = {
-  bookingUrl: string;
   adminEmail: string;
   websiteUrl: string;
   instagramUrl: string;

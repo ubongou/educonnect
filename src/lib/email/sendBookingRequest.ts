@@ -3,7 +3,6 @@ import { getFromAddress, getResend } from "./client";
 import {
   curriculumLabel,
   formatSource,
-  performanceLabel,
   subjectLabel,
   type BookingRequestInput,
 } from "@/lib/booking/schema";
@@ -20,8 +19,11 @@ export type SendBookingRequestResult =
  * absent => skipped (the row is already saved in `booking_requests`,
  * so a missing key just means no email).
  */
+export type BookingChannel = "whatsapp" | "calendar";
+
 export async function sendBookingRequestEmail(
   input: BookingRequestInput,
+  channel: BookingChannel = "calendar",
 ): Promise<SendBookingRequestResult> {
   const resend = getResend();
   if (!resend) {
@@ -35,13 +37,13 @@ export async function sendBookingRequestEmail(
   }
 
   const sourceLabel = formatSource(input.source);
-  const { html, text } = render(input, sourceLabel);
+  const { html, text } = render(input, sourceLabel, channel);
 
   const { error } = await resend.emails.send({
     from: getFromAddress(),
     to: adminEmail,
     replyTo: input.parent_email,
-    subject: `[Masani booking] ${input.child_name} — ${subjectLabel[input.subject]} (${sourceLabel})`,
+    subject: `[Masani booking${channel === "whatsapp" ? " · WhatsApp" : ""}] ${input.child_name} — ${subjectLabel[input.subject]} (${sourceLabel})`,
     html,
     text,
   });
@@ -59,6 +61,7 @@ export async function sendBookingRequestEmail(
 function render(
   i: BookingRequestInput,
   sourceLabel: string,
+  channel: BookingChannel,
 ): { html: string; text: string } {
   const curriculum =
     i.curriculum === "other"
@@ -66,15 +69,19 @@ function render(
       : curriculumLabel[i.curriculum];
 
   const fields: Array<[string, string]> = [
+    [
+      "Chose",
+      channel === "whatsapp"
+        ? "Talk to us now (WhatsApp). Reply to them on WhatsApp."
+        : "Book a time (calendar)",
+    ],
     ["Source", sourceLabel],
     ["Child's name", i.child_name],
     ["Age", String(i.child_age)],
     ["Class / grade", i.child_grade],
     ["Curriculum", curriculum],
     ["Subject", subjectLabel[i.subject]],
-    ["Performance", performanceLabel[i.current_performance]],
-    ["Learning needs", i.learning_needs],
-    ["Concerns", i.concerns || "(none provided)"],
+    ["Help wanted with", i.learning_needs || "(none provided)"],
     ["Parent's name", i.parent_name],
     ["Parent's phone (WhatsApp)", i.parent_phone],
     ["Parent's email", i.parent_email],
@@ -93,7 +100,7 @@ function render(
       <body style="margin:0;padding:24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#04131C;background:#FBF9F4;">
         <div style="max-width:620px;margin:0 auto;background:#fff;border:1px solid #e8e3d6;border-radius:18px;padding:32px;">
           <p style="margin:0 0 4px;font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#6b7680;">Masani booking request</p>
-          <h1 style="margin:0 0 20px;font-size:22px;line-height:1.2;color:#04131C;">${esc(i.child_name)} — trial ${esc(subjectLabel[i.subject])}</h1>
+          <h1 style="margin:0 0 20px;font-size:22px;line-height:1.2;color:#04131C;">${esc(i.child_name)} — free consultation, ${esc(subjectLabel[i.subject])}</h1>
           <table style="border-collapse:collapse;font-size:14px;color:#3a4750;">${rows}</table>
           <hr style="border:none;border-top:1px solid #e8e3d6;margin:24px 0 16px;" />
           <p style="margin:0;font-size:12px;color:#6b7680;">Reply directly to this email to respond to <strong>${esc(i.parent_name)}</strong>.</p>

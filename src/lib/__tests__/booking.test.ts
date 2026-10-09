@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+  bookHref,
   bookingRequestSchema,
   formatSource,
   normalizeSource,
+  normalizeSubject,
+  pricingPlanFromSource,
 } from "@/lib/booking/schema";
 
 const valid = {
@@ -66,10 +69,17 @@ describe("bookingRequestSchema", () => {
     expect(r.success).toBe(true);
   });
 
-  it("rejects too-short learning_needs", () => {
-    expect(
-      bookingRequestSchema.safeParse({ ...valid, learning_needs: "hi" }).success,
-    ).toBe(false);
+  it("accepts an empty learning_needs (now optional)", () => {
+    const r = bookingRequestSchema.safeParse({ ...valid, learning_needs: "" });
+    expect(r.success).toBe(true);
+  });
+
+  it("defaults current_performance to not_sure when not asked", () => {
+    const rest: Partial<typeof valid> = { ...valid };
+    delete rest.current_performance;
+    const r = bookingRequestSchema.safeParse(rest);
+    expect(r.success).toBe(true);
+    if (r.success) expect(r.data.current_performance).toBe("not_sure");
   });
 
   it("rejects bad email", () => {
@@ -108,5 +118,64 @@ describe("normalizeSource", () => {
   it("groups every guide-<slug> under 'guide'", () => {
     expect(normalizeSource("guide-how-much-does-a-tutor-cost")).toBe("guide");
     expect(normalizeSource("404")).toBe("404");
+  });
+});
+
+describe("booking sources", () => {
+  // Every ?source= a public CTA sends. Anything that normalises to "direct"
+  // here is a lead the admin email would mis-attribute.
+  const ctaSources = [
+    "hero",
+    "nav",
+    "footer",
+    "pricing-8",
+    "pricing-24",
+    "pricing-48",
+    "home-any-subject",
+    "tutoring",
+    "tutoring-any-subject",
+    "exams",
+    "exams-any-exam",
+    "seo-subject",
+    "seo-country",
+    "about",
+    "guide",
+    "guide-some-slug",
+    "promise",
+    "404",
+  ];
+
+  it.each(ctaSources)("attributes %s", (src) => {
+    expect(normalizeSource(src)).not.toBe("direct");
+    expect(formatSource(normalizeSource(src))).not.toBe(formatSource("direct"));
+  });
+
+  it("falls back to direct for unknown or missing sources", () => {
+    expect(normalizeSource("nope")).toBe("direct");
+    expect(normalizeSource(null)).toBe("direct");
+  });
+
+  it("reads the plan size from pricing sources only", () => {
+    expect(pricingPlanFromSource("pricing-24")).toBe(24);
+    expect(pricingPlanFromSource("hero")).toBeNull();
+  });
+});
+
+describe("subject pre-selection", () => {
+  it("accepts only known subjects", () => {
+    expect(normalizeSubject("mathematics")).toBe("mathematics");
+    expect(normalizeSubject("history")).toBeUndefined();
+    expect(normalizeSubject(null)).toBeUndefined();
+  });
+
+  it("adds the subject to /book links from mapped subject pages", () => {
+    expect(bookHref("seo-subject", "maths")).toBe(
+      "/book?source=seo-subject&subject=mathematics",
+    );
+    expect(bookHref("seo-subject", "physics")).toBe(
+      "/book?source=seo-subject&subject=science",
+    );
+    expect(bookHref("seo-subject", "11-plus")).toBe("/book?source=seo-subject");
+    expect(bookHref("seo-country")).toBe("/book?source=seo-country");
   });
 });

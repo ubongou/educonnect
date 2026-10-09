@@ -137,7 +137,7 @@ export default function AboutPage() {
               personalised learning plan within 24 hours.
             </p>
             <Link href="/book?source=about" className="btn btn-coral">
-              Book a free session
+              Book a free consultation
             </Link>
           </div>
         </section>

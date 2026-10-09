@@ -67,7 +67,13 @@ export const sourceIds = [
   "ss-guarantee",
   "ss-final",
   "ss-sticky",
-  // Search landing pages (subjects, countries, about).
+  // Home, hub and search landing pages. The *-any-subject / *-any-exam ids
+  // are the "Don't see your child's subject?" tiles.
+  "home-any-subject",
+  "tutoring",
+  "tutoring-any-subject",
+  "exams",
+  "exams-any-exam",
   "seo-subject",
   "seo-country",
   "about",
@@ -91,6 +97,11 @@ const sourceLabels: Record<SourceId, string> = {
   "ss-guarantee": "Strategy session · After the guarantee",
   "ss-final": "Strategy session · Final CTA",
   "ss-sticky": "Strategy session · Sticky mobile bar",
+  "home-any-subject": "Home page · Ask about a subject",
+  tutoring: "Online tutoring page",
+  "tutoring-any-subject": "Online tutoring page · Ask about a subject",
+  exams: "Exams page",
+  "exams-any-exam": "Exams page · Ask about an exam",
   "seo-subject": "Subject page (search)",
   "seo-country": "Country page (search)",
   about: "About page",
@@ -116,6 +127,38 @@ export function normalizeSource(raw: unknown): SourceId {
   return "direct";
 }
 
+/** The plan size behind a pricing-page CTA, e.g. "pricing-24" → 24. */
+export function pricingPlanFromSource(source: string): number | null {
+  const m = /^pricing-(\d+)$/.exec(source);
+  return m ? Number(m[1]) : null;
+}
+
+/** Pre-selects the trial subject from a ?subject= param; ignores anything unknown. */
+export function normalizeSubject(raw: unknown): Subject | undefined {
+  return typeof raw === "string" && (subjectValues as readonly string[]).includes(raw)
+    ? (raw as Subject)
+    : undefined;
+}
+
+// /tutoring/[slug] pages that map onto one of the form's subjects.
+const subjectForSlug: Record<string, Subject> = {
+  maths: "mathematics",
+  english: "english",
+  "reading-and-creative-writing": "english",
+  science: "science",
+  biology: "science",
+  chemistry: "science",
+  physics: "science",
+};
+
+/** /book href for a CTA, pre-selecting the subject when the page has one. */
+export function bookHref(source: string, pageSlug?: string): string {
+  const subject = pageSlug ? subjectForSlug[pageSlug] : undefined;
+  return subject
+    ? `/book?source=${source}&subject=${subject}`
+    : `/book?source=${source}`;
+}
+
 // -----------------------------------------------------------------------------
 // The form schema. Used both in the server action (validation gate) and in
 // the client (types + enum lists for rendering).
@@ -133,14 +176,13 @@ export const bookingRequestSchema = z
     curriculum: z.enum(curriculumValues, { message: "Pick a curriculum" }),
     curriculum_other: z.string().trim().max(120).default(""),
     subject: z.enum(subjectValues, { message: "Pick a subject" }),
-    learning_needs: z
-      .string()
-      .trim()
-      .min(5, "Tell us a little more (5+ characters)")
-      .max(1000),
-    current_performance: z.enum(performanceValues, {
-      message: "Pick a performance level",
-    }),
+    // Optional since the form was shortened: one free-text box replaced the
+    // separate learning-needs and concerns boxes. Stored as "" when skipped
+    // (the column is NOT NULL).
+    learning_needs: z.string().trim().max(1000).default(""),
+    // No longer asked on the form (the tutor judges this on the call). The
+    // column is NOT NULL with a check constraint, so it defaults to not_sure.
+    current_performance: z.enum(performanceValues).default("not_sure"),
     concerns: z.string().trim().max(1000).default(""),
     parent_name: z.string().trim().min(1, "Parent's name is required").max(120),
     parent_phone: z
