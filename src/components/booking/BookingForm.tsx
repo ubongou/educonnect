@@ -362,7 +362,7 @@ export function BookingForm({ source, subject }: BookingFormProps) {
                     name="child_age"
                     type="number"
                     inputMode="numeric"
-                    min={3}
+                    min={1}
                     max={19}
                     defaultValue={values.child_age}
                     error={errs.child_age}
@@ -428,7 +428,7 @@ export function BookingForm({ source, subject }: BookingFormProps) {
                   <Field
                     label="Which subject?"
                     name="subject_other"
-                    hint="e.g. Yoruba, Coding, French"
+                    hint="e.g. Physics, Public speaking, Singing"
                     defaultValue={values.subject_other}
                     error={errs.subject_other}
                   />
