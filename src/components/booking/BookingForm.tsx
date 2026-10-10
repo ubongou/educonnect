@@ -428,7 +428,7 @@ export function BookingForm({ source, subject }: BookingFormProps) {
                   <Field
                     label="Which subject?"
                     name="subject_other"
-                    hint="e.g. Physics, Public speaking, Singing"
+                    hint="e.g. Physics, Public speaking, Creative writing"
                     defaultValue={values.subject_other}
                     error={errs.subject_other}
                   />
