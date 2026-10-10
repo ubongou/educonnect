@@ -27,15 +27,14 @@ export const FROM_PRICES = `£${minPerSession("GBP")} / $${minPerSession("USD")}
 
 /**
  * Proof points shown under the hero and in llms.txt. Source: the admin portal.
- * Lessons per week = lesson reports filed in a typical recent week (30 in the
- * week of 21 Sept 2026; about 30 a week on average from mid August to the end
- * of September). Countries = where active families live. The satisfaction
+ * Lessons per week = about 50, confirmed by Ubong on 10 Oct 2026 (up from
+ * about 30 a week, mid August to end of September). Countries = where active families live. The satisfaction
  * figure was supplied by Masani; keep the survey or ratings it is based on.
  * Update these when the numbers move.
  */
 export const proofStats = [
-  // "30+": reports filed undercount lessons taught, so 30 is a floor.
-  { value: "30+", label: "one to one lessons taught every week" },
+  // "50+": reports filed undercount lessons taught, so 50 is a floor.
+  { value: "50+", label: "one to one lessons taught every week" },
   // US, Canada, Trinidad and Tobago, UK, Nigeria: North America, Europe, Africa.
   { value: "5", label: "countries, across 3 continents" },
   // Confirmed by Ubong on 3 Oct 2026 as backed by Masani's own parent
