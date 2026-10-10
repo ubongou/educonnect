@@ -10,6 +10,7 @@
 --   • subject        — kept, and still NOT NULL: the first ticked subject
 --                      (a standard one when any is ticked). Its check now also
 --                      allows 'other', for a request that is only "Other".
+--   • child_age      — now 1–19 (was 3–19): physical classes take toddlers.
 --
 -- Code deployed a few minutes ahead of this migration falls back to the old
 -- columns (see submitBookingRequest), so no request is lost either way.
@@ -37,6 +38,12 @@ alter table public.booking_requests
       and subjects <@ array['english','mathematics','science','other']::text[]
     )
   );
+
+alter table public.booking_requests
+  drop constraint if exists booking_requests_child_age_check;
+alter table public.booking_requests
+  add constraint booking_requests_child_age_check
+  check (child_age between 1 and 19);
 
 update public.booking_requests
   set subjects = array[subject]

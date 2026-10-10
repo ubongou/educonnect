@@ -203,7 +203,7 @@ export const bookingRequestSchema = z
     child_age: z.coerce
       .number({ message: "Age must be a number" })
       .int("Age must be a whole number")
-      .min(3, "Age must be at least 3")
+      .min(1, "Age must be at least 1")
       .max(19, "Age must be 19 or under"),
     child_grade: z.string().trim().min(1, "Class / grade is required").max(80),
     curriculum: z.enum(curriculumValues, { message: "Pick a curriculum" }),

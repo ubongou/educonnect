@@ -68,11 +68,15 @@ describe("dateOfBirthError", () => {
   it("accepts a valid child's birthday", () => {
     expect(dateOfBirthError("2016-03-12", today)).toBeNull();
   });
+  it("accepts toddlers from age 1", () => {
+    expect(dateOfBirthError("2024-05-01", today)).toBeNull(); // 2
+    expect(dateOfBirthError("2025-10-06", today)).toBeNull(); // 1 today
+  });
   it("rejects impossible, future and out-of-range dates", () => {
     expect(dateOfBirthError("2016-02-30", today)).toMatch(/valid/);
     expect(dateOfBirthError("not a date", today)).toMatch(/valid/);
     expect(dateOfBirthError("2027-01-01", today)).toMatch(/future/);
-    expect(dateOfBirthError("2025-01-01", today)).toMatch(/between/);
+    expect(dateOfBirthError("2025-10-07", today)).toMatch(/between 1 and 25/);
     expect(dateOfBirthError("1990-01-01", today)).toMatch(/between/);
   });
 });

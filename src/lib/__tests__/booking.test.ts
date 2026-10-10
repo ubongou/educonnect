@@ -33,8 +33,12 @@ describe("bookingRequestSchema", () => {
   });
 
   it("rejects an out-of-range age", () => {
-    expect(bookingRequestSchema.safeParse({ ...valid, child_age: 2 }).success).toBe(false);
+    expect(bookingRequestSchema.safeParse({ ...valid, child_age: 0 }).success).toBe(false);
     expect(bookingRequestSchema.safeParse({ ...valid, child_age: 25 }).success).toBe(false);
+  });
+
+  it("accepts toddlers from age 1", () => {
+    expect(bookingRequestSchema.safeParse({ ...valid, child_age: 2 }).success).toBe(true);
   });
 
   it("coerces child_age from a numeric string (FormData input)", () => {

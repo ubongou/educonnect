@@ -9,8 +9,8 @@
 
 export const OFFICE_TIME_ZONE = "Africa/Lagos";
 
-/** Matches the students.age CHECK (3–25). */
-export const MIN_AGE = 3;
+/** Matches the students.age CHECK (1–25, migration 0041). */
+export const MIN_AGE = 1;
 export const MAX_AGE = 25;
 
 const DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
