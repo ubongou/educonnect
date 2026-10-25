@@ -467,7 +467,7 @@ export function BookingForm({ source, subject }: BookingFormProps) {
                   name="parent_phone"
                   type="tel"
                   autoComplete="tel"
-                  hint="Include your country code, e.g. +44 7911 123456"
+                  hint="Include your country code, for example +44 for the UK or +1 for the US or Canada"
                   defaultValue={values.parent_phone}
                   error={errs.parent_phone}
                 />
