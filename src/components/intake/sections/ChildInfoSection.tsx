@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { ChipGroup } from "@/components/ui/ChipGroup";
 import { FormField, inputBase } from "@/components/ui/FormField";
 import { IntakeSection } from "../IntakeSection";
+import { intakeUploadPolicy, validateUpload } from "@/lib/uploads/policies";
 import type { Curriculum, Gender, IntakeFileKind } from "@/types/domain";
 
 export type ChildInfoValues = {
@@ -56,9 +58,33 @@ export function ChildInfoSection({
   onChange: (next: ChildInfoValues) => void;
   number: number;
 }) {
+  const [fileErrors, setFileErrors] = useState<Partial<Record<IntakeFileKind, string>>>({});
   const patch = (p: Partial<ChildInfoValues>) => onChange({ ...value, ...p });
   const setFile = (kind: IntakeFileKind, file: File | null) =>
     onChange({ ...value, files: { ...value.files, [kind]: file } });
+
+  // Check type and size as soon as a file is picked, so a file we can't take
+  // (e.g. an iPhone HEIC photo) is caught here rather than after all 8 steps.
+  const pickFile = (kind: IntakeFileKind, input: HTMLInputElement) => {
+    const file = input.files?.[0] ?? null;
+    if (file) {
+      const check = validateUpload(intakeUploadPolicy, {
+        mimeType: file.type,
+        sizeBytes: file.size,
+      });
+      if (!check.ok) {
+        input.value = "";
+        setFile(kind, null);
+        setFileErrors((e) => ({
+          ...e,
+          [kind]: `${check.error} Use a PDF, Word document, or a JPG, PNG or WebP image up to 20 MB.`,
+        }));
+        return;
+      }
+    }
+    setFileErrors((e) => ({ ...e, [kind]: undefined }));
+    setFile(kind, file);
+  };
 
   return (
     <IntakeSection
@@ -145,14 +171,19 @@ export function ChildInfoSection({
               <div className="flex flex-wrap items-center gap-3">
                 <input
                   type="file"
-                  accept=".pdf,.doc,.docx,image/*"
-                  onChange={(e) => setFile(s.kind, e.target.files?.[0] ?? null)}
+                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp"
+                  onChange={(e) => pickFile(s.kind, e.target)}
                   className="file:mr-3 file:rounded-md file:border-[1.5px] file:border-navy file:bg-white file:px-3 file:py-[7px] file:font-heading file:text-[12px] file:font-bold file:text-navy hover:file:bg-navy/5"
                 />
                 {picked && (
                   <span className="text-[12px] text-g600">{picked.name}</span>
                 )}
               </div>
+              {fileErrors[s.kind] && (
+                <p role="alert" className="mt-2 text-[12px] font-semibold text-coral">
+                  {fileErrors[s.kind]}
+                </p>
+              )}
             </FormField>
           );
         })}

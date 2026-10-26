@@ -1,9 +1,8 @@
 "use server";
 
-import { redirect } from "next/navigation";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { createClient } from "@/lib/supabase/server";
-import { getR2Bucket, getR2Client } from "@/lib/r2/client";
+import { presignPut } from "@/lib/r2/objects";
+import { buildStorageKey } from "@/lib/uploads/keys";
 import {
   intakeUploadPolicy,
   validateUpload,
@@ -11,39 +10,34 @@ import {
 import { onboardingSchema } from "@/lib/validation";
 import type { IntakeFileKind } from "@/types/domain";
 
-export type OnboardingResult = { ok: boolean; error?: string };
+export type OnboardingResult =
+  | { ok: true; studentId: string }
+  | { ok: false; error: string };
+
+export type IntakeFileInput = {
+  studentId: string;
+  kind: IntakeFileKind;
+  mimeType: string;
+  sizeBytes: number;
+  originalFilename: string;
+};
+
+export type IntakeUploadResult =
+  | { ok: true; presignedPutUrl: string; storageKey: string }
+  | { ok: false; error: string };
 
 const FILE_KINDS: IntakeFileKind[] = ["curriculum", "school_report", "class_notes"];
 
 /**
- * Onboarding submit handler.
- *
- * Shape of `formData`:
- *   - "payload":       JSON string matching `onboardingSchema`.
- *   - "file_curriculum"    (optional): curriculum document
- *   - "file_school_report" (optional): latest school report
- *   - "file_class_notes"   (optional): recent class notes
- *
- * Two-phase commit: the RPC atomically inserts the student + parent link,
- * THEN we upload any selected files to R2 server-side. Each file is
- * validated against `intakeUploadPolicy` (MIME allowlist + 20MB cap)
- * before bytes leave the request — failure aborts the whole submission
- * to match the prior abort-on-first-error behavior.
+ * Onboarding submit handler: creates the student + parent link from the
+ * child details and intake answers. Files are NOT sent here — a server action
+ * request is capped at 1 MB (and Vercel caps any request at ~4.5 MB), so a
+ * single phone photo of a school report used to make the whole registration
+ * fail. The form uploads files afterwards, straight from the browser to R2,
+ * via `requestIntakeFileUpload` + `recordIntakeFile`.
  */
-export async function submitIntake(formData: FormData): Promise<OnboardingResult> {
-  const payloadRaw = formData.get("payload");
-  if (typeof payloadRaw !== "string") {
-    return { ok: false, error: "Missing intake payload" };
-  }
-
-  let json: unknown;
-  try {
-    json = JSON.parse(payloadRaw);
-  } catch {
-    return { ok: false, error: "Invalid intake payload" };
-  }
-
-  const parsed = onboardingSchema.safeParse(json);
+export async function submitIntake(payload: unknown): Promise<OnboardingResult> {
+  const parsed = onboardingSchema.safeParse(payload);
   if (!parsed.success) {
     const first = parsed.error.issues[0];
     const where = first?.path.length ? ` (${first.path.join(".")})` : "";
@@ -51,24 +45,6 @@ export async function submitIntake(formData: FormData): Promise<OnboardingResult
   }
 
   const v = parsed.data;
-
-  // Pre-validate every selected file BEFORE creating the student row, so a
-  // bad MIME / oversized file doesn't leave a half-committed intake behind.
-  const selectedFiles: { kind: IntakeFileKind; file: File }[] = [];
-  for (const kind of FILE_KINDS) {
-    const f = formData.get(`file_${kind}`);
-    if (!(f instanceof File) || f.size === 0) continue;
-    const mimeType = f.type || "application/octet-stream";
-    const check = validateUpload(intakeUploadPolicy, {
-      mimeType,
-      sizeBytes: f.size,
-    });
-    if (!check.ok) {
-      return { ok: false, error: `${kind}: ${check.error}` };
-    }
-    selectedFiles.push({ kind, file: f });
-  }
-
   const supabase = await createClient();
 
   // The RPC coerces "" -> NULL internally (nullif), so empty strings here map
@@ -100,53 +76,97 @@ export async function submitIntake(formData: FormData): Promise<OnboardingResult
   const student = Array.isArray(studentData) ? studentData[0] : studentData;
   if (!student?.id) return { ok: false, error: "Student not created" };
 
-  if (selectedFiles.length > 0) {
-    const r2 = getR2Client();
-    const bucket = getR2Bucket();
-    if (!r2 || !bucket) {
-      return { ok: false, error: "File storage is not configured" };
-    }
+  return { ok: true, studentId: student.id };
+}
 
-    for (const { kind, file } of selectedFiles) {
-      const ext = file.name.includes(".")
-        ? (file.name.split(".").pop() ?? "").toLowerCase()
-        : "";
-      const suffix = ext ? `.${ext}` : "";
-      const storageKey = `${intakeUploadPolicy.prefix}/${student.id}/${kind}-${crypto.randomUUID()}${suffix}`;
-      const contentType = file.type || "application/octet-stream";
+/** Shared checks for both intake-file steps: shape, policy, and parent link. */
+async function checkIntakeFile(
+  input: IntakeFileInput,
+): Promise<
+  | { ok: true; supabase: Awaited<ReturnType<typeof createClient>> }
+  | { ok: false; error: string }
+> {
+  if (!input?.studentId || !FILE_KINDS.includes(input.kind)) {
+    return { ok: false, error: "Invalid file details" };
+  }
+  const check = validateUpload(intakeUploadPolicy, {
+    mimeType: input.mimeType,
+    sizeBytes: input.sizeBytes,
+  });
+  if (!check.ok) return check;
 
-      try {
-        const body = new Uint8Array(await file.arrayBuffer());
-        await r2.send(
-          new PutObjectCommand({
-            Bucket: bucket,
-            Key: storageKey,
-            Body: body,
-            ContentType: contentType,
-            ContentLength: body.byteLength,
-          }),
-        );
-      } catch (err) {
-        return {
-          ok: false,
-          error: `${kind} upload failed: ${err instanceof Error ? err.message : String(err)}`,
-        };
-      }
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Auth required" };
 
-      const { error: metaErr } = await supabase.from("intake_files").insert({
-        student_id: student.id,
-        kind,
-        original_filename: file.name,
-        storage_key: storageKey,
-        mime_type: file.type || null,
-        size_bytes: file.size,
-        status: "ready",
-      });
-      if (metaErr) {
-        return { ok: false, error: `${kind} record failed: ${metaErr.message}` };
-      }
-    }
+  const { data: link } = await supabase
+    .from("parent_students")
+    .select("student_id")
+    .eq("student_id", input.studentId)
+    .eq("parent_id", user.id)
+    .maybeSingle();
+  if (!link) return { ok: false, error: "Child not found" };
+
+  return { ok: true, supabase };
+}
+
+/** Step 1 of 2: a presigned PUT URL for the browser to upload bytes to. */
+export async function requestIntakeFileUpload(
+  input: IntakeFileInput,
+): Promise<IntakeUploadResult> {
+  const check = await checkIntakeFile(input);
+  if (!check.ok) return check;
+
+  const storageKey = buildStorageKey({
+    prefix: intakeUploadPolicy.prefix,
+    studentId: input.studentId,
+    kind: input.kind,
+    filename: input.originalFilename,
+    mime: input.mimeType,
+  });
+
+  try {
+    const presignedPutUrl = await presignPut({
+      key: storageKey,
+      contentType: input.mimeType,
+      contentLength: input.sizeBytes,
+      ttlSeconds: 3600,
+    });
+    return { ok: true, presignedPutUrl, storageKey };
+  } catch (err) {
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "Failed to prepare upload",
+    };
+  }
+}
+
+/**
+ * Step 2 of 2: record the uploaded file once the browser PUT succeeded. The
+ * row goes straight in as `ready` — there's no pending row to clean up if the
+ * upload never happens. RLS (intake_files_insert_parent) is the backstop.
+ */
+export async function recordIntakeFile(
+  input: IntakeFileInput & { storageKey: string },
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const check = await checkIntakeFile(input);
+  if (!check.ok) return check;
+
+  if (!input.storageKey?.startsWith(`${intakeUploadPolicy.prefix}/${input.studentId}/`)) {
+    return { ok: false, error: "Invalid storage key" };
   }
 
-  redirect("/dashboard");
+  const { error } = await check.supabase.from("intake_files").insert({
+    student_id: input.studentId,
+    kind: input.kind,
+    original_filename: input.originalFilename.slice(0, 255),
+    storage_key: input.storageKey,
+    mime_type: input.mimeType,
+    size_bytes: input.sizeBytes,
+    status: "ready",
+  });
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
 }

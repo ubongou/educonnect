@@ -1,8 +1,15 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
-import { submitIntake } from "@/lib/actions/onboarding";
+import {
+  recordIntakeFile,
+  requestIntakeFileUpload,
+  submitIntake,
+} from "@/lib/actions/onboarding";
+import { putWithProgress } from "@/components/uploads/putWithProgress";
+import type { IntakeFileKind } from "@/types/domain";
 
 import {
   ChildInfoSection,
@@ -77,6 +84,40 @@ function stripEmpty<T extends Record<string, unknown>>(obj: T): Partial<T> {
   return out as Partial<T>;
 }
 
+const fileLabels: Record<IntakeFileKind, string> = {
+  curriculum: "Curriculum document",
+  school_report: "School report",
+  class_notes: "Class notes",
+};
+
+/**
+ * Uploads one intake file straight from the browser to storage. Never throws:
+ * any failure comes back as a message for the parent.
+ */
+async function uploadIntakeFile(
+  studentId: string,
+  kind: IntakeFileKind,
+  file: File,
+): Promise<string | null> {
+  try {
+    const details = {
+      studentId,
+      kind,
+      mimeType: file.type || "application/octet-stream",
+      sizeBytes: file.size,
+      originalFilename: file.name,
+    };
+    const req = await requestIntakeFileUpload(details);
+    if (!req.ok) return req.error;
+    const put = await putWithProgress(req.presignedPutUrl, file, () => {});
+    if (!put.ok) return put.error;
+    const rec = await recordIntakeFile({ ...details, storageKey: req.storageKey });
+    return rec.ok ? null : rec.error;
+  } catch (err) {
+    return err instanceof Error ? err.message : "Upload failed";
+  }
+}
+
 const stepTitles = [
   "About your child",
   "Learning background",
@@ -127,7 +168,11 @@ export function IntakeForm() {
   const [v, setV] = useState<IntakeState>(empty);
   const [step, setStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  // Set once the child is registered, so a retry after a failed file upload
+  // can never register the same child twice.
+  const [studentId, setStudentId] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const router = useRouter();
   const topRef = useRef<HTMLDivElement>(null);
 
   const patch = <K extends keyof IntakeState>(key: K, next: IntakeState[K]) =>
@@ -152,14 +197,18 @@ export function IntakeForm() {
 
     setError(null);
 
+    if (studentId) {
+      router.push("/dashboard");
+      return;
+    }
+
     if (!childInfoComplete(v.childInfo)) {
-      setError("Fill in the required fields in step 1 before submitting.");
       goTo(0);
+      setError("Fill in the required fields in step 1 before submitting.");
       return;
     }
 
     startTransition(async () => {
-      const fd = new FormData();
       const childInfo = v.childInfo;
       const payload = {
         childInfo: {
@@ -179,14 +228,39 @@ export function IntakeForm() {
         personality: stripEmpty(v.personality),
         goals: stripEmpty(v.goals),
       };
-      fd.append("payload", JSON.stringify(payload));
-      for (const kind of ["curriculum", "school_report", "class_notes"] as const) {
-        const f = childInfo.files[kind];
-        if (f) fd.append(`file_${kind}`, f);
+
+      let res: Awaited<ReturnType<typeof submitIntake>>;
+      try {
+        res = await submitIntake(payload);
+      } catch {
+        setError(
+          "We couldn't reach the server. Check your internet connection and press Submit again.",
+        );
+        return;
+      }
+      if (!res.ok) {
+        setError(res.error);
+        return;
       }
 
-      const res = await submitIntake(fd);
-      if (res && !res.ok) setError(res.error ?? "Submission failed");
+      const failed: string[] = [];
+      for (const kind of ["curriculum", "school_report", "class_notes"] as const) {
+        const f = childInfo.files[kind];
+        if (!f) continue;
+        const uploadError = await uploadIntakeFile(res.studentId, kind, f);
+        if (uploadError) failed.push(`${fileLabels[kind]}: ${uploadError}`);
+      }
+
+      if (failed.length > 0) {
+        setStudentId(res.studentId);
+        setError(
+          `Your child is registered, but some files didn't upload (${failed.join("; ")}). ` +
+            "You can send them to us later. Press Go to dashboard to continue.",
+        );
+        return;
+      }
+
+      router.push("/dashboard");
     });
   };
 
@@ -281,7 +355,7 @@ export function IntakeForm() {
 
         {isLast ? (
           <Button type="submit" size="lg" disabled={pending}>
-            {pending ? "Submitting…" : "Submit intake"}
+            {pending ? "Submitting…" : studentId ? "Go to dashboard" : "Submit intake"}
           </Button>
         ) : (
           <Button
