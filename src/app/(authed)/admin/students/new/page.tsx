@@ -43,8 +43,9 @@ export default async function AdminNewStudentPage() {
           New student
         </h1>
         <p className="mt-2 text-[14px] text-g600">
-          Create a student record directly. The intake questionnaire can be
-          completed later by the linked parent.
+          Create a student record directly. After saving, use &ldquo;Fill in
+          questionnaire answers&rdquo; on the student&rsquo;s page to enter the rest of
+          the sign-up questions.
         </p>
       </div>
 

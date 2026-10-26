@@ -3,7 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { adminStudentCreateSchema, adminStudentUpdateSchema } from "@/lib/validation";
+import {
+  adminStudentCreateSchema,
+  adminStudentUpdateSchema,
+  intakeSchema,
+} from "@/lib/validation";
 import { ageOn, officeToday } from "@/lib/birthdays";
 
 export type StudentMutationResult =
@@ -90,6 +94,47 @@ export async function updateStudent(
 
   revalidatePath(`/admin/students/${studentId}`);
   revalidatePath("/admin/students");
+  return { ok: true };
+}
+
+/**
+ * Admin-only: enter or edit a student's intake questionnaire (sections 2–8 of
+ * the parent sign-up form), e.g. from answers a parent sent by WhatsApp. The
+ * whole questionnaire is replaced, so clearing a field removes the answer.
+ */
+export async function updateStudentIntake(
+  studentId: string,
+  input: unknown,
+): Promise<SimpleStudentResult> {
+  await requireAdmin();
+
+  const parsed = intakeSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const supabase = await createClient();
+  const { data: current, error: readErr } = await supabase
+    .from("students")
+    .select("intake_submitted_at")
+    .eq("id", studentId)
+    .maybeSingle();
+  if (readErr) return { ok: false, error: readErr.message };
+  if (!current) return { ok: false, error: "Student not found" };
+
+  const { error } = await supabase
+    .from("students")
+    .update({
+      intake: parsed.data,
+      // First time the questionnaire is filled in, stamp it like a parent submission.
+      ...(current.intake_submitted_at ? {} : { intake_submitted_at: new Date().toISOString() }),
+    })
+    .eq("id", studentId);
+
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath(`/admin/students/${studentId}`);
+  revalidatePath(`/teacher/students/${studentId}`);
   return { ok: true };
 }
 

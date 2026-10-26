@@ -74,7 +74,7 @@ const empty: IntakeState = {
   goals: emptyGoals,
 };
 
-function stripEmpty<T extends Record<string, unknown>>(obj: T): Partial<T> {
+export function stripEmpty<T extends Record<string, unknown>>(obj: T): Partial<T> {
   const out: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(obj)) {
     if (v === "" || v === 0 || v === null || v === undefined) continue;

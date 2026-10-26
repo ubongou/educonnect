@@ -476,9 +476,19 @@ export default async function AdminStudentDetail({
       </section>
 
       <section className="mt-10">
-        <h2 className="mb-4 font-heading text-[11px] font-bold uppercase tracking-[0.12em] text-g400">
-          Intake
-        </h2>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-heading text-[11px] font-bold uppercase tracking-[0.12em] text-g400">
+            Intake
+          </h2>
+          <Link
+            href={`/admin/students/${student.id}/intake`}
+            className="font-heading text-[13px] font-semibold text-navy underline-offset-4 hover:underline"
+          >
+            {intake && Object.keys(intake).length > 0
+              ? "Edit questionnaire answers"
+              : "Fill in questionnaire answers"}
+          </Link>
+        </div>
         <IntakeSummary
           child={{
             full_name: student.full_name,
