@@ -129,6 +129,19 @@ export const defaultTestimonials: TestimonialsContent = {
       where: "United States",
       initial: "J",
     },
+    {
+      body: "I have noticed a lot of improvement in my daughter. Ms Temi is doing a good job with her.",
+      author: "Mrs. Dora",
+      where: "Masani parent",
+      initial: "D",
+    },
+    {
+      // Same parent as the strategy-session quote; kept anonymous at her request.
+      body: "My daughter seems very happy with Miss UU and is very excited to have her classes.",
+      author: "Mrs. Keisha",
+      where: "United Kingdom",
+      initial: "K",
+    },
   ],
 };
 

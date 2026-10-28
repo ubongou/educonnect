@@ -176,6 +176,12 @@ const testimonials = [
     where: "United Kingdom",
     initial: "K",
   },
+  {
+    body: "I have noticed a lot of improvement in my daughter. Ms Temi is doing a good job with her.",
+    author: "Mrs. Dora",
+    where: "Masani parent",
+    initial: "D",
+  },
 ];
 
 // FAQ structured data for SEO / answer engines.

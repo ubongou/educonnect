@@ -868,11 +868,16 @@
 .mkt-root .testimonials {
   padding: 72px 0;
 }
+/* Flex rather than grid so a short last row (e.g. 5 quotes) sits centred. */
 .mkt-root .testi-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 24px;
   margin-top: 56px;
+}
+.mkt-root .testi-grid > .testi {
+  flex: 0 1 calc((100% - 48px) / 3);
 }
 .mkt-root .testi {
   background: #fff;
@@ -918,13 +923,13 @@
   color: #fff;
   font-size: 16px;
 }
-.mkt-root .testi:nth-child(1) .av {
+.mkt-root .testi:nth-child(3n + 1) .av {
   background: var(--coral);
 }
-.mkt-root .testi:nth-child(2) .av {
+.mkt-root .testi:nth-child(3n + 2) .av {
   background: var(--sky);
 }
-.mkt-root .testi:nth-child(3) .av {
+.mkt-root .testi:nth-child(3n) .av {
   background: var(--yellow);
   color: var(--navy);
 }
@@ -1609,9 +1614,11 @@
     padding: 56px 0;
   }
   .mkt-root .testi-grid {
-    grid-template-columns: 1fr;
     gap: 14px;
     margin-top: 36px;
+  }
+  .mkt-root .testi-grid > .testi {
+    flex-basis: 100%;
   }
   .mkt-root .about {
     padding: 56px 0;
