@@ -177,9 +177,9 @@ const testimonials = [
     initial: "K",
   },
   {
-    body: "I have noticed a lot of improvement in my daughter. Ms Temi is doing a good job with her.",
+    body: "I must say that I have noticed A LOT of improvement in her. Her tutor is doing a good job with her. Thanks.",
     author: "Mrs. Dora",
-    where: "Masani parent",
+    where: "United States",
     initial: "D",
   },
 ];

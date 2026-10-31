@@ -4,6 +4,7 @@ import "../../styles/landing.css";
 import { Nav } from "@/components/ui/Nav";
 import { Footer } from "@/components/ui/Footer";
 import { defaultPricingTiers, defaultTestimonials } from "@/lib/marketing/defaults";
+import { WhatsAppQuotes } from "@/components/marketing/WhatsAppQuotes";
 import { everyFamilyGets, howItWorks, type Faq } from "@/lib/marketing/seoPages";
 import { MIT_FELLOWSHIP } from "@/lib/seo";
 
@@ -243,16 +244,7 @@ export function LandingPage({
             <h2 id="lp-quotes" className="lp-h2">
               What parents say
             </h2>
-            <div className="lp-quotes">
-              {quotes.map((q) => (
-                <figure key={q.author} className="lp-quote">
-                  <blockquote>{q.body}</blockquote>
-                  <figcaption>
-                    {q.author}, {q.where}
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
+            <WhatsAppQuotes quotes={quotes} />
           </div>
         </section>
 

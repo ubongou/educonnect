@@ -933,6 +933,126 @@
   background: var(--yellow);
   color: var(--navy);
 }
+/* ---------- WhatsApp-style testimonials (WhatsAppQuotes) ----------
+   Dark-mode WhatsApp chats. CSS columns, not grid, so each card is only as
+   tall as its message and short ones don't leave empty boxes. */
+.mkt-root .wa-grid {
+  column-count: 3;
+  column-gap: 24px;
+  margin-top: 56px;
+}
+.mkt-root .wa-card {
+  break-inside: avoid;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0 0 24px;
+  border-radius: 24px;
+  overflow: hidden;
+  background-color: #0b141a;
+  /* Faint doodles, like WhatsApp's chat wallpaper. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' fill='none' stroke='rgba(255,255,255,0.05)' stroke-width='1.4'%3E%3Ccircle cx='18' cy='20' r='7'/%3E%3Cpath d='M60 10l6 12-13 0z'/%3E%3Crect x='92' y='14' width='16' height='12' rx='3'/%3E%3Cpath d='M14 70c6-8 14-8 20 0'/%3E%3Ccircle cx='70' cy='64' r='4'/%3E%3Cpath d='M96 60l10 10M106 60l-10 10'/%3E%3Cpath d='M30 100h18v10H30z'/%3E%3Cpath d='M74 98c4 8 12 8 16 0'/%3E%3C/svg%3E");
+  box-shadow: 0 10px 30px rgba(4, 19, 28, 0.14);
+}
+.mkt-root .wa-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  background: #202c33;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+.mkt-root .wa-av {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 15px;
+  color: #fff;
+}
+.mkt-root .wa-card:nth-child(3n + 1) .wa-av {
+  background: var(--coral);
+}
+.mkt-root .wa-card:nth-child(3n + 2) .wa-av {
+  background: var(--sky);
+}
+.mkt-root .wa-card:nth-child(3n) .wa-av {
+  background: var(--yellow);
+  color: var(--navy);
+}
+.mkt-root .wa-who {
+  display: block;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.2;
+  color: #e9edef;
+}
+.mkt-root .wa-where {
+  display: block;
+  font-size: 12.5px;
+  color: #8696a0;
+}
+.mkt-root .wa-ic {
+  margin-left: auto;
+  display: flex;
+}
+.mkt-root .wa-body {
+  padding: 22px 18px 26px;
+}
+.mkt-root .wa-bubble {
+  position: relative;
+  margin: 0;
+  max-width: 94%;
+  padding: 10px 14px 12px;
+  border-radius: 0 12px 12px 12px;
+  background: #202c33;
+  color: #e9edef;
+  font-size: 15.5px;
+  line-height: 1.55;
+  box-shadow: 0 1px 0.5px rgba(11, 20, 26, 0.13);
+}
+/* The little tail on an incoming message. */
+.mkt-root .wa-bubble::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  top: 0;
+  border-top: 10px solid #202c33;
+  border-left: 8px solid transparent;
+}
+.mkt-root .wa-foot {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: #5b6670;
+  text-align: center;
+}
+.mkt-root .wa-foot svg {
+  display: inline-block;
+  vertical-align: -5px;
+  margin-right: 8px;
+}
+@media (max-width: 900px) {
+  .mkt-root .wa-grid {
+    column-count: 2;
+  }
+}
+@media (max-width: 600px) {
+  .mkt-root .wa-grid {
+    column-count: 1;
+    margin-top: 36px;
+  }
+  .mkt-root .wa-card {
+    margin-bottom: 14px;
+  }
+  .mkt-root .wa-bubble {
+    font-size: 15px;
+  }
+}
+
 .mkt-root .testi .who {
   display: block;
   font-weight: 600;

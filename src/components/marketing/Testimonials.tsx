@@ -1,4 +1,5 @@
 import type { TestimonialsContent } from "@/lib/marketing/schemas";
+import { WhatsAppQuotes } from "./WhatsAppQuotes";
 
 export function Testimonials({ content }: { content: TestimonialsContent }) {
   return (
@@ -12,28 +13,7 @@ export function Testimonials({ content }: { content: TestimonialsContent }) {
           </div>
         </div>
 
-        <div className="testi-grid">
-          {content.quotes.map((q, i) => (
-            <article
-              key={i}
-              className={`testi reveal${i > 0 ? ` delay-${i}` : ""}`}
-            >
-              <div className="quote-mark" aria-hidden="true">
-                &ldquo;
-              </div>
-              <blockquote>{q.body}</blockquote>
-              <div className="by">
-                <div className="av" aria-hidden="true">
-                  {q.initial}
-                </div>
-                <div>
-                  <div className="who">{q.author}</div>
-                  <div className="where">{q.where}</div>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
+        <WhatsAppQuotes quotes={content.quotes} />
       </div>
     </section>
   );

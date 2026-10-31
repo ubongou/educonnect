@@ -108,6 +108,9 @@ export const defaultHowItWorks: HowItWorksContent = {
     "Masani parent dashboard showing student progress and session data",
 };
 
+// Real WhatsApp messages, shown as chats (WhatsAppQuotes). Wording is the
+// parent's own, lightly tidied; teachers are never named. The order fills the
+// three columns top to bottom, so it's chosen to keep them roughly level.
 export const defaultTestimonials: TestimonialsContent = {
   title: "Real results, real families",
   quotes: [
@@ -124,20 +127,26 @@ export const defaultTestimonials: TestimonialsContent = {
       initial: "F",
     },
     {
+      body: "I am very pleased with my daughter's tutor at Masani. She praises my daughter when she does well and is firm when necessary, which has helped build her confidence, especially in reading and reciting her multiplication tables. I also find the monthly child reports very useful as they clearly highlight my child's strengths and the areas where she needs further support. Overall, I appreciate the tutor's encouragement, guidance, and commitment to my daughter's progress.",
+      author: "Mrs. Yemisi",
+      where: "United States",
+      initial: "Y",
+    },
+    {
       body: "Our daughter gets excited to connect with her Masani tutor. Her attitude toward learning mathematics has changed completely. Her self-confidence has increased and she is eager to learn new concepts.",
       author: "Mrs. Joanne",
       where: "United States",
       initial: "J",
     },
     {
-      body: "I have noticed a lot of improvement in my daughter. Ms Temi is doing a good job with her.",
+      body: "I must say that I have noticed A LOT of improvement in her. Her tutor is doing a good job with her. Thanks.",
       author: "Mrs. Dora",
-      where: "Masani parent",
+      where: "United States",
       initial: "D",
     },
     {
       // Same parent as the strategy-session quote; kept anonymous at her request.
-      body: "My daughter seems very happy with Miss UU and is very excited to have her classes.",
+      body: "My daughter seems very happy with her tutor and is very excited to have her classes.",
       author: "Mrs. Keisha",
       where: "United Kingdom",
       initial: "K",

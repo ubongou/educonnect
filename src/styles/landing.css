@@ -263,32 +263,6 @@
 }
 
 /* Quotes */
-.mkt-root .lp-quotes {
-  display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
-}
-.mkt-root .lp-quote {
-  margin: 0;
-  background: var(--navy);
-  color: #fff;
-  border-radius: var(--radius-lg);
-  padding: 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-.mkt-root .lp-quote blockquote {
-  margin: 0;
-  font-size: 16.5px;
-  line-height: 1.55;
-}
-.mkt-root .lp-quote figcaption {
-  font-size: 14px;
-  color: var(--cyan);
-  margin-top: auto;
-}
-
 /* FAQ */
 .mkt-root .lp-faq {
   display: grid;
