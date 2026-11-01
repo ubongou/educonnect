@@ -44,7 +44,7 @@ export const proofStats = [
 ];
 
 export const PROMISE_PATH = "/our-promise";
-export const GUIDE_PATH = "/guides/online-tutoring-for-nigerian-families-abroad";
+export const GUIDE_PATH = "/guides/hiring-a-nigerian-tutor-what-to-check";
 
 export const GUARANTEE_DAYS = 90;
 export const FIX_DAYS = 14;

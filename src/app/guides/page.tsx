@@ -3,24 +3,16 @@ import "../../styles/landing.css";
 import { Nav } from "@/components/ui/Nav";
 import { Footer } from "@/components/ui/Footer";
 import { guides } from "@/lib/marketing/guides";
-import { GUIDE_PATH } from "@/lib/marketing/promise";
 import { JsonLdScript, absoluteUrl, breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
   title: "Guides for Nigerian Parents Abroad",
   description:
-    "Practical guides for Nigerian families in the UK, US and Canada: tutoring costs, the 11+, the UK school system, moving schools, curricula, online tutoring and SAT prep.",
+    "Practical guides for Nigerian families in the UK, US and Canada: school systems, exams, choosing and checking a tutor, and helping your child learn at home.",
   path: "/guides",
 });
 
-const all = [
-  {
-    href: GUIDE_PATH,
-    title: "Online tutoring for Nigerian families abroad: what to look for",
-    description: "The questions worth asking any online tutoring service before you commit.",
-  },
-  ...guides.map((g) => ({ href: `/guides/${g.slug}`, title: g.h1, description: g.description })),
-];
+const all = guides.map((g) => ({ href: `/guides/${g.slug}`, title: g.h1, description: g.description }));
 
 export default function GuidesIndex() {
   const crumbs = [

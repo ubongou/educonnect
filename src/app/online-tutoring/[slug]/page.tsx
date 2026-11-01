@@ -99,7 +99,7 @@ export default async function CountryPage({
             title: "For parents",
             links: [
               ...guidesForCountry(page.slug),
-              { href: "/guides/online-tutoring-for-nigerian-families-abroad", label: "How to choose an online tutor" },
+              { href: "/guides/hiring-a-nigerian-tutor-what-to-check", label: "Hiring a Nigerian tutor: what to check" },
               { href: "/our-promise", label: "The Masani Promise" },
             ],
           },

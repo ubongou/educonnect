@@ -40,7 +40,7 @@ export default function NotFound() {
                 <li><Link href="/pricing">Pricing</Link></li>
                 <li><Link href="/tutoring">Subjects we teach</Link></li>
                 <li><Link href="/our-promise">Our promise</Link></li>
-                <li><Link href="/guides/online-tutoring-for-nigerian-families-abroad">How to choose an online tutor</Link></li>
+                <li><Link href="/guides/hiring-a-nigerian-tutor-what-to-check">Hiring a Nigerian tutor: what to check</Link></li>
                 <li><Link href="/about">About Masani</Link></li>
               </ul>
             </nav>

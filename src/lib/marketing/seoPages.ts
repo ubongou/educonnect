@@ -493,6 +493,11 @@ const baseSubjectPages: SubjectPage[] = [
     ],
     faqs: [
       {
+        question: "Is the SAT the same as the SATs in England?",
+        answer:
+          "No. The SAT is a US college admissions test. KS2 SATs are national tests taken in Year 6 in England. If your child is in Year 6 in England, see our KS2 SATs tutoring page.",
+      },
+      {
         question: "Should my child take the SAT or the ACT?",
         answer:
           "Most US colleges accept either. A diagnostic test in each often shows a clear preference, and we will recommend one based on your child's results and target schools.",

@@ -83,7 +83,7 @@ ${countryPages.map((c) => `- [${c.title}](${absoluteUrl(`/online-tutoring/${c.sl
 - [Free personalised learning plan](${absoluteUrl("/strategy-session")}): book the free 15 minute session
 - [About Masani](${absoluteUrl("/about")}): founders, teacher selection and MIT recognition
 - [The Masani Promise](${absoluteUrl(PROMISE_PATH)}): 90 day money back guarantee, unused session refunds and free teacher changes
-- [How to choose an online tutor](${absoluteUrl(GUIDE_PATH)}): a guide for Nigerian families abroad
+- [Hiring a Nigerian tutor from abroad](${absoluteUrl(GUIDE_PATH)}): what to check first
 
 ## Guides for parents
 

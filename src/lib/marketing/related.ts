@@ -17,6 +17,105 @@ type GuideRelations = {
 };
 
 export const GUIDE_RELATIONS: Record<string, GuideRelations> = {
+  "hiring-a-nigerian-tutor-what-to-check": {
+    guides: ["red-flags-hiring-online-tutor", "questions-to-ask-free-tutoring-consultation", "keeping-your-child-safe-in-online-lessons"],
+    exams: ["ks2-sats", "11-plus", "gcse", "sat-act"],
+    countries: ["uk", "usa", "canada"],
+  },
+  "nigerian-tutor-or-local-tutor": {
+    guides: ["hiring-a-nigerian-tutor-what-to-check", "how-much-does-a-tutor-cost", "is-online-tutoring-worth-it"],
+    countries: ["uk", "usa", "canada"],
+  },
+  "red-flags-hiring-online-tutor": {
+    guides: ["hiring-a-nigerian-tutor-what-to-check", "keeping-your-child-safe-in-online-lessons", "is-tutoring-working-what-to-look-for"],
+    countries: ["uk", "usa", "canada"],
+  },
+  "questions-to-ask-free-tutoring-consultation": {
+    guides: ["hiring-a-nigerian-tutor-what-to-check", "red-flags-hiring-online-tutor", "how-much-tutoring-does-my-child-need"],
+    countries: ["uk", "usa", "canada"],
+  },
+  "keeping-your-child-safe-in-online-lessons": {
+    guides: ["hiring-a-nigerian-tutor-what-to-check", "red-flags-hiring-online-tutor", "questions-to-ask-free-tutoring-consultation"],
+    countries: ["uk", "usa", "canada"],
+  },
+  "how-much-tutoring-does-my-child-need": {
+    guides: ["is-tutoring-working-what-to-look-for", "is-online-tutoring-worth-it", "get-your-child-to-study-independently"],
+    exams: ["11-plus", "gcse", "sat-act"],
+    countries: ["uk", "usa", "canada"],
+  },
+  "is-tutoring-working-what-to-look-for": {
+    guides: ["how-much-tutoring-does-my-child-need", "red-flags-hiring-online-tutor", "is-online-tutoring-worth-it"],
+    countries: ["uk", "usa", "canada"],
+  },
+  "child-put-in-lower-grade-after-moving-from-nigeria": {
+    guides: ["uk-school-system-explained-for-nigerian-parents", "us-school-system-explained-for-nigerian-parents", "canadian-school-system-explained-for-nigerian-parents"],
+    exams: ["ks2-sats", "eqao-osslt", "gifted-tests"],
+    countries: ["uk", "usa", "canada"],
+  },
+  "us-school-system-explained-for-nigerian-parents": {
+    guides: ["sat-vs-act-which-test", "sat-prep-by-grade", "child-put-in-lower-grade-after-moving-from-nigeria"],
+    exams: ["state-tests", "sat-act", "ap", "ib", "gifted-tests", "shsat", "ssat-isee"],
+    countries: ["usa"],
+  },
+  "canadian-school-system-explained-for-nigerian-parents": {
+    guides: ["child-put-in-lower-grade-after-moving-from-nigeria", "moving-from-nigeria-with-children-school-checklist", "sat-vs-act-which-test"],
+    exams: ["eqao-osslt", "alberta", "bc-assessments", "quebec-ministry", "waterloo-contests"],
+    countries: ["canada"],
+  },
+  "state-or-private-school-after-moving-abroad": {
+    guides: ["grammar-school-admissions-by-area", "uk-school-system-explained-for-nigerian-parents", "us-school-system-explained-for-nigerian-parents"],
+    exams: ["11-plus", "common-entrance", "ssat-isee", "shsat"],
+    countries: ["uk", "usa", "canada"],
+  },
+  "grammar-school-admissions-by-area": {
+    guides: ["when-to-start-11-plus-preparation", "state-or-private-school-after-moving-abroad", "what-is-spag-ks2"],
+    exams: ["11-plus", "ks2-sats", "common-entrance"],
+    countries: ["uk"],
+  },
+  "gcse-grades-explained": {
+    guides: ["uk-school-system-explained-for-nigerian-parents", "british-vs-american-curriculum", "good-at-maths-struggles-with-writing"],
+    exams: ["gcse", "a-level", "scottish-qualifications"],
+    countries: ["uk"],
+  },
+  "what-is-spag-ks2": {
+    guides: ["good-at-maths-struggles-with-writing", "when-to-start-11-plus-preparation", "careless-mistakes-running-out-of-time-in-exams"],
+    subjects: ["english"],
+    exams: ["ks2-sats", "11-plus"],
+    countries: ["uk"],
+  },
+  "different-maths-methods-school": {
+    guides: ["help-your-child-with-school-when-you-work-full-time", "uk-school-system-explained-for-nigerian-parents", "british-vs-american-curriculum"],
+    subjects: ["maths"],
+    exams: ["ks2-sats", "11-plus", "state-tests"],
+    countries: ["uk", "usa"],
+  },
+  "good-at-maths-struggles-with-writing": {
+    guides: ["what-is-spag-ks2", "get-your-child-to-study-independently", "child-put-in-lower-grade-after-moving-from-nigeria"],
+    subjects: ["english", "reading-and-creative-writing"],
+    exams: ["ks2-sats", "gcse"],
+    countries: ["uk", "usa", "canada"],
+  },
+  "careless-mistakes-running-out-of-time-in-exams": {
+    guides: ["get-your-child-to-study-independently", "how-much-tutoring-does-my-child-need", "what-is-spag-ks2"],
+    subjects: ["maths"],
+    exams: ["ks2-sats", "11-plus", "gcse", "sat-act"],
+    countries: ["uk", "usa", "canada"],
+  },
+  "get-your-child-to-study-independently": {
+    guides: ["careless-mistakes-running-out-of-time-in-exams", "help-your-child-with-school-when-you-work-full-time", "how-much-tutoring-does-my-child-need"],
+    exams: ["ks2-sats", "11-plus", "gcse", "sat-act"],
+    countries: ["uk", "usa", "canada"],
+  },
+  "help-your-child-with-school-when-you-work-full-time": {
+    guides: ["different-maths-methods-school", "get-your-child-to-study-independently", "how-much-tutoring-does-my-child-need"],
+    subjects: ["maths", "english"],
+    countries: ["uk", "usa", "canada"],
+  },
+  "sat-vs-act-which-test": {
+    guides: ["sat-prep-by-grade", "us-school-system-explained-for-nigerian-parents", "careless-mistakes-running-out-of-time-in-exams"],
+    exams: ["sat-act", "ap"],
+    countries: ["usa", "canada"],
+  },
   "how-much-does-a-tutor-cost": {
     guides: ["is-online-tutoring-worth-it", "uk-school-system-explained-for-nigerian-parents"],
     subjects: ["maths", "english"],

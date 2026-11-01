@@ -22,7 +22,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     page("/about", 0.7),
     page("/our-promise", 0.7),
     page("/guides", 0.7),
-    page("/guides/online-tutoring-for-nigerian-families-abroad", 0.7),
     ...guides.map((g) => page(`/guides/${g.slug}`, 0.7)),
     page("/book", 0.6),
     page("/privacy", 0.2, "yearly"),

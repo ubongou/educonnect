@@ -6,18 +6,62 @@ import { movingWithChildrenGuide } from "./moving-with-children";
 import { britishVsAmericanGuide } from "./british-vs-american";
 import { onlineTutoringWorthItGuide } from "./online-tutoring-worth-it";
 import { satPrepGuide } from "./sat-prep-by-grade";
+import { hiringNigerianTutorGuide } from "./hiring-nigerian-tutor";
+import { nigerianOrLocalTutorGuide } from "./nigerian-or-local-tutor";
+import { redFlagsTutorGuide } from "./red-flags-online-tutor";
+import { consultationQuestionsGuide } from "./consultation-questions";
+import { onlineSafetyGuide } from "./online-lesson-safety";
+import { howMuchTutoringGuide } from "./how-much-tutoring";
+import { isTutoringWorkingGuide } from "./is-tutoring-working";
+import { lowerGradeAfterMoveGuide } from "./lower-grade-after-move";
+import { usSchoolSystemGuide } from "./us-school-system";
+import { canadaSchoolSystemGuide } from "./canada-school-system";
+import { stateVsPrivateSchoolGuide } from "./state-vs-private-school";
+import { grammarSchoolAdmissionsGuide } from "./grammar-school-admissions";
+import { gcseGradesGuide } from "./gcse-grades";
+import { spagGuide } from "./what-is-spag";
+import { mathsMethodsGuide } from "./maths-methods";
+import { writingHelpGuide } from "./struggles-with-writing";
+import { carelessMistakesGuide } from "./careless-mistakes";
+import { independentStudyGuide } from "./independent-study";
+import { busyParentsGuide } from "./busy-parents";
+import { satVsActGuide } from "./sat-vs-act";
 
 export type { Guide } from "./types";
 
 /** Parent guides rendered at /guides/[slug]. Order = order on /guides. */
 export const guides: Guide[] = [
+  // Choosing and checking a tutor
+  hiringNigerianTutorGuide,
+  nigerianOrLocalTutorGuide,
+  redFlagsTutorGuide,
+  consultationQuestionsGuide,
+  onlineSafetyGuide,
   tutorCostGuide,
-  elevenPlusGuide,
-  ukSchoolSystemGuide,
-  movingWithChildrenGuide,
-  britishVsAmericanGuide,
   onlineTutoringWorthItGuide,
+  howMuchTutoringGuide,
+  isTutoringWorkingGuide,
+  // School systems and moving
+  ukSchoolSystemGuide,
+  usSchoolSystemGuide,
+  canadaSchoolSystemGuide,
+  movingWithChildrenGuide,
+  lowerGradeAfterMoveGuide,
+  stateVsPrivateSchoolGuide,
+  britishVsAmericanGuide,
+  // Exams
+  elevenPlusGuide,
+  grammarSchoolAdmissionsGuide,
+  spagGuide,
+  gcseGradesGuide,
   satPrepGuide,
+  satVsActGuide,
+  // Helping at home
+  busyParentsGuide,
+  mathsMethodsGuide,
+  writingHelpGuide,
+  carelessMistakesGuide,
+  independentStudyGuide,
 ];
 
 export function guideBySlug(slug: string): Guide | undefined {

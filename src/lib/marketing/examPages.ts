@@ -144,6 +144,11 @@ export const examPages: SubjectPage[] = [
     ],
     faqs: [
       {
+        question: "Are KS2 SATs the same as the SAT?",
+        answer:
+          "No. KS2 SATs are national tests taken in May of Year 6 in England. The SAT is a US college admissions test, usually taken in Grades 11 and 12. If you are looking for SAT preparation, see our SAT and ACT prep page.",
+      },
+      {
         question: "What do the KS2 SATs test?",
         answer:
           "Reading, maths (an arithmetic paper and two reasoning papers), and grammar, punctuation and spelling. Writing is assessed by your child's teacher rather than in a test.",
@@ -165,7 +170,7 @@ export const examPages: SubjectPage[] = [
     name: "Common Entrance",
     linkLabel: "Common Entrance tutoring",
     currency: "GBP",
-    title: "Common Entrance and ISEB Pre Test Tutoring Online",
+    title: "13+ Common Entrance and ISEB Pre Test Tutoring Online",
     description:
       "One to one online tutoring for independent school entry: the ISEB Common Pre Test and 13+ Common Entrance, with vetted Nigerian teachers.",
     h1: "Online tutoring for independent school entrance",
@@ -214,7 +219,7 @@ export const examPages: SubjectPage[] = [
     name: "National 5 & Highers",
     linkLabel: "National 5 and Highers tutoring",
     currency: "GBP",
-    title: "National 5 and Highers Tutoring Online in Scotland",
+    title: "National 5 and Higher Tutoring: Maths, Physics, English",
     description:
       "One to one online National 5, Higher and Advanced Higher tutoring with vetted Nigerian teachers. Maths, English and sciences, following SQA courses.",
     h1: "Online National 5 and Highers tutoring",
@@ -241,6 +246,11 @@ export const examPages: SubjectPage[] = [
       "Past paper practice is marked against SQA marking instructions, so your child learns what earns credit.",
     ],
     faqs: [
+      {
+        question: "Which National 5 and Higher subjects do you tutor?",
+        answer:
+          "Maths and applications of maths, English, biology, chemistry and physics. National 5 physics and Higher physics are among the courses we prepare students for, following the SQA course specification.",
+      },
       {
         question: "How are National 5s and Highers graded?",
         answer:

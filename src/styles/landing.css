@@ -595,6 +595,9 @@
   display: grid;
   gap: 10px;
 }
+.mkt-root .gd-body > * {
+  min-width: 0;
+}
 .mkt-root .gd-table-wrap {
   overflow-x: auto;
   border: 1px solid var(--line);
@@ -640,8 +643,12 @@
 .mkt-root .gd-sources ul {
   padding-left: 20px;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 6px;
   font-size: 15px;
+}
+.mkt-root .gd-sources li {
+  overflow-wrap: anywhere;
 }
 .mkt-root .lp-tile h3 a:hover {
   color: var(--coral-deep);
