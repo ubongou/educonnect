@@ -27,14 +27,15 @@ export const FROM_PRICES = `£${minPerSession("GBP")} / $${minPerSession("USD")}
 
 /**
  * Proof points shown under the hero and in llms.txt. Source: the admin portal.
- * Lessons per week = about 50, confirmed by Ubong on 10 Oct 2026 (up from
- * about 30 a week, mid August to end of September). Countries = where active families live. The satisfaction
+ * Lessons per week = 100+, confirmed by Ubong on 3 Nov 2026: 82 online
+ * sessions scheduled in the admin portal for the week of 9 Nov, plus in-person
+ * lessons that take it past 100 (was about 50 in Oct, about 30 Aug to Sep). Countries = where active families live. The satisfaction
  * figure was supplied by Masani; keep the survey or ratings it is based on.
  * Update these when the numbers move.
  */
 export const proofStats = [
-  // "50+": reports filed undercount lessons taught, so 50 is a floor.
-  { value: "50+", label: "one to one lessons taught every week" },
+  // "100+": 82 online scheduled plus in-person lessons. Keep it a floor.
+  { value: "100+", label: "one to one lessons taught every week" },
   // US, Canada, Trinidad and Tobago, UK, Nigeria: North America, Europe, Africa.
   { value: "5", label: "countries, across 3 continents" },
   // Confirmed by Ubong on 3 Oct 2026 as backed by Masani's own parent
