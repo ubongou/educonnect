@@ -870,8 +870,11 @@
     padding: 48px 0;
   }
   .mkt-root .ss-steps {
-    grid-template-columns: 1fr;
-    gap: 12px;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .mkt-root .ss-step {
+    padding: 16px 14px;
   }
   .mkt-root .ss-guarantees {
     grid-template-columns: 1fr;
@@ -937,5 +940,12 @@
   }
   .mkt-root .ss-booked {
     padding: 24px 16px 48px;
+  }
+}
+
+/* Phones: testimonials become a swipe row (see marketing.css). */
+@media (max-width: 600px) {
+  .mkt-root .ss-section .testi-grid > .testi {
+    flex: 0 0 84%;
   }
 }

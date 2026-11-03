@@ -2381,3 +2381,189 @@
     font-size: 14px;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Phones: compact cards so lists don't turn into a very long scroll.
+   Short cards sit two or three to a row; long-text cards become a swipe row.
+--------------------------------------------------------------------------- */
+@media (max-width: 600px) {
+  /* Subject tiles (home, /tutoring): two to a row. Restates the earlier
+     rule with enough weight to beat the later .hb-tiles auto-fit grid. */
+  .mkt-root .hb-tiles.lp-grid-subjects {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* Linked cards (exams, subjects an exam covers, guides): two to a row,
+     blurb cut to three lines. */
+  .mkt-root .lp-grid.lx-cards {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .mkt-root .lx-cards .lp-tile {
+    padding: 14px;
+    border-radius: 16px;
+  }
+  .mkt-root .lx-cards .lp-tile .hb-glyph {
+    width: 40px;
+    height: 40px;
+    font-size: 15px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+  }
+  .mkt-root .lx-cards .lp-tile h3 {
+    font-size: 15.5px;
+    line-height: 1.25;
+  }
+  .mkt-root .lx-cards .lp-tile-meta {
+    font-size: 10.5px;
+    padding: 2px 8px;
+    margin: 4px 0 6px;
+  }
+  .mkt-root .lx-cards .lp-tile p {
+    font-size: 13px;
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+  }
+  .mkt-root .lx-cards .lp-chips {
+    gap: 4px;
+    padding-top: 10px;
+  }
+  .mkt-root .lx-cards .lp-chips a,
+  .mkt-root .lx-cards .lp-chips span {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+
+  /* "What every family gets": two to a row. */
+  .mkt-root .lx-bento {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .mkt-root .lx-bento article {
+    padding: 14px;
+    border-radius: 16px;
+    gap: 6px;
+  }
+  .mkt-root .lx-bento .lx-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+  }
+  .mkt-root .lx-bento .lx-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+  .mkt-root .lx-bento h3 {
+    font-size: 15px;
+    line-height: 1.25;
+  }
+  .mkt-root .lx-bento p {
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  /* Exams by country: two to a row. */
+  .mkt-root .lp-exam-groups {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .mkt-root .lp-exam-group {
+    padding: 14px;
+    border-radius: 16px;
+  }
+  .mkt-root .lp-exam-mark {
+    font-size: 34px;
+    margin-bottom: 6px;
+  }
+  .mkt-root .lp-exam-group h3 {
+    font-size: 15px;
+  }
+  .mkt-root .lp-exam-group .lp-chips {
+    gap: 4px;
+    margin-top: 8px;
+  }
+  .mkt-root .lp-exam-group .lp-chips a {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+
+  /* Package prices on subject and country pages: three across. */
+  .mkt-root .lp-prices {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .mkt-root .lp-price {
+    padding: 14px 8px;
+    text-align: center;
+    border-radius: 16px;
+  }
+  .mkt-root .lp-price-sessions {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+  }
+  .mkt-root .lp-price-total {
+    font-size: clamp(20px, 6.4vw, 26px);
+    margin: 4px 0;
+    white-space: nowrap;
+  }
+  .mkt-root .lp-price-per {
+    font-size: 11px;
+    line-height: 1.35;
+  }
+  .mkt-root .lp-price-free {
+    font-size: 10px;
+    padding: 2px 6px;
+    margin-top: 6px;
+  }
+  .mkt-root .lp-price .lp-badge,
+  .mkt-root .lp-price [class*="badge"] {
+    font-size: 8px;
+    padding: 2px 5px;
+    white-space: nowrap;
+  }
+
+  /* Country cards on /tutoring: a swipe row. */
+  .mkt-root .hb-countries {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 10px;
+    margin: 0 calc(-1 * var(--gutter));
+    padding: 0 var(--gutter) 6px;
+    scroll-padding: 0 var(--gutter);
+    scrollbar-width: none;
+  }
+  .mkt-root .hb-countries::-webkit-scrollbar {
+    display: none;
+  }
+  .mkt-root .hb-countries > * {
+    flex: 0 0 82%;
+    scroll-snap-align: start;
+    padding: 20px;
+  }
+
+  /* The Masani Promise card: same content, tighter. */
+  .mkt-root .pp-promise {
+    padding: 20px;
+  }
+  .mkt-root .pp-promise h3 {
+    font-size: 20px;
+    margin: 6px 0 8px;
+  }
+  .mkt-root .pp-promise li {
+    padding: 7px 0;
+    font-size: 14.5px;
+    line-height: 1.45;
+  }
+
+  /* Home and landing FAQs: less padding per question. */
+  .mkt-root .lx-faq summary {
+    padding: 15px 38px 15px 0;
+    font-size: 16.5px;
+  }
+}
