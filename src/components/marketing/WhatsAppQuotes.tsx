@@ -20,6 +20,10 @@ function WhatsAppIcon({ color }: { color: string }) {
 export function WhatsAppQuotes({ quotes }: { quotes: TestimonialQuote[] }) {
   return (
     <>
+      <p className="wa-foot">
+        <WhatsAppIcon color="#1d9e75" />
+        Real messages parents sent us on WhatsApp.
+      </p>
       <div className="wa-grid">
         {quotes.map((q) => (
           <figure key={`${q.author}-${q.body.slice(0, 24)}`} className="wa-card">
@@ -41,10 +45,6 @@ export function WhatsAppQuotes({ quotes }: { quotes: TestimonialQuote[] }) {
           </figure>
         ))}
       </div>
-      <p className="wa-foot">
-        <WhatsAppIcon color="#1d9e75" />
-        Real messages parents sent us on WhatsApp, shared with their permission.
-      </p>
     </>
   );
 }

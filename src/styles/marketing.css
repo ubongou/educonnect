@@ -997,16 +997,27 @@
   border-top: 10px solid #202c33;
   border-left: 8px solid transparent;
 }
+/* Sits under the section heading, above the chats, so it never floats
+   beneath uneven columns. */
 .mkt-root .wa-foot {
-  margin: 8px 0 0;
-  font-size: 14px;
-  color: #5b6670;
-  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 0;
+  font-size: 14.5px;
+  color: var(--ink-2);
 }
 .mkt-root .wa-foot svg {
-  display: inline-block;
-  vertical-align: -5px;
-  margin-right: 8px;
+  flex-shrink: 0;
+}
+.mkt-root .wa-foot + .wa-grid {
+  margin-top: 28px;
+}
+.mkt-root .testimonials .section-head {
+  margin-bottom: 0;
+}
+.mkt-root .lp-h2 + .wa-foot {
+  margin-top: -14px;
 }
 @media (max-width: 900px) {
   .mkt-root .wa-grid {
