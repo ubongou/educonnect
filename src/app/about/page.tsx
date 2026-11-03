@@ -54,7 +54,6 @@ export default function AboutPage() {
         <section className="lp-hero">
           <div className="container hb-hero-grid">
             <div>
-              <p className="eyebrow">About Masani</p>
               <h1>
                 {defaultFounders.headingLead}
                 <em>{defaultFounders.headingHighlight}</em>

@@ -61,7 +61,6 @@ export default function ExamsPage() {
                   </li>
                 </ol>
               </nav>
-              <p className="eyebrow">UK · US · Canada · International</p>
               <h1>
                 Exams we <em>prepare</em> for
               </h1>

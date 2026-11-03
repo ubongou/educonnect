@@ -12,7 +12,6 @@ export const metadata = pageMetadata({
 export default function SafeguardingPage() {
   return (
     <LegalPage
-      eyebrow="Safeguarding"
       title="How we keep children safe"
       updated={LEGAL_UPDATED}
       intro={safeguardingIntro}

@@ -12,7 +12,6 @@ export const metadata = pageMetadata({
 export default function TermsPage() {
   return (
     <LegalPage
-      eyebrow="Terms"
       title="Terms of Service"
       updated={LEGAL_UPDATED}
       intro={termsIntro}

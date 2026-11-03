@@ -45,7 +45,6 @@ export default function GuidesIndex() {
           <div className="container">
             <div className="gx-hero-grid">
               <div>
-                <p className="eyebrow">{guides.length} guides for parents</p>
                 <h1>Straight answers for Nigerian parents abroad</h1>
               </div>
               <div className="gx-author">

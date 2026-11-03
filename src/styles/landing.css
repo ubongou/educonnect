@@ -866,12 +866,6 @@
   font-size: 13.5px;
   color: var(--ink-2);
 }
-.mkt-root .lx-tags .lx-tag-kicker {
-  background: var(--navy);
-  border-color: var(--navy);
-  color: var(--yellow);
-  font-weight: 600;
-}
 
 .mkt-root .lx-plan {
   flex: 1 1 360px;

@@ -24,7 +24,6 @@ export default function BookThanksPage() {
       <main id="main-content">
         <section className="booking" aria-labelledby="thanks-heading">
           <div className="container booking-container">
-            <span className="eyebrow">Free consultation</span>
             <h1 id="thanks-heading" className="booking-title">
               Last step: pick a time for your call
             </h1>

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import { IntakeForm } from "@/components/intake/IntakeForm";
 import { requireParent } from "@/lib/auth";
 
@@ -18,7 +17,6 @@ export default async function OnboardingPage() {
     <div className="min-h-screen bg-paper pb-24">
       <header className="bg-navy bg-dot-blue px-6 py-14 md:py-20">
         <Container>
-          <Eyebrow className="text-yellow/80">Welcome to Masani</Eyebrow>
           <h1 className="mt-2 font-heading text-[clamp(28px,4vw,44px)] font-semibold leading-[1.05] tracking-[-0.02em] text-white">
             Tell us about your child.
           </h1>

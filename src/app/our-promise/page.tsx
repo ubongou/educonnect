@@ -56,7 +56,6 @@ export default function PromisePage() {
         <section className="lp-hero">
           <div className="container hb-hero-grid">
             <div>
-              <p className="eyebrow">Our promise</p>
               <h1>
                 The Masani <em>Promise</em>
               </h1>

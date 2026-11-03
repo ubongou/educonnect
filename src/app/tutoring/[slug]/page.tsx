@@ -123,7 +123,6 @@ export default async function SubjectPage({
       />
       <LandingPage
         breadcrumb={crumbs}
-        eyebrow={isExam ? "Exam prep" : "One to one · Online"}
         tags={
           exam
             ? [countries(exam), exam.when]

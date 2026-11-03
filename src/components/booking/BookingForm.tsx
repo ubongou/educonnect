@@ -218,7 +218,6 @@ export function BookingForm({ source, subject }: BookingFormProps) {
     <section className="booking" aria-labelledby="booking-heading">
       <div className="container booking-layout">
         <div className="booking-container" ref={topRef}>
-          <span className="eyebrow">Free consultation</span>
           {showWhatsApp ? (
             <>
               <h1 id="booking-heading" className="booking-title">
@@ -554,7 +553,8 @@ export function BookingForm({ source, subject }: BookingFormProps) {
                 closing first, and what to do about each.
               </li>
               <li>
-                <strong>No obligation.</strong> There&apos;s nothing to pay today.
+                <strong>No obligation.</strong>{" "}
+                There&apos;s nothing to pay today.
               </li>
             </ol>
           </div>

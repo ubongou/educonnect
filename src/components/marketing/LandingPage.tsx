@@ -81,7 +81,6 @@ const familyIcons = [
  */
 export function LandingPage({
   breadcrumb,
-  eyebrow,
   tags = [],
   glyph,
   h1,
@@ -97,9 +96,7 @@ export function LandingPage({
   linkSections = [],
 }: {
   breadcrumb: Array<{ name: string; path: string }>;
-  /** The highlighted first chip above the H1. */
-  eyebrow: string;
-  /** Plain chips after the eyebrow: ages, countries, when it's taken. */
+  /** Plain facts above the H1: ages, countries, when it's taken. */
   tags?: string[];
   /** Large decorative mark in the hero card. */
   glyph: string;
@@ -154,12 +151,13 @@ export function LandingPage({
                   ))}
                 </ol>
               </nav>
-              <ul className="lx-tags">
-                <li className="lx-tag-kicker">{eyebrow}</li>
-                {tags.map((t) => (
-                  <li key={t}>{t}</li>
-                ))}
-              </ul>
+              {tags.length > 0 && (
+                <ul className="lx-tags">
+                  {tags.map((t) => (
+                    <li key={t}>{t}</li>
+                  ))}
+                </ul>
+              )}
               <h1 id="lp-h1">{h1}</h1>
               <p className="lp-intro">{intro}</p>
               <div className="lp-ctas">

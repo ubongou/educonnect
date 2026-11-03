@@ -16,7 +16,6 @@ export default function NotFound() {
       <main id="main-content" className="lp">
         <section className="lp-hero">
           <div className="container">
-            <p className="eyebrow">Page not found</p>
             <h1>We couldn&apos;t find that page</h1>
             <p className="lp-intro">
               The link may be old or mistyped. Here are the places most parents are

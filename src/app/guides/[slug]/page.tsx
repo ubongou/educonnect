@@ -163,7 +163,6 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
                 ))}
               </ol>
             </nav>
-            <p className="eyebrow">Guide for parents · {readMinutes(g)} min read</p>
             <h1 style={{ maxWidth: "22ch" }}>{g.h1}</h1>
             <div className="gd-byline">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -177,7 +176,8 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
                     month: "long",
                     year: "numeric",
                     timeZone: "UTC",
-                  })}
+                  })}{" "}
+                  · {readMinutes(g)} min read
                 </span>
               </div>
             </div>

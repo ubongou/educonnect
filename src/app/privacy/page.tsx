@@ -12,7 +12,6 @@ export const metadata = pageMetadata({
 export default function PrivacyPage() {
   return (
     <LegalPage
-      eyebrow="Privacy"
       title="Privacy notice"
       updated={LEGAL_UPDATED}
       intro={privacyIntro}

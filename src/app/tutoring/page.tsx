@@ -49,7 +49,6 @@ export default function TutoringHubPage() {
         <section className="lp-hero">
           <div className="container hb-hero-grid">
             <div>
-              <p className="eyebrow">One to one · Online · Primary to secondary</p>
               <h1>
                 Online tutoring for Nigerian families <em>abroad</em>
               </h1>

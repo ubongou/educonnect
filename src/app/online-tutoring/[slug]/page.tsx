@@ -69,8 +69,6 @@ export default async function CountryPage({
       />
       <LandingPage
         breadcrumb={crumbs}
-        eyebrow={`Nigerian families in ${page.country}`}
-        tags={["One to one", "Online", "In your time zone"]}
         glyph={glyphFor(page.slug, page.country)}
         h1={page.h1}
         intro={page.intro}

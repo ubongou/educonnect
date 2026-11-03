@@ -15,14 +15,12 @@ export type LegalSection = {
  * readable column, every word in the server HTML.
  */
 export function LegalPage({
-  eyebrow,
   title,
   updated,
   intro,
   sections,
   related,
 }: {
-  eyebrow: string;
   title: string;
   updated: string;
   intro: string;
@@ -38,7 +36,6 @@ export function LegalPage({
       <main id="main-content" className="lp">
         <section className="lp-hero">
           <div className="container">
-            <p className="eyebrow">{eyebrow}</p>
             <h1>{title}</h1>
             <p className="lp-sub">Last updated {updated}</p>
             <p className="lp-intro">{intro}</p>
