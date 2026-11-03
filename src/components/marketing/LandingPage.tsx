@@ -256,37 +256,7 @@ export function LandingPage({
             </section>
           ))}
 
-        {/* What every family gets */}
-        <section className="lx-dark">
-          <div className="container">
-            <h2 className="lp-h2">What every Masani family gets</h2>
-            <div className="lx-bento">
-              {everyFamilyGets.map((f, i) => (
-                <article key={f.title}>
-                  <span
-                    className={`lx-icon lx-icon-${i % 4}`}
-                    aria-hidden="true"
-                  >
-                    <svg
-                      width="22"
-                      height="22"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d={familyIcons[i % familyIcons.length]} />
-                    </svg>
-                  </span>
-                  <h3>{f.title}</h3>
-                  <p>{f.body}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
+        <FamilyBento />
 
         {/* How it works */}
         <section className="lp-section">
@@ -434,6 +404,57 @@ export function LandingPage({
       </main>
       <Footer mode="marketing" />
     </div>
+  );
+}
+
+/**
+ * "What every Masani family gets" as a dark band of icon tiles. Shared by the
+ * landing pages and the home page, where it also carries the "what sets us
+ * apart" line.
+ */
+export function FamilyBento({
+  heading = "What every Masani family gets",
+  intro,
+  headingId,
+  light = false,
+}: {
+  heading?: string;
+  intro?: string;
+  headingId?: string;
+  /** Light band, for pages where a dark section already sits next to it. */
+  light?: boolean;
+}) {
+  return (
+    <section className={`lx-dark${light ? " lx-light" : ""}`} aria-labelledby={headingId}>
+      <div className="container">
+        <h2 id={headingId} className="lp-h2">
+          {heading}
+        </h2>
+        {intro && <p className="lx-dark-intro">{intro}</p>}
+        <div className="lx-bento">
+          {everyFamilyGets.map((f, i) => (
+            <article key={f.title}>
+              <span className={`lx-icon lx-icon-${i % 4}`} aria-hidden="true">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d={familyIcons[i % familyIcons.length]} />
+                </svg>
+              </span>
+              <h3>{f.title}</h3>
+              <p>{f.body}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 

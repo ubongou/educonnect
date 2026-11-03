@@ -2,12 +2,11 @@ import "../styles/landing.css";
 import { Nav } from "@/components/ui/Nav";
 import { JsonLdScript, faqJsonLd, pageMetadata } from "@/lib/seo";
 import { homeFaqs } from "@/lib/marketing/promise";
-import { FamilyGets, HomeFaq, PricePromise, ProofStrip } from "@/components/marketing/HomeExtras";
+import { BookingBand, FamilyGets, HomeFaq, PricePromise, ProofStrip } from "@/components/marketing/HomeExtras";
 import { Footer } from "@/components/ui/Footer";
 import { ExamsOverview, GuidesSection, SubjectsSection } from "@/components/marketing/SubjectsAndExams";
 import { Hero } from "@/components/marketing/Hero";
 import { Marquee } from "@/components/marketing/Marquee";
-import { WhyGrid } from "@/components/marketing/WhyGrid";
 import { HowItWorks } from "@/components/marketing/HowItWorks";
 import { Testimonials } from "@/components/marketing/Testimonials";
 import { FoundersAbout } from "@/components/marketing/FoundersAbout";
@@ -38,8 +37,7 @@ export default function Home() {
         <Hero content={home.hero} />
         <Marquee content={home.marquee} />
         <ProofStrip />
-        <FamilyGets />
-        <WhyGrid content={home.whyGrid} />
+        <FamilyGets heading={home.whyGrid.title} intro={home.whyGrid.subtitle} />
         <HowItWorks content={home.howItWorks} />
         <SubjectsSection bookingSource="home" />
         <ExamsOverview tint />
@@ -49,6 +47,7 @@ export default function Home() {
         <GuidesSection tint />
         <FoundersAbout content={home.founders} />
         <Contact content={home.contact} />
+        <BookingBand source="home-final" />
       </main>
       <Footer mode="marketing" />
     </div>

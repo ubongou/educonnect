@@ -356,7 +356,8 @@
   padding: 24px 0 40px;
   position: relative;
 }
-.mkt-root .hero .reveal {
+.mkt-root .hero .reveal,
+.mkt-root.reveal-on .hero .reveal {
   opacity: 1;
   transform: none;
   transition: none;
@@ -1655,22 +1656,25 @@
   /* Fast on purpose. At 0.8s a quickly-scrolling phone visitor — the norm on ad
      traffic — outran the animation and saw blank sections where the content
      should be. Short enough to read as polish, not as a loading state. */
-  .mkt-root .reveal {
+  /* Hidden only once the reveal script has run (`.reveal-on`), never before
+     hydration, so a slow phone sees content immediately rather than a blank
+     page while JavaScript loads. */
+  .mkt-root.reveal-on .reveal {
     opacity: 0;
     transform: translateY(8px);
     transition: opacity 0.3s ease, transform 0.3s ease;
   }
-  .mkt-root .reveal.visible {
+  .mkt-root.reveal-on .reveal.visible {
     opacity: 1;
     transform: none;
   }
-  .mkt-root .reveal.delay-1 {
+  .mkt-root.reveal-on .reveal.delay-1 {
     transition-delay: 0.04s;
   }
-  .mkt-root .reveal.delay-2 {
+  .mkt-root.reveal-on .reveal.delay-2 {
     transition-delay: 0.08s;
   }
-  .mkt-root .reveal.delay-3 {
+  .mkt-root.reveal-on .reveal.delay-3 {
     transition-delay: 0.12s;
   }
 }

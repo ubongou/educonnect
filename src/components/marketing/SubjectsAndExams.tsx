@@ -179,7 +179,7 @@ const FEATURED_GUIDES = [
 ];
 
 export function GuidesSection({ tint = false }: { tint?: boolean }) {
-  const featured = FEATURED_GUIDES.map((slug) => guides.find((g) => g.slug === slug)).filter(
+  const [lead, ...rest] = FEATURED_GUIDES.map((slug) => guides.find((g) => g.slug === slug)).filter(
     (g) => g !== undefined,
   );
   return (
@@ -191,14 +191,39 @@ export function GuidesSection({ tint = false }: { tint?: boolean }) {
         <p className="lp-sub">
           Straight answers to the questions families ask us most, written by {GUIDE_AUTHOR.name}.
         </p>
-        <LinkCardGrid
-          cards={featured.map((g) => ({
-            title: g.shortTitle,
-            href: `/guides/${g.slug}`,
-            meta: `${readMinutes(g)} min read`,
-            body: g.description,
-          }))}
-        />
+        <div className="gx-home">
+          {lead && (
+            <article className="gx-featured">
+              <div>
+                <span className="gx-badge">Start here</span>
+                <h2>
+                  <Link href={`/guides/${lead.slug}`}>{lead.h1}</Link>
+                </h2>
+                <p>{lead.description}</p>
+                <p className="gx-read">
+                  Read the guide → <span>{readMinutes(lead)} min read</span>
+                </p>
+              </div>
+            </article>
+          )}
+          <ul className="gx-shelf-list">
+            {rest.map((g, n) => (
+              <li key={g.slug}>
+                <article className="gx-row">
+                  <span className="hb-glyph" aria-hidden="true">
+                    {String(n + 1).padStart(2, "0")}
+                  </span>
+                  <div>
+                    <h3>
+                      <Link href={`/guides/${g.slug}`}>{g.shortTitle}</Link>
+                    </h3>
+                  </div>
+                  <span>{readMinutes(g)} min →</span>
+                </article>
+              </li>
+            ))}
+          </ul>
+        </div>
         <p className="lp-sub" style={{ marginTop: 20 }}>
           <Link href="/guides" className="lp-link">
             See all {guides.length} guides

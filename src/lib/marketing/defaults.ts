@@ -20,7 +20,7 @@ import type {
 export const bundledAssets = {
   heroImage: "/brand-v2/student-hero.webp",
   mitBadge: "/brand-v2/mit-lockup-white.png",
-  dashboardImage: "/brand-v2/dashboard-preview.png",
+  dashboardImage: "/brand-v2/dashboard-preview.webp",
   founderPhotos: [
     "/brand-v2/founder-unyime.webp",
     "/brand-v2/founder-grace.jpg",

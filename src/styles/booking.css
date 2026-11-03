@@ -5,6 +5,14 @@
   padding: 56px 0 80px;
 }
 .mkt-root .booking-layout {
+  max-width: 1120px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px 56px;
+  align-items: flex-start;
+}
+.mkt-root .booking-layout > .booking-container {
+  flex: 999 1 560px;
   max-width: 720px;
 }
 .mkt-root .booking-container {
@@ -340,5 +348,100 @@
   }
   .mkt-root .booking-cal-embed {
     min-height: 560px;
+  }
+}
+
+/* Reassurance under the heading, and the side panel beside the form */
+.mkt-root .booking-reassure {
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.mkt-root .booking-reassure li {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  padding: 5px 14px 5px 32px;
+  font-size: 14px;
+  position: relative;
+}
+.mkt-root .booking-reassure li::before {
+  content: "✓";
+  position: absolute;
+  left: 13px;
+  color: #1f9d55;
+  font-weight: 700;
+}
+.mkt-root .booking-aside {
+  flex: 1 1 300px;
+  min-width: 0;
+  position: sticky;
+  top: 110px;
+  background: var(--navy);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.mkt-root .booking-aside img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+.mkt-root .booking-aside > div {
+  padding: 24px 26px 28px;
+}
+.mkt-root .booking-aside h2 {
+  font-size: 13px;
+  font-family: var(--f-body);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 16px;
+}
+.mkt-root .booking-aside ol {
+  list-style: none;
+  counter-reset: bk;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 16px;
+}
+.mkt-root .booking-aside li {
+  counter-increment: bk;
+  position: relative;
+  padding-left: 46px;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.82);
+}
+.mkt-root .booking-aside li strong {
+  color: #fff;
+}
+.mkt-root .booking-aside li::before {
+  content: counter(bk);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--yellow);
+  color: var(--ink);
+  font-family: var(--f-display);
+  font-weight: 700;
+}
+.mkt-root .booking-aside li:nth-child(2)::before { background: var(--sky); }
+.mkt-root .booking-aside li:nth-child(3)::before { background: var(--coral); }
+@media (max-width: 900px) {
+  .mkt-root .booking-aside {
+    position: static;
+  }
+  .mkt-root .booking-aside img {
+    display: none;
   }
 }

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { bundledAssets } from "@/lib/marketing/defaults";
 import type { FoundersContent } from "@/lib/marketing/schemas";
 
@@ -12,7 +13,11 @@ export function FoundersAbout({ content }: { content: FoundersContent }) {
               <em>{content.headingHighlight}</em>
             </h2>
             <p>{content.intro}</p>
-            {content.intro2 && <p>{content.intro2}</p>}
+            <p>
+              <Link href="/about" className="lp-link">
+                Read our story and how we choose teachers
+              </Link>
+            </p>
           </div>
         </div>
 
@@ -39,7 +44,9 @@ export function FoundersAbout({ content }: { content: FoundersContent }) {
                 </div>
                 <div className="founder-body">
                   <h3>{f.name}</h3>
-                  <p>{f.bio}</p>
+                  {/* First sentence only (a full stop before a capital, so "B.Sc. in" is
+                      not a break): the full story lives on /about. */}
+                  <p>{f.bio.split(/(?<=\.)\s(?=[A-Z])/)[0]}</p>
                 </div>
               </article>
             );

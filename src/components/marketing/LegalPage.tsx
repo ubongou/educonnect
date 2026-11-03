@@ -2,6 +2,7 @@ import Link from "next/link";
 import "../../styles/landing.css";
 import { Nav } from "@/components/ui/Nav";
 import { Footer } from "@/components/ui/Footer";
+import { headingAnchor } from "@/lib/marketing/anchor";
 
 export type LegalSection = {
   heading: string;
@@ -36,7 +37,7 @@ export function LegalPage({
       <Nav mode="marketing" />
       <main id="main-content" className="lp">
         <section className="lp-hero">
-          <div className="container lp-narrow">
+          <div className="container">
             <p className="eyebrow">{eyebrow}</p>
             <h1>{title}</h1>
             <p className="lp-sub">Last updated {updated}</p>
@@ -44,32 +45,44 @@ export function LegalPage({
           </div>
         </section>
         <section className="lp-section">
-          <div className="container lp-narrow legal-body">
-            {sections.map((s) => (
-              <section key={s.heading}>
-                <h2>{s.heading}</h2>
-                {s.paragraphs?.map((p) => (
-                  <p key={p}>{p}</p>
+          <div className="container gd-layout">
+            <nav className="gd-toc" aria-label="On this page">
+              <p>On this page</p>
+              <ol>
+                {sections.map((s) => (
+                  <li key={s.heading}>
+                    <a href={`#${headingAnchor(s.heading)}`}>{s.heading}</a>
+                  </li>
                 ))}
-                {s.bullets && (
-                  <ul>
-                    {s.bullets.map((b) => (
-                      <li key={b}>{b}</li>
-                    ))}
-                  </ul>
-                )}
-              </section>
-            ))}
-            {related && related.length > 0 && (
-              <p className="legal-related">
-                {related.map((r, i) => (
-                  <span key={r.href}>
-                    {i > 0 && " · "}
-                    <Link href={r.href}>{r.label}</Link>
-                  </span>
-                ))}
-              </p>
-            )}
+              </ol>
+            </nav>
+            <div className="legal-body gd-body">
+              {sections.map((s) => (
+                <section key={s.heading} id={headingAnchor(s.heading)}>
+                  <h2>{s.heading}</h2>
+                  {s.paragraphs?.map((p) => (
+                    <p key={p}>{p}</p>
+                  ))}
+                  {s.bullets && (
+                    <ul>
+                      {s.bullets.map((b) => (
+                        <li key={b}>{b}</li>
+                      ))}
+                    </ul>
+                  )}
+                </section>
+              ))}
+              {related && related.length > 0 && (
+                <p className="legal-related">
+                  {related.map((r, i) => (
+                    <span key={r.href}>
+                      {i > 0 && " · "}
+                      <Link href={r.href}>{r.label}</Link>
+                    </span>
+                  ))}
+                </p>
+              )}
+            </div>
           </div>
         </section>
       </main>

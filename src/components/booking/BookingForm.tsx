@@ -260,6 +260,14 @@ export function BookingForm({ source, subject }: BookingFormProps) {
             </p>
           )}
 
+          {shownStep !== 3 && !showWhatsApp && (
+            <ul className="booking-reassure">
+              <li>15 minutes</li>
+              <li>No obligation</li>
+              <li>Written plan in 24 hours</li>
+            </ul>
+          )}
+
           <StepIndicator step={shownStep} />
 
           {showWhatsApp ? (
@@ -527,6 +535,30 @@ export function BookingForm({ source, subject }: BookingFormProps) {
             </form>
           )}
         </div>
+        <aside className="booking-aside" aria-label="What happens on the call">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/gallery/photo-4.webp"
+            alt="A child smiling and raising her hand during an online lesson"
+            loading="lazy"
+          />
+          <div>
+            <h2>What happens on the call</h2>
+            <ol>
+              <li>
+                <strong>Fifteen minutes</strong> with one of our education experts about
+                your child.
+              </li>
+              <li>
+                <strong>A written plan within 24 hours</strong>: strengths, the gaps worth
+                closing first, and what to do about each.
+              </li>
+              <li>
+                <strong>No obligation.</strong> There&apos;s nothing to pay today.
+              </li>
+            </ol>
+          </div>
+        </aside>
       </div>
     </section>
   );

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { defaultPricingTiers } from "@/lib/marketing/defaults";
-import { everyFamilyGets } from "@/lib/marketing/seoPages";
+import { FamilyBento } from "@/components/marketing/LandingPage";
 import { GUIDE_PATH, PROMISE_PATH, homeFaqs, promiseSummary, proofStats } from "@/lib/marketing/promise";
 
 /**
@@ -10,24 +10,8 @@ import { GUIDE_PATH, PROMISE_PATH, homeFaqs, promiseSummary, proofStats } from "
  */
 
 /** Concrete promises, placed straight under the hero. */
-export function FamilyGets() {
-  return (
-    <section className="lp-section" aria-labelledby="gets-heading">
-      <div className="container">
-        <h2 id="gets-heading" className="lp-h2">
-          What every family gets
-        </h2>
-        <div className="lp-grid">
-          {everyFamilyGets.map((f) => (
-            <article key={f.title} className="lp-tile">
-              <h3>{f.title}</h3>
-              <p>{f.body}</p>
-            </article>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+export function FamilyGets({ heading, intro }: { heading: string; intro: string }) {
+  return <FamilyBento heading={heading} intro={intro} headingId="gets-heading" light />;
 }
 
 /** Price and guarantee side by side, after the testimonials. */
@@ -61,12 +45,28 @@ export function PricePromise() {
 /** Questions parents ask. Mirrors the FAQPage JSON-LD on the homepage. */
 export function HomeFaq() {
   return (
-    <section className="lp-section" aria-labelledby="home-faq-heading">
-      <div className="container lp-narrow">
-        <h2 id="home-faq-heading" className="lp-h2">
-          Questions parents ask
-        </h2>
-        <div className="lp-faq">
+    <section className="lx-faq-wrap" aria-labelledby="home-faq-heading">
+      <div className="container lx-faq-grid">
+        <div>
+          <h2 id="home-faq-heading" className="lp-h2">
+            Questions parents ask
+          </h2>
+          <ul className="lx-faq-links">
+            <li>
+              <Link href={GUIDE_PATH}>Our guide to choosing an online tutor</Link>
+            </li>
+            <li>
+              <Link href={PROMISE_PATH}>Our promise</Link>
+            </li>
+            <li>
+              <Link href="/pricing">Pricing</Link>
+            </li>
+            <li>
+              <Link href="/strategy-session">Book your free call</Link>
+            </li>
+          </ul>
+        </div>
+        <div className="lx-faq">
           {homeFaqs.map((f) => (
             <details key={f.question}>
               <summary>{f.question}</summary>
@@ -74,23 +74,21 @@ export function HomeFaq() {
             </details>
           ))}
         </div>
-        <p className="lp-sub" style={{ marginTop: 20 }}>
-          <Link href={GUIDE_PATH} className="lp-link">
-            Read our guide to choosing an online tutor
-          </Link>
-          {" · "}
-          <Link href={PROMISE_PATH} className="lp-link">
-            Our promise
-          </Link>
-          {" · "}
-          <Link href="/pricing" className="lp-link">
-            Pricing
-          </Link>
-          {" · "}
-          <Link href="/strategy-session" className="lp-link">
-            Book your free call
-          </Link>
-        </p>
+      </div>
+    </section>
+  );
+}
+
+/** One clear next step at the end of the page. */
+export function BookingBand({ source }: { source: string }) {
+  return (
+    <section className="lp-final">
+      <div className="container">
+        <h2>Start with a free, personalised learning plan</h2>
+        <p>Fifteen minutes about your child. A written plan within 24 hours. No obligation.</p>
+        <Link href={`/book?source=${source}`} className="btn btn-coral">
+          Book a free consultation
+        </Link>
       </div>
     </section>
   );

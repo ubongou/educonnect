@@ -7,6 +7,14 @@ export function MarketingScrollReveal() {
     const els = document.querySelectorAll<HTMLElement>(".mkt-root .reveal");
     if (els.length === 0) return;
 
+    // Anything already on screen (or scrolled past) stays visible, so the
+    // page never blanks out after it has painted. Only content still below
+    // the fold is hidden, and it fades in as it arrives.
+    els.forEach((el) => {
+      if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add("visible");
+    });
+    document.querySelectorAll(".mkt-root").forEach((root) => root.classList.add("reveal-on"));
+
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {

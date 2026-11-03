@@ -6,6 +6,7 @@ import { Nav } from "@/components/ui/Nav";
 import { Footer } from "@/components/ui/Footer";
 import { GUIDE_AUTHOR, guideBySlug, guides, readMinutes } from "@/lib/marketing/guides";
 import type { GuideBlock } from "@/lib/marketing/guides/types";
+import { headingAnchor } from "@/lib/marketing/anchor";
 import { relatedForGuide } from "@/lib/marketing/related";
 import {
   JsonLdScript,
@@ -31,14 +32,6 @@ export async function generateMetadata({
   const g = guideBySlug(slug);
   if (!g) return {};
   return pageMetadata({ title: g.title, description: g.description, path: `/guides/${g.slug}` });
-}
-
-/** Stable fragment id for a section heading. */
-function anchor(heading: string): string {
-  return heading
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
 }
 
 function Block({ block }: { block: GuideBlock }) {
@@ -199,7 +192,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
               <ol>
                 {g.sections.map((s) => (
                   <li key={s.heading}>
-                    <a href={`#${anchor(s.heading)}`}>{s.heading}</a>
+                    <a href={`#${headingAnchor(s.heading)}`}>{s.heading}</a>
                   </li>
                 ))}
               </ol>
@@ -209,7 +202,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
             </nav>
             <article className="gd-body">
             {g.sections.map((s) => (
-              <section key={s.heading} id={anchor(s.heading)}>
+              <section key={s.heading} id={headingAnchor(s.heading)}>
                 <h2>{s.heading}</h2>
                 {s.blocks.map((b, i) => (
                   <Block key={i} block={b} />
