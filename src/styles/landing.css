@@ -2088,3 +2088,6 @@
 .mkt-root .lx-cards .lx-card-compact h3 {
   font-size: 18px;
 }
+.mkt-root .lx-price-badge-economical {
+  background: var(--sky);
+}

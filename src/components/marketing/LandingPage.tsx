@@ -14,6 +14,7 @@ import {
   type Faq,
 } from "@/lib/marketing/seoPages";
 import { MIT_FELLOWSHIP } from "@/lib/seo";
+import type { TierBadge } from "@/lib/marketing/schemas";
 
 type Currency = "USD" | "GBP" | "CAD";
 
@@ -53,6 +54,12 @@ export type LinkCard = {
 };
 
 export type LinkSection = { title: string; intro?: string; cards: LinkCard[] };
+
+/** Same labels as the pricing page, so the two never disagree. */
+const badgeLabels: Record<TierBadge, string> = {
+  popular: "Most popular",
+  economical: "Most economical",
+};
 
 /** Icons for the "every family gets" grid, in the order of `everyFamilyGets`. */
 const familyIcons = [
@@ -122,7 +129,6 @@ export function LandingPage({
   const heroCard = approach ?? blocks[0];
   const [rows, checklist] = approach ? blocks : blocks.slice(1);
   const tiers = defaultPricingTiers.tiers;
-  const featured = Math.floor(tiers.length / 2);
 
   return (
     <div className="mkt-root">
@@ -320,15 +326,17 @@ export function LandingPage({
               </Link>
             </div>
             <div className="lp-prices lx-prices">
-              {tiers.map((t, i) => {
+              {tiers.map((t) => {
                 const p = t.prices[currency];
                 return (
                   <div
                     key={t.sessions}
-                    className={`lp-price${i === featured ? " lx-price-featured" : ""}`}
+                    className={`lp-price${t.badge === "popular" ? " lx-price-featured" : ""}`}
                   >
-                    {i === featured && (
-                      <p className="lx-price-badge">Most chosen</p>
+                    {t.badge && (
+                      <p className={`lx-price-badge lx-price-badge-${t.badge}`}>
+                        {badgeLabels[t.badge]}
+                      </p>
                     )}
                     <p className="lp-price-sessions">{t.sessions} sessions</p>
                     <p className="lp-price-total">{money(p.total, currency)}</p>
