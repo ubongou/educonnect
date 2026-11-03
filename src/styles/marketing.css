@@ -1327,6 +1327,24 @@
   border-color: var(--sky);
   color: #fff;
 }
+/* Phones: keep all four currencies on one line. */
+@media (max-width: 640px) {
+  .mkt-root .currency-toggle {
+    flex-wrap: nowrap;
+    gap: 6px;
+    margin-bottom: 32px;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .mkt-root .currency-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 10px 4px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+}
 
 /* ---------- PRICING GRID ---------- */
 .mkt-root .pricing-grid {
