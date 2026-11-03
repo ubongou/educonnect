@@ -3,9 +3,16 @@ import { bookHref } from "@/lib/booking/schema";
 import "../../styles/landing.css";
 import { Nav } from "@/components/ui/Nav";
 import { Footer } from "@/components/ui/Footer";
-import { defaultPricingTiers, defaultTestimonials } from "@/lib/marketing/defaults";
+import {
+  defaultPricingTiers,
+  defaultTestimonials,
+} from "@/lib/marketing/defaults";
 import { WhatsAppQuotes } from "@/components/marketing/WhatsAppQuotes";
-import { everyFamilyGets, howItWorks, type Faq } from "@/lib/marketing/seoPages";
+import {
+  everyFamilyGets,
+  howItWorks,
+  type Faq,
+} from "@/lib/marketing/seoPages";
 import { MIT_FELLOWSHIP } from "@/lib/seo";
 
 type Currency = "USD" | "GBP" | "CAD";
@@ -25,7 +32,9 @@ export function money(value: number, currency: Currency): string {
 
 /** Lowest per-session price across packages, for "from £x a session". */
 export function fromPrice(currency: Currency): string {
-  const min = Math.min(...defaultPricingTiers.tiers.map((t) => t.prices[currency].perSession));
+  const min = Math.min(
+    ...defaultPricingTiers.tiers.map((t) => t.prices[currency].perSession),
+  );
   return money(min, currency);
 }
 
@@ -39,12 +48,24 @@ export type LinkCard = {
   meta?: string;
   body?: string;
   tags?: Array<{ label: string; href?: string }>;
+  /** Short decorative mark shown above the title. */
+  mark?: string;
 };
 
 export type LinkSection = { title: string; intro?: string; cards: LinkCard[] };
 
+/** Icons for the "every family gets" grid, in the order of `everyFamilyGets`. */
+const familyIcons = [
+  "m12 2 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z",
+  "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h5",
+  "M2 7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zM17 10l5-3v10l-5-3z",
+  "M3 3v18h18M7 14l4-4 4 4 5-6",
+  "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2",
+  "M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3",
+];
+
 /**
- * The shared layout for search landing pages (subjects and countries).
+ * The shared layout for search landing pages (subjects, exams and countries).
  *
  * Deliberately a server component with every word in the HTML: search engines
  * and AI crawlers read the initial response, so nothing here waits on
@@ -54,6 +75,8 @@ export type LinkSection = { title: string; intro?: string; cards: LinkCard[] };
 export function LandingPage({
   breadcrumb,
   eyebrow,
+  tags = [],
+  glyph,
   h1,
   intro,
   bookingSource,
@@ -67,7 +90,12 @@ export function LandingPage({
   linkSections = [],
 }: {
   breadcrumb: Array<{ name: string; path: string }>;
+  /** The highlighted first chip above the H1. */
   eyebrow: string;
+  /** Plain chips after the eyebrow: ages, countries, when it's taken. */
+  tags?: string[];
+  /** Large decorative mark in the hero card. */
+  glyph: string;
   h1: string;
   intro: string;
   bookingSource: string;
@@ -75,10 +103,14 @@ export function LandingPage({
   bookingPageSlug?: string;
   currency: Currency;
   blocks: ListBlock[];
+  /** Shown as numbered steps in the hero card. Without it, the first block is. */
   approach?: { title: string; items: string[] };
   testimonialMatch?: RegExp;
   faqs: Faq[];
-  related: Array<{ title: string; links: Array<{ href: string; label: string }> }>;
+  related: Array<{
+    title: string;
+    links: Array<{ href: string; label: string }>;
+  }>;
   /** Linked card grids after the lists, e.g. "Exams we prepare for". */
   linkSections?: LinkSection[];
 }) {
@@ -87,6 +119,10 @@ export function LandingPage({
     ? defaultTestimonials.quotes.filter((q) => testimonialMatch.test(q.where))
     : [];
   const quotes = matched.length > 0 ? matched : defaultTestimonials.quotes;
+  const heroCard = approach ?? blocks[0];
+  const [rows, checklist] = approach ? blocks : blocks.slice(1);
+  const tiers = defaultPricingTiers.tiers;
+  const featured = Math.floor(tiers.length / 2);
 
   return (
     <div className="mkt-root">
@@ -96,86 +132,148 @@ export function LandingPage({
       <Nav mode="marketing" />
       <main id="main-content" className="lp">
         {/* Hero */}
-        <section className="lp-hero" aria-labelledby="lp-h1">
-          <div className="container">
-            <nav aria-label="Breadcrumb" className="lp-crumbs">
-              <ol>
-                {breadcrumb.map((c, i) => (
-                  <li key={c.path}>
-                    {i < breadcrumb.length - 1 ? (
-                      <Link href={c.path}>{c.name}</Link>
-                    ) : (
-                      <span aria-current="page">{c.name}</span>
-                    )}
-                  </li>
+        <section className="lx-hero" aria-labelledby="lp-h1">
+          <div className="container lx-hero-grid">
+            <div>
+              <nav aria-label="Breadcrumb" className="lp-crumbs">
+                <ol>
+                  {breadcrumb.map((c, i) => (
+                    <li key={c.path}>
+                      {i < breadcrumb.length - 1 ? (
+                        <Link href={c.path}>{c.name}</Link>
+                      ) : (
+                        <span aria-current="page">{c.name}</span>
+                      )}
+                    </li>
+                  ))}
+                </ol>
+              </nav>
+              <ul className="lx-tags">
+                <li className="lx-tag-kicker">{eyebrow}</li>
+                {tags.map((t) => (
+                  <li key={t}>{t}</li>
                 ))}
-              </ol>
-            </nav>
-            <p className="eyebrow">{eyebrow}</p>
-            <h1 id="lp-h1">{h1}</h1>
-            <p className="lp-intro">{intro}</p>
-            <div className="lp-ctas">
-              <Link href={bookingHref} className="btn btn-coral">
-                Book a free consultation
-              </Link>
-              <Link href="/pricing" className="btn btn-ghost">
-                See pricing
-              </Link>
+              </ul>
+              <h1 id="lp-h1">{h1}</h1>
+              <p className="lp-intro">{intro}</p>
+              <div className="lp-ctas">
+                <Link href={bookingHref} className="btn btn-coral">
+                  Book a free consultation
+                </Link>
+                <Link href="/pricing" className="btn btn-ghost">
+                  See pricing
+                </Link>
+              </div>
             </div>
-            <ul className="lp-trust">
-              <li>Teachers from the top 3% of applicants</li>
-              <li>From {fromPrice(currency)} a session</li>
-              <li>Selected for the MIT Social Innovation Fellowship, 2025</li>
-            </ul>
+            {heroCard && (
+              <div className="lx-plan">
+                <span className="lx-plan-glyph" aria-hidden="true">
+                  {glyph}
+                </span>
+                <h2>{heroCard.title}</h2>
+                <ol>
+                  {heroCard.items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ol>
+              </div>
+            )}
           </div>
+        </section>
+
+        {/* Proof strip */}
+        <section className="lx-proof" aria-label="Why families choose Masani">
+          <ul className="container">
+            <li>
+              <strong>Top 3%</strong>
+              <span>of teachers who apply are accepted</span>
+            </li>
+            <li>
+              <strong>From {fromPrice(currency)}</strong>
+              <span>a session, paid per package</span>
+            </li>
+            <li>
+              <strong>90 days</strong>
+              <span>
+                <Link href="/our-promise">money back promise</Link>
+              </span>
+            </li>
+            <li>
+              <strong>MIT 2025</strong>
+              <span>Social Innovation Fellowship</span>
+            </li>
+          </ul>
         </section>
 
         {/* Who it's for / what we cover */}
-        <section className="lp-section">
-          <div className="container lp-two">
-            {blocks.map((b) => (
-              <div key={b.title} className="lp-card">
-                <h2>{b.title}</h2>
-                <ul className="lp-checks">
-                  {b.items.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {linkSections.filter((s) => s.cards.length > 0).map((section) => (
-          <section key={section.title} className="lp-section">
-            <div className="container">
-              <h2 className="lp-h2">{section.title}</h2>
-              {section.intro && <p className="lp-sub">{section.intro}</p>}
-              <LinkCardGrid cards={section.cards} />
-            </div>
-          </section>
-        ))}
-
-        {approach && (
+        {(rows || checklist) && (
           <section className="lp-section">
-            <div className="container">
-              <h2 className="lp-h2">{approach.title}</h2>
-              <ol className="lp-approach">
-                {approach.items.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ol>
+            <div className="container lx-fit">
+              {rows && (
+                <div className="lx-rows">
+                  <h2 className="lp-h2">{rows.title}</h2>
+                  <ol>
+                    {rows.items.map((item, i) => (
+                      <li key={item}>
+                        <span aria-hidden="true">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        {item}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+              {checklist && (
+                <div className="lx-covers">
+                  <h2>{checklist.title}</h2>
+                  <ul>
+                    {checklist.items.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </section>
         )}
 
+        {linkSections
+          .filter((s) => s.cards.length > 0)
+          .map((section) => (
+            <section key={section.title} className="lp-section lp-tint">
+              <div className="container">
+                <h2 className="lp-h2">{section.title}</h2>
+                {section.intro && <p className="lp-sub">{section.intro}</p>}
+                <LinkCardGrid cards={section.cards} />
+              </div>
+            </section>
+          ))}
+
         {/* What every family gets */}
-        <section className="lp-section lp-tint">
+        <section className="lx-dark">
           <div className="container">
             <h2 className="lp-h2">What every Masani family gets</h2>
-            <div className="lp-grid">
-              {everyFamilyGets.map((f) => (
-                <article key={f.title} className="lp-tile">
+            <div className="lx-bento">
+              {everyFamilyGets.map((f, i) => (
+                <article key={f.title}>
+                  <span
+                    className={`lx-icon lx-icon-${i % 4}`}
+                    aria-hidden="true"
+                  >
+                    <svg
+                      width="22"
+                      height="22"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d={familyIcons[i % familyIcons.length]} />
+                    </svg>
+                  </span>
                   <h3>{f.title}</h3>
                   <p>{f.body}</p>
                 </article>
@@ -188,7 +286,7 @@ export function LandingPage({
         <section className="lp-section">
           <div className="container">
             <h2 className="lp-h2">How it works</h2>
-            <ol className="lp-steps">
+            <ol className="lx-steps">
               {howItWorks.map((s) => (
                 <li key={s.title}>
                   <h3>{s.title}</h3>
@@ -202,39 +300,50 @@ export function LandingPage({
         {/* Pricing snapshot */}
         <section className="lp-section lp-tint" aria-labelledby="lp-pricing">
           <div className="container">
-            <h2 id="lp-pricing" className="lp-h2">
-              Simple, transparent pricing
-            </h2>
-            <p className="lp-sub">
-              Pay per package, not per month. No hidden fees, and you can pause or
-              cancel with 48 hours&apos; notice. Your first 90 days are covered by{" "}
-              <Link href="/our-promise" className="lp-link">
-                our money back promise
+            <div className="lx-head">
+              <div>
+                <h2 id="lp-pricing" className="lp-h2">
+                  Simple, transparent pricing
+                </h2>
+                <p className="lp-sub">
+                  Pay per package, not per month. No hidden fees, and you can
+                  pause or cancel with 48 hours&apos; notice. Your first 90 days
+                  are covered by{" "}
+                  <Link href="/our-promise" className="lp-link">
+                    our money back promise
+                  </Link>
+                  .
+                </p>
+              </div>
+              <Link href="/pricing" className="lp-link">
+                Compare packages in pounds, dollars, Canadian dollars or naira
               </Link>
-              .
-            </p>
-            <div className="lp-prices">
-              {defaultPricingTiers.tiers.map((t) => {
+            </div>
+            <div className="lp-prices lx-prices">
+              {tiers.map((t, i) => {
                 const p = t.prices[currency];
                 return (
-                  <div key={t.sessions} className="lp-price">
+                  <div
+                    key={t.sessions}
+                    className={`lp-price${i === featured ? " lx-price-featured" : ""}`}
+                  >
+                    {i === featured && (
+                      <p className="lx-price-badge">Most chosen</p>
+                    )}
                     <p className="lp-price-sessions">{t.sessions} sessions</p>
                     <p className="lp-price-total">{money(p.total, currency)}</p>
                     <p className="lp-price-per">
                       {money(p.perSession, currency)} a session · {t.duration}
                     </p>
                     {p.free > 0 && (
-                      <p className="lp-price-free">Includes {p.free} free sessions</p>
+                      <p className="lp-price-free">
+                        Includes {p.free} free sessions
+                      </p>
                     )}
                   </div>
                 );
               })}
             </div>
-            <p className="lp-sub">
-              <Link href="/pricing" className="lp-link">
-                Compare packages in pounds, dollars, Canadian dollars or naira
-              </Link>
-            </p>
           </div>
         </section>
 
@@ -249,12 +358,21 @@ export function LandingPage({
         </section>
 
         {/* FAQ */}
-        <section className="lp-section lp-tint" aria-labelledby="lp-faq">
-          <div className="container lp-narrow">
-            <h2 id="lp-faq" className="lp-h2">
-              Frequently asked questions
-            </h2>
-            <div className="lp-faq">
+        <section className="lx-faq-wrap" aria-labelledby="lp-faq">
+          <div className="container lx-faq-grid">
+            <div>
+              <h2 id="lp-faq" className="lp-h2">
+                Questions parents ask
+              </h2>
+              <p className="lp-sub">
+                Something else on your mind? Ask us on the{" "}
+                <Link href={bookingHref} className="lp-link">
+                  free consultation
+                </Link>
+                .
+              </p>
+            </div>
+            <div className="lx-faq">
               {faqs.map((f) => (
                 <details key={f.question}>
                   <summary>{f.question}</summary>
@@ -267,16 +385,21 @@ export function LandingPage({
 
         {/* Related */}
         <section className="lp-section">
-          <div className="container lp-related">
+          <div className="container lx-related">
             {related.map((r) => (
               <nav key={r.title} aria-label={r.title}>
                 <h2>{r.title}</h2>
                 <ul>
-                  {r.links.map((l) => (
-                    <li key={l.href}>
-                      <Link href={l.href}>{l.label}</Link>
-                    </li>
-                  ))}
+                  {r.links
+                    .filter(
+                      (l, i, all) =>
+                        all.findIndex((o) => o.href === l.href) === i,
+                    )
+                    .map((l) => (
+                      <li key={l.href}>
+                        <Link href={l.href}>{l.label}</Link>
+                      </li>
+                    ))}
                 </ul>
               </nav>
             ))}
@@ -284,16 +407,20 @@ export function LandingPage({
         </section>
 
         {/* Final CTA */}
-        <section className="lp-final">
+        <section className="lx-final">
           <div className="container">
-            <h2>Start with a free, personalised learning plan</h2>
-            <p>
-              Fifteen minutes about your child. A written plan within 24 hours.
-              No obligation. {MIT_FELLOWSHIP}
-            </p>
-            <Link href={bookingHref} className="btn btn-coral">
-              Book a free consultation
-            </Link>
+            <div>
+              <div>
+                <h2>Start with a free, personalised learning plan</h2>
+                <p>
+                  Fifteen minutes about your child. A written plan within 24
+                  hours. No obligation. {MIT_FELLOWSHIP}
+                </p>
+              </div>
+              <Link href={bookingHref} className="btn lx-btn-navy">
+                Book a free consultation
+              </Link>
+            </div>
           </div>
         </section>
       </main>
@@ -309,16 +436,31 @@ export function LandingPage({
  */
 export function LinkCardGrid({ cards }: { cards: LinkCard[] }) {
   return (
-    <div className="lp-grid">
+    <div className="lp-grid lx-cards">
       {cards.map((c) => (
-        <article key={c.id ?? c.title} id={c.id} className={`lp-tile${c.href ? " lp-tile-link" : ""}`}>
+        <article
+          key={c.id ?? c.title}
+          id={c.id}
+          className={`lp-tile${c.href ? " lp-tile-link" : ""}${c.body || c.meta ? "" : " lx-card-compact"}`}
+        >
+          {c.mark && (
+            <span className="hb-glyph" aria-hidden="true">
+              {c.mark}
+            </span>
+          )}
           <h3>{c.href ? <Link href={c.href}>{c.title}</Link> : c.title}</h3>
           {c.meta && <p className="lp-tile-meta">{c.meta}</p>}
           {c.body && <p>{c.body}</p>}
           {c.tags && c.tags.length > 0 && (
             <ul className="lp-chips" aria-label={`${c.title} covers`}>
               {c.tags.map((t) => (
-                <li key={t.label}>{t.href ? <Link href={t.href}>{t.label}</Link> : <span>{t.label}</span>}</li>
+                <li key={t.label}>
+                  {t.href ? (
+                    <Link href={t.href}>{t.label}</Link>
+                  ) : (
+                    <span>{t.label}</span>
+                  )}
+                </li>
               ))}
             </ul>
           )}

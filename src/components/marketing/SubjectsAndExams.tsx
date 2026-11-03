@@ -12,6 +12,7 @@ import {
   type Exam,
 } from "@/lib/marketing/exams";
 import { GUIDE_AUTHOR, guides, readMinutes } from "@/lib/marketing/guides";
+import { glyphFor } from "@/lib/marketing/glyphs";
 
 /**
  * The Subjects, Exams and Guides blocks shared by the home page, /tutoring and
@@ -45,11 +46,14 @@ export function SubjectsSection({
           {heading}
         </h2>
         <p className="lp-sub">{intro}</p>
-        <div className="lp-grid lp-grid-subjects">
+        <div className="hb-tiles lp-grid-subjects">
           {cards.map((s) => {
             const slug = s.slug as keyof typeof SUBJECT_CARD_BLURBS;
             return (
-              <article key={s.slug} className="lp-tile lp-tile-link">
+              <article key={s.slug} className="hb-tile">
+                <span className="hb-glyph" aria-hidden="true">
+                  {glyphFor(s.slug, s.name)}
+                </span>
                 <h3>
                   <Link href={`/tutoring/${s.slug}`}>{s.name}</Link>
                 </h3>
@@ -58,7 +62,7 @@ export function SubjectsSection({
               </article>
             );
           })}
-          <article className="lp-tile lp-any">
+          <article className="hb-tile lp-any">
             <div>
               <h3>Don&apos;t see your child&apos;s subject?</h3>
               <p>Tell us what they need. We&apos;ll find the right teacher for any subject, at any level.</p>
@@ -95,7 +99,10 @@ export function ExamsOverview({ tint = false }: { tint?: boolean }) {
         </p>
         <div className="lp-exam-groups">
           {examsByCountry().map((g) => (
-            <div key={g.id} className="lp-tile lp-exam-group">
+            <div key={g.id} className="lp-exam-group">
+              <span className="lp-exam-mark" aria-hidden="true">
+                {glyphFor(g.id, g.short)}
+              </span>
               <h3>
                 {g.label}
               </h3>
@@ -131,7 +138,8 @@ export function ExamsByCountry() {
           aria-labelledby={`exams-${g.id}`}
         >
           <div className="container">
-            <h2 id={`exams-${g.id}`} className="lp-h2">
+            <h2 id={`exams-${g.id}`} className="lp-h2 lp-exam-country-h">
+              <span aria-hidden="true">{glyphFor(g.id, g.short)}</span>
               {g.label}
             </h2>
             {g.countryPageSlug && (
@@ -145,6 +153,7 @@ export function ExamsByCountry() {
               cards={g.exams.map((e) => ({
                 // Anchor ids only on the exam's first country, so they stay unique.
                 id: e.countries[0] === g.id ? e.id : undefined,
+                mark: glyphFor(e.pageSlug ?? e.id, e.shortName ?? e.name),
                 title: e.name,
                 href: examHref(e),
                 meta: e.when,

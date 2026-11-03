@@ -29,40 +29,67 @@ import { satVsActGuide } from "./sat-vs-act";
 
 export type { Guide } from "./types";
 
-/** Parent guides rendered at /guides/[slug]. Order = order on /guides. */
-export const guides: Guide[] = [
-  // Choosing and checking a tutor
-  hiringNigerianTutorGuide,
-  nigerianOrLocalTutorGuide,
-  redFlagsTutorGuide,
-  consultationQuestionsGuide,
-  onlineSafetyGuide,
-  tutorCostGuide,
-  onlineTutoringWorthItGuide,
-  howMuchTutoringGuide,
-  isTutoringWorkingGuide,
-  // School systems and moving
-  ukSchoolSystemGuide,
-  usSchoolSystemGuide,
-  canadaSchoolSystemGuide,
-  movingWithChildrenGuide,
-  lowerGradeAfterMoveGuide,
-  stateVsPrivateSchoolGuide,
-  britishVsAmericanGuide,
-  // Exams
-  elevenPlusGuide,
-  grammarSchoolAdmissionsGuide,
-  spagGuide,
-  gcseGradesGuide,
-  satPrepGuide,
-  satVsActGuide,
-  // Helping at home
-  busyParentsGuide,
-  mathsMethodsGuide,
-  writingHelpGuide,
-  carelessMistakesGuide,
-  independentStudyGuide,
+/** Guides grouped into the topic shelves on /guides, in display order. */
+export const guideTopics: Array<{ id: string; title: string; sub: string; guides: Guide[] }> = [
+  {
+    id: "choosing",
+    title: "Choosing and checking a tutor",
+    sub: "What to ask, what to watch for, and whether it is working.",
+    guides: [
+      hiringNigerianTutorGuide,
+      nigerianOrLocalTutorGuide,
+      redFlagsTutorGuide,
+      consultationQuestionsGuide,
+      onlineSafetyGuide,
+      tutorCostGuide,
+      onlineTutoringWorthItGuide,
+      howMuchTutoringGuide,
+      isTutoringWorkingGuide,
+    ],
+  },
+  {
+    id: "schools",
+    title: "School systems and moving",
+    sub: "For families relocating or settling in.",
+    guides: [
+      ukSchoolSystemGuide,
+      usSchoolSystemGuide,
+      canadaSchoolSystemGuide,
+      movingWithChildrenGuide,
+      lowerGradeAfterMoveGuide,
+      stateVsPrivateSchoolGuide,
+      britishVsAmericanGuide,
+    ],
+  },
+  {
+    id: "exams",
+    title: "Exams",
+    sub: "Timelines, formats and what to practise.",
+    guides: [
+      elevenPlusGuide,
+      grammarSchoolAdmissionsGuide,
+      spagGuide,
+      gcseGradesGuide,
+      satPrepGuide,
+      satVsActGuide,
+    ],
+  },
+  {
+    id: "home",
+    title: "Helping at home",
+    sub: "Small habits that make lessons stick.",
+    guides: [
+      busyParentsGuide,
+      mathsMethodsGuide,
+      writingHelpGuide,
+      carelessMistakesGuide,
+      independentStudyGuide,
+    ],
+  },
 ];
+
+/** Parent guides rendered at /guides/[slug]. Order = order on /guides. */
+export const guides: Guide[] = guideTopics.flatMap((t) => t.guides);
 
 export function guideBySlug(slug: string): Guide | undefined {
   return guides.find((g) => g.slug === slug);

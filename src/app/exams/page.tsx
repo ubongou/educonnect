@@ -3,7 +3,8 @@ import "../../styles/landing.css";
 import { Nav } from "@/components/ui/Nav";
 import { Footer } from "@/components/ui/Footer";
 import { ExamsByCountry } from "@/components/marketing/SubjectsAndExams";
-import { EXAMS, examHref } from "@/lib/marketing/exams";
+import { EXAMS, examHref, examsByCountry } from "@/lib/marketing/exams";
+import { glyphFor } from "@/lib/marketing/glyphs";
 import { JsonLdScript, absoluteUrl, breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
@@ -48,32 +49,50 @@ export default function ExamsPage() {
       <Nav mode="marketing" activeHref="/exams" />
       <main id="main-content" className="lp">
         <section className="lp-hero">
-          <div className="container">
-            <nav aria-label="Breadcrumb" className="lp-crumbs">
-              <ol>
-                <li>
-                  <Link href="/">Home</Link>
-                </li>
-                <li>
-                  <span aria-current="page">Exams</span>
-                </li>
-              </ol>
-            </nav>
-            <p className="eyebrow">UK · US · Canada · International</p>
-            <h1>Exams we prepare for</h1>
-            <p className="lp-intro">
-              One to one preparation for the tests and exams that shape your child&apos;s next
-              step, from primary school checks to university entrance. Each exam lists the
-              subjects it covers, so you can see exactly what your child&apos;s teacher will work on.
-            </p>
-            <div className="lp-ctas">
-              <Link href="/book?source=exams" className="btn btn-coral">
-                Book a free consultation
-              </Link>
-              <Link href="/tutoring" className="btn btn-ghost">
-                See all subjects
-              </Link>
+          <div className="container hb-hero-grid">
+            <div>
+              <nav aria-label="Breadcrumb" className="lp-crumbs">
+                <ol>
+                  <li>
+                    <Link href="/">Home</Link>
+                  </li>
+                  <li>
+                    <span aria-current="page">Exams</span>
+                  </li>
+                </ol>
+              </nav>
+              <p className="eyebrow">UK · US · Canada · International</p>
+              <h1>
+                Exams we <em>prepare</em> for
+              </h1>
+              <p className="lp-intro">
+                One to one preparation for the tests and exams that shape your child&apos;s next
+                step, from primary school checks to university entrance. Each exam lists the
+                subjects it covers, so you can see exactly what your child&apos;s teacher will work on.
+              </p>
+              <div className="lp-ctas">
+                <Link href="/book?source=exams" className="btn btn-coral">
+                  Book a free consultation
+                </Link>
+                <Link href="/tutoring" className="btn btn-ghost">
+                  See all subjects
+                </Link>
+              </div>
             </div>
+            <nav className="hb-jump" aria-labelledby="ex-jump">
+              <h2 id="ex-jump">{EXAMS.length} exams, by country</h2>
+              <ul className="ex-jump-countries">
+                {examsByCountry().map((g) => (
+                  <li key={g.id}>
+                    <a href={`#${g.id}`}>
+                      <strong aria-hidden="true">{glyphFor(g.id, g.short)}</strong>
+                      {g.label}
+                      <span>{g.exams.length} exams</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           </div>
         </section>
 

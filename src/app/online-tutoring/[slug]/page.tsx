@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { LandingPage } from "@/components/marketing/LandingPage";
+import { glyphFor } from "@/lib/marketing/glyphs";
 import { countryBySlug, countryPages, subjectOnlyPages } from "@/lib/marketing/seoPages";
 import { examHref, examsForCountryPage, subjectLink } from "@/lib/marketing/exams";
 import { guidesForCountry } from "@/lib/marketing/related";
@@ -69,6 +70,8 @@ export default async function CountryPage({
       <LandingPage
         breadcrumb={crumbs}
         eyebrow={`Nigerian families in ${page.country}`}
+        tags={["One to one", "Online", "In your time zone"]}
+        glyph={glyphFor(page.slug, page.country)}
         h1={page.h1}
         intro={page.intro}
         bookingSource="seo-country"
@@ -86,6 +89,7 @@ export default async function CountryPage({
               "Each exam lists the subjects it covers. Tap a subject to see how we teach it.",
             cards: examsForCountryPage(page.slug).map((e) => ({
               id: e.id,
+              mark: glyphFor(e.pageSlug ?? e.id, e.shortName ?? e.name),
               title: e.name,
               href: examHref(e),
               meta: e.when,

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import "../../../styles/landing.css";
 import { Nav } from "@/components/ui/Nav";
 import { Footer } from "@/components/ui/Footer";
-import { GUIDE_AUTHOR, guideBySlug, guides } from "@/lib/marketing/guides";
+import { GUIDE_AUTHOR, guideBySlug, guides, readMinutes } from "@/lib/marketing/guides";
 import type { GuideBlock } from "@/lib/marketing/guides/types";
 import { relatedForGuide } from "@/lib/marketing/related";
 import {
@@ -31,6 +31,14 @@ export async function generateMetadata({
   const g = guideBySlug(slug);
   if (!g) return {};
   return pageMetadata({ title: g.title, description: g.description, path: `/guides/${g.slug}` });
+}
+
+/** Stable fragment id for a section heading. */
+function anchor(heading: string): string {
+  return heading
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
 function Block({ block }: { block: GuideBlock }) {
@@ -148,7 +156,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
       <Nav mode="marketing" />
       <main id="main-content" className="lp">
         <section className="lp-hero">
-          <div className="container lp-narrow">
+          <div className="container">
             <nav aria-label="Breadcrumb" className="lp-crumbs">
               <ol>
                 {crumbs.map((c, i) => (
@@ -162,7 +170,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
                 ))}
               </ol>
             </nav>
-            <p className="eyebrow">Guide for parents</p>
+            <p className="eyebrow">Guide for parents · {readMinutes(g)} min read</p>
             <h1 style={{ maxWidth: "22ch" }}>{g.h1}</h1>
             <div className="gd-byline">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -184,10 +192,24 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
           </div>
         </section>
 
-        <article className="lp-section">
-          <div className="container lp-narrow gd-body">
+        <div className="lp-section">
+          <div className="container gd-layout">
+            <nav className="gd-toc" aria-label="On this page">
+              <p>On this page</p>
+              <ol>
+                {g.sections.map((s) => (
+                  <li key={s.heading}>
+                    <a href={`#${anchor(s.heading)}`}>{s.heading}</a>
+                  </li>
+                ))}
+              </ol>
+              <Link href={`/book?source=guide-${g.slug}`} className="btn btn-coral">
+                Book a free consultation
+              </Link>
+            </nav>
+            <article className="gd-body">
             {g.sections.map((s) => (
-              <section key={s.heading}>
+              <section key={s.heading} id={anchor(s.heading)}>
                 <h2>{s.heading}</h2>
                 {s.blocks.map((b, i) => (
                   <Block key={i} block={b} />
@@ -228,8 +250,9 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
                 ))}
               </ul>
             </section>
+            </article>
           </div>
-        </article>
+        </div>
 
         <section className="lp-final">
           <div className="container">

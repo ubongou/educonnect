@@ -9,8 +9,10 @@ import {
   examsByCountry,
   examsForSubject,
   subjectLink,
+  SUBJECT_CARD_AGES,
   type Exam,
 } from "@/lib/marketing/exams";
+import { glyphFor } from "@/lib/marketing/glyphs";
 import { guidesForExam, guidesForSubject } from "@/lib/marketing/related";
 import type { LinkSection } from "@/components/marketing/LandingPage";
 import {
@@ -65,6 +67,7 @@ export default async function SubjectPage({
       .join(", ");
   const examCard = (e: Exam) => ({
     id: e.id,
+    mark: glyphFor(e.pageSlug ?? e.id, e.shortName ?? e.name),
     title: e.name,
     href: examHref(e) ?? `/exams#${e.id}`,
     meta: `${countries(e)} · ${e.when}`,
@@ -80,7 +83,7 @@ export default async function SubjectPage({
               : undefined,
             cards: exam.subjects.map((ref) => {
               const l = subjectLink(ref);
-              return { id: ref, title: l.label, href: l.href };
+              return { id: ref, title: l.label, href: l.href, mark: glyphFor(ref, l.label) };
             }),
           },
         ]
@@ -120,14 +123,20 @@ export default async function SubjectPage({
       />
       <LandingPage
         breadcrumb={crumbs}
-        eyebrow={`${page.name} · One to one · Online`}
+        eyebrow={isExam ? "Exam prep" : "One to one · Online"}
+        tags={
+          exam
+            ? [countries(exam), exam.when]
+            : [SUBJECT_CARD_AGES[page.slug as keyof typeof SUBJECT_CARD_AGES] ?? "Primary to secondary"]
+        }
+        glyph={glyphFor(page.slug, page.name)}
         h1={page.h1}
         intro={page.intro}
         bookingSource="seo-subject"
         bookingPageSlug={page.slug}
         currency={page.currency ?? "USD"}
         blocks={[
-          { title: "Who it's for", items: page.whoFor },
+          { title: "Is this right for your child?", items: page.whoFor },
           { title: page.coversTitle, items: page.covers },
         ]}
         approach={{ title: "How lessons work", items: page.approach }}

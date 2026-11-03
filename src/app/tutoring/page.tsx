@@ -2,7 +2,10 @@ import Link from "next/link";
 import "../../styles/landing.css";
 import { Nav } from "@/components/ui/Nav";
 import { Footer } from "@/components/ui/Footer";
-import { countryPages, subjectOnlyPages } from "@/lib/marketing/seoPages";
+import { countryPages, examPrepPages, subjectOnlyPages } from "@/lib/marketing/seoPages";
+import { subjectCards } from "@/lib/marketing/exams";
+import { glyphFor } from "@/lib/marketing/glyphs";
+import { fromPrice } from "@/components/marketing/LandingPage";
 import { ExamsOverview, SubjectsSection } from "@/components/marketing/SubjectsAndExams";
 import { JsonLdScript, absoluteUrl, breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 
@@ -44,22 +47,48 @@ export default function TutoringHubPage() {
       <Nav mode="marketing" activeHref="/tutoring" />
       <main id="main-content" className="lp">
         <section className="lp-hero">
-          <div className="container">
-            <p className="eyebrow">One to one · Online · Primary to secondary</p>
-            <h1>Online tutoring for Nigerian families abroad</h1>
-            <p className="lp-intro">
-              Private lessons with carefully vetted Nigerian teachers, following
-              your child&apos;s own school curriculum, in your own time zone. Choose
-              a subject, find your child&apos;s exam, or see how we work in your country.
-            </p>
-            <div className="lp-ctas">
-              <Link href="/book?source=seo-subject" className="btn btn-coral">
-                Book a free consultation
-              </Link>
-              <Link href="/pricing" className="btn btn-ghost">
-                See pricing
-              </Link>
+          <div className="container hb-hero-grid">
+            <div>
+              <p className="eyebrow">One to one · Online · Primary to secondary</p>
+              <h1>
+                Online tutoring for Nigerian families <em>abroad</em>
+              </h1>
+              <p className="lp-intro">
+                Private lessons with carefully vetted Nigerian teachers, following
+                your child&apos;s own school curriculum, in your own time zone. Choose
+                a subject, find your child&apos;s exam, or see how we work in your country.
+              </p>
+              <div className="lp-ctas">
+                <Link href="/book?source=seo-subject" className="btn btn-coral">
+                  Book a free consultation
+                </Link>
+                <Link href="/pricing" className="btn btn-ghost">
+                  See pricing
+                </Link>
+              </div>
             </div>
+            <nav className="hb-jump" aria-labelledby="hb-jump">
+              <h2 id="hb-jump">Jump to</h2>
+              <ul>
+                {examPrepPages.slice(0, 2).map((s) => (
+                  <li key={s.slug} className="hb-jump-exam">
+                    <Link href={`/tutoring/${s.slug}`}>{s.linkLabel}</Link>
+                  </li>
+                ))}
+                {subjectCards().map((s) => (
+                  <li key={s.slug}>
+                    <Link href={`/tutoring/${s.slug}`}>{s.name}</Link>
+                  </li>
+                ))}
+                <li>
+                  <Link href="/exams">All exams →</Link>
+                </li>
+              </ul>
+              <p>
+                ✓ Teachers from the top 3% of applicants &nbsp; ✓ From {fromPrice("USD")} a
+                session
+              </p>
+            </nav>
           </div>
         </section>
 
@@ -77,18 +106,30 @@ export default function TutoringHubPage() {
             <h2 id="countries" className="lp-h2">
               Where we teach
             </h2>
-            <div className="lp-grid">
-              {countryPages.map((c) => (
-                <Link key={c.slug} href={`/online-tutoring/${c.slug}`} className="lp-tile">
-                  <h3>{c.areaServed}</h3>
-                  <p>{c.description}</p>
-                </Link>
-              ))}
-            </div>
             <p className="lp-sub">
               Families elsewhere, including Australia and Nigeria, are welcome too.
               Lessons are online and scheduled in your local time.
             </p>
+            <div className="hb-countries">
+              {countryPages.map((c) => (
+                <Link key={c.slug} href={`/online-tutoring/${c.slug}`} className="hb-country">
+                  <strong aria-hidden="true">{glyphFor(c.slug, c.country)}</strong>
+                  <h3>{c.areaServed}</h3>
+                  <p>{c.description}</p>
+                  <span className="hb-more">Tutoring in {c.country} →</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="lp-final">
+          <div className="container">
+            <h2>Not sure where to start? Start with a free plan.</h2>
+            <p>Fifteen minutes about your child. A written plan within 24 hours. No obligation.</p>
+            <Link href="/book?source=tutoring-final" className="btn btn-coral">
+              Book a free consultation
+            </Link>
           </div>
         </section>
       </main>
