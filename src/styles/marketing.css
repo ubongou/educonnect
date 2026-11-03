@@ -2032,3 +2032,237 @@
     margin-bottom: 0;
   }
 }
+
+/* ---------- PRICING: Masani next to a local tutor ---------- */
+.mkt-root .cmp-section {
+  padding: 24px 0 64px;
+}
+.mkt-root .cmp-section .container {
+  max-width: 1000px;
+}
+.mkt-root .cmp-title {
+  font-family: var(--f-display);
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-align: center;
+  margin: 0 0 10px;
+}
+.mkt-root .cmp-intro {
+  color: var(--ink-2);
+  text-align: center;
+  font-size: 17px;
+  max-width: 600px;
+  margin: 0 auto 28px;
+}
+.mkt-root .cmp-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  overflow: hidden;
+  font-size: 16px;
+}
+.mkt-root .cmp-table th,
+.mkt-root .cmp-table td {
+  padding: 15px 20px;
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--line);
+}
+.mkt-root .cmp-table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.mkt-root .cmp-table thead th {
+  padding: 20px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.mkt-root .cmp-table tbody th {
+  font-weight: 600;
+  color: var(--ink);
+  width: 34%;
+}
+.mkt-root .cmp-m {
+  background: #fff4ef;
+}
+.mkt-root .cmp-logo {
+  display: block;
+  height: 30px;
+  width: auto;
+}
+.mkt-root .cmp-group > * {
+  background: var(--paper-2);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-2) !important;
+  padding: 10px 20px !important;
+}
+.mkt-root .cmp-group > .cmp-m {
+  background: #fbe9e1;
+}
+.mkt-root .cmp-sub {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.mkt-root .cmp-price {
+  color: var(--ink-2);
+  font-size: 17px;
+}
+.mkt-root .cmp-m.cmp-price {
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 18px;
+}
+.mkt-root .cmp-save {
+  display: inline-block;
+  margin-left: 8px;
+  background: #e6f5ed;
+  color: #1d9e75;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  vertical-align: 2px;
+  white-space: nowrap;
+}
+.mkt-root .cmp-note {
+  color: var(--ink-2);
+  font-size: 15px;
+}
+.mkt-root .cmp-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--ink-2);
+}
+.mkt-root .cmp-mark.cmp-yes {
+  color: var(--ink);
+  font-weight: 600;
+}
+.mkt-root .cmp-dot {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 800;
+}
+.mkt-root .cmp-yes .cmp-dot { background: #e6f5ed; color: #1d9e75; }
+.mkt-root .cmp-some .cmp-dot { background: #fff5dd; color: #b77d00; }
+.mkt-root .cmp-no .cmp-dot { background: #f2efe8; color: #8a949b; }
+.mkt-root .cmp-foot {
+  font-size: 13px;
+  color: var(--ink-2);
+  margin: 12px 0 0;
+}
+.mkt-root .cmp-foot a {
+  color: inherit;
+  text-decoration: underline;
+}
+.mkt-root .cmp-callout {
+  margin-top: 24px;
+  background: var(--navy);
+  color: #fff;
+  border-radius: 18px;
+  padding: 22px 26px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+}
+.mkt-root .cmp-callout p {
+  margin: 0;
+  font-size: 17px;
+}
+.mkt-root .cmp-callout strong {
+  color: var(--yellow);
+  font-family: var(--f-display);
+  font-size: 26px;
+}
+.mkt-root .cmp-sources {
+  padding: 40px 0 56px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 90px;
+}
+.mkt-root .cmp-sources h2 {
+  font-family: var(--f-display);
+  font-size: 20px;
+  margin: 0 0 8px;
+}
+.mkt-root .cmp-sources p {
+  color: var(--ink-2);
+  font-size: 14.5px;
+  max-width: 680px;
+  margin: 0 0 12px;
+}
+.mkt-root .cmp-sources ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 14.5px;
+  line-height: 1.8;
+}
+.mkt-root .cmp-sources a {
+  color: var(--ink);
+  text-decoration: underline;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 600px) {
+  .mkt-root .cmp-section {
+    padding: 16px 0 48px;
+  }
+  .mkt-root .cmp-table {
+    font-size: 14px;
+  }
+  .mkt-root .cmp-table th,
+  .mkt-root .cmp-table td {
+    padding: 12px 10px;
+  }
+  .mkt-root .cmp-table thead th {
+    padding: 14px 10px;
+    font-size: 13px;
+  }
+  .mkt-root .cmp-table tbody th {
+    width: 32%;
+  }
+  .mkt-root .cmp-logo {
+    height: 22px;
+  }
+  .mkt-root .cmp-group > * {
+    padding: 8px 10px !important;
+    font-size: 11.5px;
+  }
+  .mkt-root .cmp-price {
+    font-size: 14.5px;
+  }
+  .mkt-root .cmp-m.cmp-price {
+    font-size: 15.5px;
+  }
+  .mkt-root .cmp-save {
+    display: table;
+    margin: 4px 0 0;
+  }
+  .mkt-root .cmp-mark {
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .mkt-root .cmp-dot {
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
+    margin-top: 1px;
+  }
+  .mkt-root .cmp-callout {
+    padding: 20px;
+  }
+}

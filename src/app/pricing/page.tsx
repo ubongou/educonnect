@@ -4,6 +4,7 @@ import { PromiseCard } from "@/components/marketing/HomeExtras";
 import { Footer } from "@/components/ui/Footer";
 import { PricingTable } from "@/components/marketing/PricingTable";
 import { PricingFAQ } from "@/components/marketing/PricingFAQ";
+import { PriceComparisonSources } from "@/components/marketing/PriceComparison";
 import { MarketingScrollReveal } from "@/components/marketing/MarketingScrollReveal";
 import { getPricingContent } from "@/lib/marketing/content";
 import { JsonLdScript, faqJsonLd, pageMetadata, serviceJsonLd } from "@/lib/seo";
@@ -46,6 +47,7 @@ export default function PricingPage() {
           </div>
         </section>
         <PricingFAQ content={pricing.faq} />
+        <PriceComparisonSources />
       </main>
       <Footer mode="marketing" />
     </div>
