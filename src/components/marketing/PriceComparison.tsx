@@ -106,14 +106,17 @@ export function PriceComparison({
               {local ? (
                 <>
                   <tr>
-                    <th scope="row">Per session</th>
+                    <th scope="row">
+                      Per session
+                      <span className="cmp-sub">one hour</span>
+                    </th>
                     <td className="cmp-price">
                       {money(symbol, local.low)} – {money(symbol, local.high)}
                       <span className="cmp-sub">an hour</span>
                     </td>
                     <td className="cmp-m cmp-price">
                       {money(symbol, minPer)} – {money(symbol, maxPer)}
-                      <span className="cmp-sub">depends on package</span>
+                      <span className="cmp-sub">for a one hour session</span>
                     </td>
                   </tr>
                   {tiers.tiers.map((t) => {
@@ -181,7 +184,7 @@ export function PriceComparison({
         {local && (
           <p className="cmp-foot">
             Local prices are typical hourly rates for one to one private tutoring in {local.country}, checked
-            November 2026. <a href="#sources">Sources</a>
+            November 2026. Every Masani session is one hour, so the two columns compare like for like. <a href="#sources">Sources</a>
           </p>
         )}
 
