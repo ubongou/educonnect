@@ -1044,6 +1044,7 @@
   background: var(--navy);
   color: #fff;
   padding: clamp(56px, 8vw, 96px) 0;
+  scroll-margin-top: 80px;
 }
 .mkt-root .lx-dark .lp-h2 {
   color: #fff;

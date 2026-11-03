@@ -11,7 +11,7 @@ import { GUIDE_PATH, PROMISE_PATH, homeFaqs, promiseSummary, proofStats } from "
 
 /** Concrete promises, placed straight under the hero. */
 export function FamilyGets({ heading, intro }: { heading: string; intro: string }) {
-  return <FamilyBento heading={heading} intro={intro} headingId="gets-heading" light />;
+  return <FamilyBento heading={heading} intro={intro} headingId="gets-heading" id="why" light />;
 }
 
 /** Price and guarantee side by side, after the testimonials. */

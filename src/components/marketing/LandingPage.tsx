@@ -414,16 +414,19 @@ export function FamilyBento({
   heading = "What every Masani family gets",
   intro,
   headingId,
+  id,
   light = false,
 }: {
   heading?: string;
   intro?: string;
   headingId?: string;
+  /** Anchor target, e.g. "why" for the nav's /#why link. */
+  id?: string;
   /** Light band, for pages where a dark section already sits next to it. */
   light?: boolean;
 }) {
   return (
-    <section className={`lx-dark${light ? " lx-light" : ""}`} aria-labelledby={headingId}>
+    <section id={id} className={`lx-dark${light ? " lx-light" : ""}`} aria-labelledby={headingId}>
       <div className="container">
         <h2 id={headingId} className="lp-h2">
           {heading}
