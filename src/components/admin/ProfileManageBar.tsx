@@ -9,7 +9,9 @@ import { AdminProfileEditForm } from "@/components/admin/AdminProfileEditForm";
 import {
   deleteProfile,
   reassignTeacher,
+  sendPasswordResetAsAdmin,
   setProfileActive,
+  setTemporaryPasswordAsAdmin,
 } from "@/lib/actions/users";
 import {
   profileCascadeLines,
@@ -69,8 +71,12 @@ export function ProfileManageBar({
   // Dialog state lives here (not inside ActionMenu) so it survives the menu
   // closing on click.
   const [dialog, setDialog] = useState<
-    "deactivate" | "reactivate" | "delete" | null
+    "deactivate" | "reactivate" | "delete" | "sendReset" | "tempPassword" | null
   >(null);
+  // Shown once after "Set temporary password" so the admin can pass it on.
+  const [tempPassword, setTempPassword] = useState<string | null>(null);
+  const [resetSent, setResetSent] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const hasHistory = profileCascadeTotal(cascade) > 0;
 
@@ -95,6 +101,16 @@ export function ProfileManageBar({
           <ActionMenuItem onClick={() => setEditing(true)}>
             Edit details
           </ActionMenuItem>
+          {active && email && (
+            <ActionMenuItem onClick={() => setDialog("sendReset")}>
+              Send password reset email
+            </ActionMenuItem>
+          )}
+          {active && (
+            <ActionMenuItem onClick={() => setDialog("tempPassword")}>
+              Set temporary password
+            </ActionMenuItem>
+          )}
           {active ? (
             <ActionMenuItem tone="danger" onClick={() => setDialog("deactivate")}>
               Deactivate
@@ -162,6 +178,52 @@ export function ProfileManageBar({
       />
 
       <ConfirmDialog
+        open={dialog === "sendReset"}
+        onOpenChange={(o) => setDialog(o ? "sendReset" : null)}
+        title={`Send ${fullName} a password reset email`}
+        tone="default"
+        confirmLabel="Send email"
+        description={
+          <p>
+            We&apos;ll email <strong>{email}</strong> a code they can type in on the
+            forgot-password page to choose a new password. Their current password keeps
+            working until they do.
+          </p>
+        }
+        onConfirm={() => sendPasswordResetAsAdmin(profileId)}
+        onSuccess={() => {
+          setTempPassword(null);
+          setResetSent(true);
+        }}
+      />
+
+      <ConfirmDialog
+        open={dialog === "tempPassword"}
+        onOpenChange={(o) => setDialog(o ? "tempPassword" : null)}
+        title={`Set a temporary password for ${fullName}`}
+        tone="default"
+        confirmLabel="Set temporary password"
+        description={
+          <p>
+            Their current password stops working straight away. You&apos;ll see the new one
+            once, to send them (e.g. on WhatsApp). They can change it later from their
+            account page.
+          </p>
+        }
+        onConfirm={async () => {
+          const res = await setTemporaryPasswordAsAdmin(profileId);
+          if (res.ok) {
+            setResetSent(false);
+            setCopied(false);
+            setTempPassword(res.password);
+            return { ok: true };
+          }
+          return res;
+        }}
+        onSuccess={() => {}}
+      />
+
+      <ConfirmDialog
         open={dialog === "reactivate"}
         onOpenChange={(o) => setDialog(o ? "reactivate" : null)}
         title={`Reactivate ${fullName}`}
@@ -186,6 +248,56 @@ export function ProfileManageBar({
         onConfirm={() => deleteProfile(profileId, hasHistory)}
         onSuccess={() => router.push(listHref)}
       />
+
+      {resetSent && (
+        <p
+          role="status"
+          className="max-w-[360px] rounded-md border border-blue/30 bg-blue/10 px-3 py-2 text-right text-[13px] text-navy"
+        >
+          Reset email sent to {email}. Ask them to check spam if it doesn&apos;t arrive in a
+          few minutes.
+        </p>
+      )}
+
+      {tempPassword && (
+        <div
+          role="status"
+          className="flex max-w-[360px] flex-col gap-2 rounded-md border border-blue/30 bg-blue/10 px-3 py-3 text-[13px] text-navy"
+        >
+          <p>
+            Temporary password for {fullName} (shown once; copy it now):
+          </p>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 rounded border border-line bg-white px-2 py-1 font-mono text-[15px] tracking-[0.05em]">
+              {tempPassword}
+            </code>
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(tempPassword);
+                  setCopied(true);
+                } catch {
+                  setCopied(false);
+                }
+              }}
+              className="font-heading text-[12px] font-semibold underline-offset-4 hover:underline"
+            >
+              {copied ? "Copied" : "Copy"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setTempPassword(null)}
+              className="font-heading text-[12px] font-semibold text-g600 underline-offset-4 hover:underline"
+            >
+              Done
+            </button>
+          </div>
+          <p className="text-g600">
+            They sign in with {email || "their email"} and this password.
+          </p>
+        </div>
+      )}
 
       {editing && (
         <div className="w-full">

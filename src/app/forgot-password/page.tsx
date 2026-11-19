@@ -20,7 +20,7 @@ export default async function ForgotPasswordPage({
   return (
     <AuthShell
       title={<>Reset your password.</>}
-      subtitle="Enter the email tied to your Masani account — we'll email you a link to set a new password."
+      subtitle="Enter the email tied to your Masani account. We'll email you a code to set a new password."
       footer={
         <>
           Remembered it?{" "}

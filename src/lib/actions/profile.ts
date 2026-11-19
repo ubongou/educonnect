@@ -1,20 +1,12 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { requestOrigin } from "@/lib/server/requestOrigin";
 import { loginSchema } from "@/lib/validation";
 import type { Role } from "@/types/domain";
 
-async function requestOrigin(): Promise<string> {
-  const h = await headers();
-  const proto = h.get("x-forwarded-proto") ?? "https";
-  const host = h.get("x-forwarded-host") ?? h.get("host");
-  if (host) return `${proto}://${host}`;
-  return process.env.APP_URL ?? "";
-}
-
-export type AuthActionState = { ok: boolean; error?: string } | null;
+export type AuthActionState = { ok: boolean; error?: string; email?: string } | null;
 
 /**
  * Where to land after sign-in. Accepts only a same-site absolute path, so a
@@ -87,7 +79,54 @@ export async function requestPasswordReset(
   const origin = await requestOrigin();
   const redirectTo = `${origin}/auth/callback?next=/reset-password`;
   const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
-  return error ? { ok: false, error: error.message } : { ok: true };
+  return error ? { ok: false, error: error.message } : { ok: true, email };
+}
+
+/**
+ * Step two of forgot-password: the parent types the code from the reset email
+ * and a new password on the same page. No link to open, so it works whatever
+ * device or mail app the email is read on, and a mail scanner pre-opening the
+ * link can't use it up.
+ */
+export async function resetPasswordWithCode(
+  _prev: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  const email = String(formData.get("email") ?? "").trim();
+  const code = String(formData.get("code") ?? "").replace(/\s+/g, "");
+  const password = String(formData.get("password") ?? "");
+  const confirm = String(formData.get("confirm_password") ?? "");
+
+  if (!email) return { ok: false, error: "Email is required", email };
+  if (!/^\d{6,10}$/.test(code)) {
+    return { ok: false, error: "Enter the code from the email (numbers only).", email };
+  }
+  if (password.length < 8) {
+    return { ok: false, error: "Password must be at least 8 characters", email };
+  }
+  if (password !== confirm) {
+    return { ok: false, error: "Passwords do not match", email };
+  }
+
+  const supabase = await createClient();
+  const { error: verifyErr } = await supabase.auth.verifyOtp({
+    email,
+    token: code,
+    type: "recovery",
+  });
+  if (verifyErr) {
+    return {
+      ok: false,
+      error: "That code is wrong or has expired. Check the latest email, or send a new code.",
+      email,
+    };
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) return { ok: false, error: error.message, email };
+
+  await supabase.auth.signOut();
+  redirect(`/login?reset=1&email=${encodeURIComponent(email)}`);
 }
 
 export async function resetPassword(
