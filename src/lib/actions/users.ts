@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
+import { requestOrigin } from "@/lib/server/requestOrigin";
 import { adminProfileUpdateSchema } from "@/lib/validation";
 import type { ProfileCascade } from "@/lib/admin/profileCascade";
 
@@ -342,4 +343,61 @@ export async function deleteProfile(
   revalidatePath("/admin/enrollments");
   revalidatePath("/admin");
   return { ok: true };
+}
+
+/**
+ * Admin-only: email a parent or teacher a password reset code (and link), the
+ * same email they'd get from /forgot-password. For when someone is stuck and
+ * asks the team for help.
+ */
+export async function sendPasswordResetAsAdmin(
+  profileId: string,
+): Promise<UserMutationResult> {
+  await requireAdmin();
+  const supabase = await createClient();
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("email")
+    .eq("id", profileId)
+    .maybeSingle();
+  if (!profile?.email) return { ok: false, error: "This account has no email address." };
+
+  // Service-role client: it keeps no cookies, so nothing is written into the
+  // admin's own browser session.
+  const admin = createServiceRoleClient();
+  const origin = await requestOrigin();
+  const { error } = await admin.auth.resetPasswordForEmail(profile.email, {
+    redirectTo: `${origin}/auth/callback?next=/reset-password`,
+  });
+  if (error) return { ok: false, error: `Couldn't send the email: ${error.message}` };
+  return { ok: true };
+}
+
+/** Easy-to-read characters only: no 0/O, 1/l/I. */
+const TEMP_PASSWORD_ALPHABET = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+function generateTempPassword(length = 10): string {
+  const bytes = new Uint32Array(length);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => TEMP_PASSWORD_ALPHABET[b % TEMP_PASSWORD_ALPHABET.length]).join(
+    "",
+  );
+}
+
+/**
+ * Admin-only: replace a parent's or teacher's password with a generated
+ * temporary one and return it once so the admin can pass it on (e.g. by
+ * WhatsApp). For when the reset email isn't reaching them at all. They can
+ * change it afterwards from their profile page.
+ */
+export async function setTemporaryPasswordAsAdmin(
+  profileId: string,
+): Promise<{ ok: true; password: string } | { ok: false; error: string }> {
+  await requireAdmin();
+  const password = generateTempPassword();
+  const admin = createServiceRoleClient();
+  const { error } = await admin.auth.admin.updateUserById(profileId, { password });
+  if (error) return { ok: false, error: `Couldn't set the password: ${error.message}` };
+  return { ok: true, password };
 }
