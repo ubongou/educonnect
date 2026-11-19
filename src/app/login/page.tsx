@@ -13,9 +13,9 @@ export const metadata: Metadata = {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ from?: string; email?: string; reset?: string }>;
+  searchParams: Promise<{ from?: string; email?: string; reset?: string; error?: string }>;
 }) {
-  const { email, reset, from } = await searchParams;
+  const { email, reset, from, error } = await searchParams;
 
   return (
     <AuthShell
@@ -36,6 +36,18 @@ export default async function LoginPage({
           className="mb-5 rounded-md border-[1.5px] border-blue/40 bg-blue/10 px-3 py-2 text-[13px] font-semibold text-blue"
         >
           Password updated. Sign in with your new password.
+        </p>
+      )}
+      {error && !reset && (
+        <p
+          role="alert"
+          className="mb-5 rounded-md border-[1.5px] border-coral/40 bg-coral/10 px-3 py-2 text-[13px] font-semibold text-coral"
+        >
+          That link didn&apos;t work. It may have expired or already been used. Sign in, or{" "}
+          <Link href="/forgot-password" className="underline underline-offset-4">
+            request a new password reset link
+          </Link>
+          .
         </p>
       )}
       <LoginForm defaultEmail={email} from={from} />
